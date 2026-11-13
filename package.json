@@ -32,5 +32,9 @@
     "@types/react-dom": "^19.0.0",
     "tailwindcss": "^4.3.5",
     "typescript": "^5.9.0"
+  },
+  "//overrides": "deepmerge-ts is forced to 8.x to fix CVE-2026-40345 (pulled in by prisma > @prisma/config, which pins 7.1.5).",
+  "overrides": {
+    "deepmerge-ts": "^8.0.2"
   }
 }
