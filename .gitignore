@@ -1,0 +1,25 @@
+# dependencies
+/node_modules
+
+# next.js
+/.next/
+/out/
+next-env.d.ts
+*.tsbuildinfo
+
+# environment — never commit real credentials
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# local database + uploads (content lives on the server, not in git)
+/prisma/*.db
+/prisma/*.db-journal
+/uploads/
+
+# misc
+.DS_Store
+Thumbs.db
+npm-debug.log*
+/coverage

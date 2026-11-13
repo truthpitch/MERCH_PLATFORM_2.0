@@ -1,0 +1,58 @@
+// Prisma schema — custom content managed from the admin panel.
+// Products, prices, cart and checkout live in Shopify; this database only
+// stores what Shopify doesn't: homepage content, featured order, product
+// stories ("MORE INFO"), uploaded media and the maintenance switch.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  // Set DATABASE_URL in .env. Relative paths resolve from this /prisma folder.
+  // On Hostinger, use an absolute path OUTSIDE the app folder so redeploys
+  // don't wipe it, e.g. file:/home/<user>/truthpitch-data/store.db
+  url      = env("DATABASE_URL")
+}
+
+// Single row (id = 1) holding site-wide settings.
+model SiteSettings {
+  id                  Int      @id @default(1)
+  maintenanceMode     Boolean  @default(false)
+  maintenanceMessage  String   @default("We're making a few changes behind the scenes. Please check back shortly.")
+  announcementEnabled Boolean  @default(false)
+  announcementText    String   @default("")
+  heroTitle           String   @default("Merch with a message.")
+  heroSubtitle        String   @default("Clean, honest essentials from TruthPitch. Printed on demand, made to last.")
+  heroCtaLabel        String   @default("Shop the collection")
+  heroImageUrl        String   @default("")
+  aboutTitle          String   @default("About TruthPitch")
+  aboutText           String   @default("TruthPitch is about saying what matters, plainly. This shop carries a small, considered range of pieces that carry that idea with them.\n\nEvery item is printed on demand when you order it, which means less waste and no warehouses full of unsold stock.")
+  updatedAt           DateTime @updatedAt
+}
+
+// Products chosen for the homepage, in display order. Keyed by Shopify handle.
+model FeaturedProduct {
+  id        Int      @id @default(autoincrement())
+  handle    String   @unique
+  position  Int
+  createdAt DateTime @default(now())
+}
+
+// The story shown in the "MORE INFO" section of a product page.
+model ProductStory {
+  handle    String   @id
+  story     String   @default("")
+  imageUrl  String   @default("")
+  updatedAt DateTime @updatedAt
+}
+
+// Images uploaded through the admin panel (files live in UPLOAD_DIR).
+model Media {
+  id           Int      @id @default(autoincrement())
+  filename     String   @unique
+  originalName String
+  mimeType     String
+  size         Int
+  createdAt    DateTime @default(now())
+}

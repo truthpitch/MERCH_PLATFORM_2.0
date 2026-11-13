@@ -1,0 +1,36 @@
+{
+  "name": "truthpitch-merch",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Minimal merch store for TruthPitch.com — Next.js storefront on Shopify + Printful, with a small admin panel.",
+  "//scripts": "Tools are called via `node node_modules/...` instead of their bin shims so scripts also work in folders whose path contains & or ( ) on Windows.",
+  "scripts": {
+    "dev": "node node_modules/next/dist/bin/next dev",
+    "build": "node node_modules/prisma/build/index.js generate && node node_modules/next/dist/bin/next build",
+    "start": "node node_modules/prisma/build/index.js migrate deploy && node node_modules/next/dist/bin/next start",
+    "postinstall": "node node_modules/prisma/build/index.js generate",
+    "typecheck": "node node_modules/typescript/bin/tsc --noEmit",
+    "db:migrate": "node node_modules/prisma/build/index.js migrate dev",
+    "db:deploy": "node node_modules/prisma/build/index.js migrate deploy",
+    "db:studio": "node node_modules/prisma/build/index.js studio"
+  },
+  "engines": {
+    "node": ">=20.9.0"
+  },
+  "dependencies": {
+    "@prisma/client": "6.19.3",
+    "jose": "^6.2.17",
+    "next": "16.4.6",
+    "prisma": "6.19.3",
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.5",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "tailwindcss": "^4.3.5",
+    "typescript": "^5.9.0"
+  }
+}
