@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "description": "Minimal merch store for TruthPitch.com — Next.js storefront on Shopify + Printful, with a small admin panel.",
-  "//scripts": "Tools are called via `node node_modules/...` instead of their bin shims so scripts also work in folders whose path contains & or ( ) on Windows.",
+  "//scripts": "Tools are called via `node node_modules/...` instead of their bin shims so scripts also work in folders whose path contains & or ( ) on Windows. Production builds use --webpack because Turbopack needs Next's native compiler, which can't load on Hostinger's older Linux build servers.",
   "scripts": {
     "dev": "node node_modules/next/dist/bin/next dev",
-    "build": "node node_modules/prisma/build/index.js generate && node node_modules/next/dist/bin/next build",
+    "build": "node node_modules/prisma/build/index.js generate && node node_modules/next/dist/bin/next build --webpack",
     "start": "node node_modules/prisma/build/index.js migrate deploy && node node_modules/next/dist/bin/next start",
     "postinstall": "node node_modules/prisma/build/index.js generate",
     "typecheck": "node node_modules/typescript/bin/tsc --noEmit",

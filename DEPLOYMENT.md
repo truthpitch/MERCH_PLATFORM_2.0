@@ -48,6 +48,8 @@ Each new `git push` to `main` redeploys automatically, if auto-deploy is enabled
 
 > If the build environment won't let you create the data folder, create `truthpitch-data/` once with hPanel's File Manager.
 
+> **Older build servers (glibc < 2.29).** Hostinger's builders can't load Next.js's native compiler, so Next falls back to a WebAssembly version. That fallback can't compile a TypeScript `next.config.ts` or run Turbopack. This is why the project uses `next.config.mjs` and why `npm run build` runs `next build --webpack`. Keep both as they are.
+
 ---
 
 ## 2B. Hostinger VPS (Ubuntu)
