@@ -41,8 +41,9 @@ git push -u origin main
    - `ADMIN_EMAIL`, `ADMIN_PASSWORD`: a long, unique password
    - `AUTH_SECRET`: a new random value, not the one from your local `.env`
    - `SHOPIFY_*` and optionally `PRINTFUL_API_KEY`
-5. Deploy. `npm start` runs `prisma migrate deploy` first, which creates or updates the database, then starts Next.js on the port Hostinger provides through `PORT`.
-6. Point **truthpitch.com** (or a subdomain such as `shop.truthpitch.com`) to the app and turn on **SSL**. HTTPS is required, because the admin cookie is marked `secure` in production.
+5. Deploy. The build runs `scripts/prepare-db.mjs`, which creates the database folder and applies the migrations. If `DATABASE_URL` is wrong, the build stops with a readable error. Hostinger starts the server itself, so this can't depend on `npm start`.
+6. Open `https://<your-domain>/api/health`. It should say `"ok": true`. If it doesn't, the `databaseError` field tells you what's wrong.
+7. Point **truthpitch.com** (or a subdomain such as `shop.truthpitch.com`) to the app and turn on **SSL**. HTTPS is required, because the admin cookie is marked `secure` in production.
 
 Each new `git push` to `main` redeploys automatically, if auto-deploy is enabled.
 
