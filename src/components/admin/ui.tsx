@@ -23,9 +23,10 @@ const NAV = [
   { href: "/admin/products", label: "Products" },
   { href: "/admin/media", label: "Media" },
   { href: "/admin/orders", label: "Orders" },
+  { href: "/admin/messages", label: "Messages" },
 ];
 
-export function AdminNav() {
+export function AdminNav({ unreadMessages = 0 }: { unreadMessages?: number }) {
   const pathname = usePathname();
   return (
     <nav className="mx-auto flex max-w-5xl gap-6 overflow-x-auto px-4 text-sm sm:px-6">
@@ -38,6 +39,9 @@ export function AdminNav() {
             className={`border-b-2 py-3 whitespace-nowrap ${active ? "border-black text-black" : "border-transparent text-neutral-500 hover:text-black"}`}
           >
             {item.label}
+            {item.href === "/admin/messages" && unreadMessages > 0 && (
+              <span className="ml-1.5 bg-black px-1.5 py-0.5 text-[10px] font-semibold text-white">{unreadMessages}</span>
+            )}
           </Link>
         );
       })}

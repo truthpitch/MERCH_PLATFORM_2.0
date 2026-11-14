@@ -3,7 +3,12 @@
 import { SignJWT, jwtVerify } from "jose";
 
 export const SESSION_COOKIE = "tp_admin_session";
-export const SESSION_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
+/** "Remember me" checked: stay signed in for 30 days, across browser restarts. */
+export const REMEMBER_MAX_AGE = 60 * 60 * 24 * 30;
+/** "Remember me" unchecked: the cookie ends when the browser closes, the token after 12 hours at most. */
+export const SHORT_MAX_AGE = 60 * 60 * 12;
+/** Remembers the admin email (never the password) so the login form is pre-filled. */
+export const REMEMBER_EMAIL_COOKIE = "tp_admin_email";
 
 function getSecret(): Uint8Array {
   // ⚠️ Set AUTH_SECRET in .env (random, 32+ characters).
@@ -14,12 +19,12 @@ function getSecret(): Uint8Array {
   return new TextEncoder().encode(secret);
 }
 
-export async function createSessionToken(email: string): Promise<string> {
+export async function createSessionToken(email: string, maxAgeSeconds: number): Promise<string> {
   return new SignJWT({ role: "admin" })
     .setProtectedHeader({ alg: "HS256" })
     .setSubject(email)
     .setIssuedAt()
-    .setExpirationTime(`${SESSION_MAX_AGE}s`)
+    .setExpirationTime(`${maxAgeSeconds}s`)
     .sign(getSecret());
 }
 

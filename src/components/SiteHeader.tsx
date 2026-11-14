@@ -14,6 +14,9 @@ export function SiteHeader({ cartCount }: { cartCount: number }) {
           <Link href="/#about" className="hidden hover:text-black sm:inline">
             About
           </Link>
+          <Link href="/contact" className="hover:text-black">
+            Contact
+          </Link>
           <Link href="/cart" className="hover:text-black">
             Cart{cartCount > 0 ? ` (${cartCount})` : ""}
           </Link>
@@ -28,7 +31,12 @@ export function SiteFooter() {
     <footer className="mt-24 border-t border-neutral-200">
       <div className="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-10 text-xs text-neutral-500 sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <p>© {new Date().getFullYear()} TruthPitch. All rights reserved.</p>
-        <p>Printed on demand. Secure checkout by Shopify.</p>
+        <p>
+          Printed on demand. Secure checkout by Shopify.{" "}
+          <Link href="/contact" className="underline underline-offset-2 hover:text-black">
+            Contact us
+          </Link>
+        </p>
       </div>
     </footer>
   );

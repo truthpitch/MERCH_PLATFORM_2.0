@@ -15,6 +15,7 @@ export async function GET() {
     databaseUrlSet: Boolean(url),
     databaseUrlHasPlaceholder: url.includes("u123456789"),
     authConfigured: Boolean(process.env.ADMIN_EMAIL && process.env.ADMIN_PASSWORD && process.env.AUTH_SECRET),
+    mailConfigured: Boolean(process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS),
     shopifyConfigured: Boolean(process.env.SHOPIFY_STORE_DOMAIN && process.env.SHOPIFY_STOREFRONT_ACCESS_TOKEN),
   };
 

@@ -40,6 +40,8 @@ Every variable is documented in [`.env.example`](.env.example). These are the im
 | `SHOPIFY_STOREFRONT_ACCESS_TOKEN` | Real products + checkout | Shopify admin → Sales channels → **Headless** → Create storefront → public access token |
 | `SHOPIFY_ADMIN_ACCESS_TOKEN` | Orders page (optional) | Shopify admin → Settings → Apps → Develop apps → scope `read_orders` |
 | `PRINTFUL_API_KEY` | Optional direct API use | Printful → Settings → API |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` | Contact form emails (optional) | Your mailbox's SMTP settings. Hostinger: `smtp.hostinger.com`, port `465`. |
+| `CONTACT_TO_EMAIL` | Where contact emails go (optional) | Defaults to `ADMIN_EMAIL`. |
 | `UPLOAD_DIR` | Admin image uploads | Defaults to `./uploads`. Use an absolute path in production. |
 
 ## Connecting Shopify + Printful
@@ -66,6 +68,11 @@ The code is commented where credentials go. See:
 | **Products** | Edit the **MORE INFO** story (and optional image) for each product |
 | **Media** | Upload images (JPG/PNG/WebP/GIF, 5 MB max) and copy their URLs |
 | **Orders** | Latest 25 Shopify orders with payment and fulfillment status |
+| **Messages** | Contact form inbox (read/unread, reply by email, delete) and the contact page text |
+
+**Login**: tick **Remember me** to stay signed in for 30 days on that device; your email is also remembered after you log out, and your browser can save the password. Untick it on shared computers: you are then signed out when the browser closes.
+
+**Contact page** (`/contact`): name, email, subject, optional order number and message. Messages are saved in the database and listed under **Messages**; with SMTP set they're also emailed to you, with Reply-To set to the customer. Spam protection: a hidden honeypot field and max 5 messages per 10 minutes per visitor.
 
 **Maintenance mode**: when it's ON, every public page shows a "We'll be back soon" page. The `/admin` area always stays reachable. While you're logged in, you still see the real store, with a grey notice bar, so you can check changes before you reopen.
 

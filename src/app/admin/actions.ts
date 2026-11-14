@@ -45,7 +45,7 @@ export async function loginAction(_prev: LoginState, formData: FormData): Promis
     await new Promise((r) => setTimeout(r, 700)); // slow down guessing
     return { error: "Incorrect email or password." };
   }
-  await startSession(email);
+  await startSession(email, formData.get("remember") === "on");
   redirect("/admin");
 }
 
@@ -149,4 +149,42 @@ export async function deleteMediaAction(formData: FormData) {
   }
   await prisma.media.delete({ where: { id } });
   revalidatePath("/admin/media");
+}
+
+// ── Contact messages ────────────────────────────────────────
+
+export async function setMessageReadAction(formData: FormData) {
+  await requireAdmin();
+  const id = Number(formData.get("id"));
+  if (!Number.isInteger(id)) return;
+  await prisma.contactMessage.updateMany({ where: { id }, data: { read: formData.get("read") === "1" } });
+  revalidatePath("/admin", "layout");
+}
+
+export async function markAllMessagesReadAction() {
+  await requireAdmin();
+  await prisma.contactMessage.updateMany({ where: { read: false }, data: { read: true } });
+  revalidatePath("/admin", "layout");
+}
+
+export async function deleteMessageAction(formData: FormData) {
+  await requireAdmin();
+  const id = Number(formData.get("id"));
+  if (!Number.isInteger(id)) return;
+  await prisma.contactMessage.deleteMany({ where: { id } });
+  revalidatePath("/admin", "layout");
+}
+
+export async function saveContactPageAction(formData: FormData) {
+  await requireAdmin();
+  const contactEmail = text(formData, "contactEmail", 200);
+  const data = {
+    contactTitle: text(formData, "contactTitle", 120) || "Contact",
+    contactIntro: text(formData, "contactIntro", 2000),
+    // Shown publicly on the contact page; leave empty to show only the form.
+    contactEmail: /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactEmail) ? contactEmail : "",
+  };
+  await prisma.siteSettings.upsert({ where: { id: 1 }, update: data, create: { id: 1, ...data } });
+  refreshSite();
+  redirect("/admin/messages?saved=1");
 }
