@@ -52,3 +52,21 @@ export async function getProductStory(product: Product): Promise<{ story: string
   if (row && (row.story.trim() || row.imageUrl.trim())) return { story: row.story, imageUrl: row.imageUrl };
   return { story: product.defaultStory ?? "", imageUrl: "" };
 }
+
+/**
+ * Simple product search for the header search bar: every word must appear in the
+ * title, description or MORE INFO story (case- and accent-insensitive).
+ * The catalog is small (Shopify returns up to 100 products), so filtering here is fast.
+ */
+export async function searchProducts(query: string): Promise<{ products: Product[]; stories: Map<string, string> }> {
+  const normalize = (s: string) => s.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase();
+  const words = normalize(query).split(/\s+/).filter(Boolean);
+  const all = await getProducts();
+  const stories = await getProductStories(all);
+  if (words.length === 0) return { products: [], stories };
+  const products = all.filter((p) => {
+    const haystack = normalize(`${p.title} ${p.description} ${stories.get(p.handle) ?? ""}`);
+    return words.every((w) => haystack.includes(w));
+  });
+  return { products, stories };
+}

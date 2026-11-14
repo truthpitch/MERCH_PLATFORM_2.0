@@ -28,7 +28,7 @@ export function AddToCart({ variants }: { variants: ProductVariant[] }) {
 
   return (
     <div className="space-y-5">
-      <p className="text-lg text-neutral-900">{formatMoney(variant.price)}</p>
+      <p className="notranslate text-lg text-neutral-900">{formatMoney(variant.price)}</p>
 
       {hasOptions && (
         <div>

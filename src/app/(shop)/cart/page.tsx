@@ -39,7 +39,7 @@ export default async function CartPage({ searchParams }: { searchParams: Promise
                       {line.productTitle}
                     </Link>
                     {line.variantTitle !== "Default Title" && <p className="mt-1 text-sm text-neutral-500">{line.variantTitle}</p>}
-                    <p className="mt-1 text-sm text-neutral-600">{formatMoney(line.price)}</p>
+                    <p className="notranslate mt-1 text-sm text-neutral-600">{formatMoney(line.price)}</p>
                   </div>
                   <div className="flex items-center gap-4">
                     <div className="flex items-center border border-neutral-300">
@@ -71,7 +71,7 @@ export default async function CartPage({ searchParams }: { searchParams: Promise
 
           <div className="mt-8 flex items-center justify-between text-lg">
             <span className="text-neutral-700">Subtotal</span>
-            <span className="font-medium text-black">{formatMoney(cart.subtotal)}</span>
+            <span className="notranslate font-medium text-black">{formatMoney(cart.subtotal)}</span>
           </div>
           <p className="mt-1 text-sm text-neutral-500">Shipping and taxes are calculated at checkout.</p>
 

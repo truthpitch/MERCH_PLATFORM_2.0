@@ -1,28 +1,52 @@
 import Link from "next/link";
+import { Suspense } from "react";
+import { LanguageSelect } from "./header/LanguageSelect";
+import { SearchForm } from "./header/SearchForm";
+import { ThemeToggle } from "./header/ThemeToggle";
 
+/**
+ * Two-bar header.
+ * 1. Top bar (scrolls away): search on the left (full width on phones, fixed width from
+ *    tablet up, right-aligned), language and light/dark switch on the right.
+ * 2. Main bar (sticks to the top): logo and the shop menu.
+ */
 export function SiteHeader({ cartCount }: { cartCount: number }) {
   return (
-    <header className="sticky top-0 z-20 border-b border-neutral-200 bg-white/95 backdrop-blur">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4 sm:px-6">
-        <Link href="/" className="shrink-0 text-sm font-bold tracking-[0.2em] text-black sm:tracking-[0.3em]">
-          TRUTHPITCH
-        </Link>
-        <nav className="flex items-center gap-3 text-sm text-neutral-700 sm:gap-6">
-          <Link href="/products" className="hover:text-black">
-            Shop
-          </Link>
-          <Link href="/about" className="hover:text-black">
-            About
-          </Link>
-          <Link href="/contact" className="hover:text-black">
-            Contact
-          </Link>
-          <Link href="/cart" className="hover:text-black">
-            Cart{cartCount > 0 ? ` (${cartCount})` : ""}
-          </Link>
-        </nav>
+    <>
+      <div className="border-b border-neutral-200 bg-neutral-50">
+        <div className="mx-auto flex h-12 max-w-6xl items-center gap-2 px-4 sm:px-6 md:justify-end md:gap-3">
+          <Suspense fallback={<div className="h-9 flex-1 md:w-80 md:flex-none" />}>
+            <SearchForm />
+          </Suspense>
+          <div className="flex shrink-0 items-center">
+            <LanguageSelect />
+            <ThemeToggle />
+          </div>
+        </div>
       </div>
-    </header>
+
+      <header className="sticky top-0 z-20 border-b border-neutral-200 bg-white/95 backdrop-blur">
+        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4 sm:px-6">
+          <Link href="/" className="notranslate shrink-0 text-sm font-bold tracking-[0.2em] text-black sm:tracking-[0.3em]">
+            TRUTHPITCH
+          </Link>
+          <nav className="flex items-center gap-3 text-sm text-neutral-700 sm:gap-6">
+            <Link href="/products" className="hover:text-black">
+              Shop
+            </Link>
+            <Link href="/about" className="hover:text-black">
+              About
+            </Link>
+            <Link href="/contact" className="hover:text-black">
+              Contact
+            </Link>
+            <Link href="/cart" className="hover:text-black">
+              Cart{cartCount > 0 ? <span className="notranslate">{` (${cartCount})`}</span> : null}
+            </Link>
+          </nav>
+        </div>
+      </header>
+    </>
   );
 }
 

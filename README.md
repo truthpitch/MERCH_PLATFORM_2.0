@@ -59,6 +59,14 @@ The code is commented where credentials go. See:
 - `src/lib/shopify/admin.ts`: order overview
 - `src/lib/printful.ts`: Printful API helper (optional)
 
+## Storefront features
+
+- **Header**: two bars. The top bar has the search field (magnifier button or Enter opens `/search`), the language menu and the light/dark switch. On phones the search fills the bar; from tablet up it sits on the right. The main bar (logo + Shop, About, Contact, Cart) stays at the top while scrolling.
+- **Search** (`/search?q=`): every word must appear in a product's title, description or MORE INFO story.
+- **Shop page**: each product has a foldable **MORE INFO** under its title; the full story only shows once it's opened.
+- **Dark mode**: follows the device setting until the visitor picks one; the choice is remembered on that device. It only affects the storefront, not the admin panel.
+- **Languages**: the menu lists 45+ languages in their own names. Translation is done by Google's website translator and covers the whole page, including your own texts. The Google script only loads when a language other than English is active; on a first visit the browser's preferred language is used automatically. Prices and the TRUTHPITCH logo are never translated.
+
 ## Admin panel
 
 | Page | What it does |

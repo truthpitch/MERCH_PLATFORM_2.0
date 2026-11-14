@@ -25,13 +25,18 @@ export default async function ShopLayout({ children }: { children: React.ReactNo
   const [settings, admin] = await Promise.all([getSettings(), isAdmin()]);
 
   if (settings.maintenanceMode && !admin) {
-    return <MaintenancePage message={settings.maintenanceMessage} />;
+    return (
+      <div className="shop-root flex flex-1 flex-col bg-white">
+        <MaintenancePage message={settings.maintenanceMessage} />
+      </div>
+    );
   }
 
   const cart = await getCart();
 
+  // .shop-root scopes dark mode to the storefront (see globals.css).
   return (
-    <>
+    <div className="shop-root flex flex-1 flex-col bg-white text-neutral-900">
       {settings.maintenanceMode && (
         <div className="bg-neutral-200 px-4 py-2 text-center text-xs text-neutral-800">
           Maintenance mode is ON — visitors see the &ldquo;back soon&rdquo; page. Only you can see the store.{" "}
@@ -46,6 +51,6 @@ export default async function ShopLayout({ children }: { children: React.ReactNo
       <SiteHeader cartCount={cart.totalQuantity} />
       <main className="flex-1">{children}</main>
       <SiteFooter />
-    </>
+    </div>
   );
 }
