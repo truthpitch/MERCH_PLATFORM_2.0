@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import { LanguageSelect } from "./header/LanguageSelect";
+import { MainNav } from "./header/MainNav";
 import { SearchForm } from "./header/SearchForm";
 import { ThemeToggle } from "./header/ThemeToggle";
 
@@ -8,7 +9,7 @@ import { ThemeToggle } from "./header/ThemeToggle";
  * Two-bar header.
  * 1. Top bar (scrolls away): search on the left (full width on phones, fixed width from
  *    tablet up, right-aligned), language and light/dark switch on the right.
- * 2. Main bar (sticks to the top): logo and the shop menu.
+ * 2. Main bar (sticks to the top): logo and the shop menu (hamburger menu on phones).
  */
 export function SiteHeader({ cartCount }: { cartCount: number }) {
   return (
@@ -30,20 +31,7 @@ export function SiteHeader({ cartCount }: { cartCount: number }) {
           <Link href="/" className="notranslate shrink-0 text-sm font-bold tracking-[0.2em] text-black sm:tracking-[0.3em]">
             TRUTHPITCH
           </Link>
-          <nav className="flex items-center gap-3 text-sm text-neutral-700 sm:gap-6">
-            <Link href="/products" className="hover:text-black">
-              Shop
-            </Link>
-            <Link href="/about" className="hover:text-black">
-              About
-            </Link>
-            <Link href="/contact" className="hover:text-black">
-              Contact
-            </Link>
-            <Link href="/cart" className="hover:text-black">
-              Cart{cartCount > 0 ? <span className="notranslate">{` (${cartCount})`}</span> : null}
-            </Link>
-          </nav>
+          <MainNav cartCount={cartCount} />
         </div>
       </header>
     </>
