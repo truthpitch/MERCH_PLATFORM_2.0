@@ -3,11 +3,11 @@ import Link from "next/link";
 export function SiteHeader({ cartCount }: { cartCount: number }) {
   return (
     <header className="sticky top-0 z-20 border-b border-neutral-200 bg-white/95 backdrop-blur">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-        <Link href="/" className="text-sm font-bold tracking-[0.3em] text-black">
+      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4 sm:px-6">
+        <Link href="/" className="shrink-0 text-sm font-bold tracking-[0.2em] text-black sm:tracking-[0.3em]">
           TRUTHPITCH
         </Link>
-        <nav className="flex items-center gap-4 text-sm text-neutral-700 sm:gap-6">
+        <nav className="flex items-center gap-3 text-sm text-neutral-700 sm:gap-6">
           <Link href="/products" className="hover:text-black">
             Shop
           </Link>

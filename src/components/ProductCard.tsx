@@ -2,7 +2,9 @@ import Link from "next/link";
 import { formatMoney } from "@/lib/format";
 import type { Product } from "@/lib/types";
 
-export function ProductCard({ product }: { product: Product }) {
+export function ProductCard({ product, story }: { product: Product; story?: string }) {
+  // A short, single-paragraph preview of the MORE INFO text (full text is on the product page).
+  const preview = story?.replace(/\s+/g, " ").trim();
   const image = product.featuredImage;
   return (
     <Link href={`/products/${product.handle}`} className="group block">
@@ -22,17 +24,19 @@ export function ProductCard({ product }: { product: Product }) {
         <h3 className="font-medium text-neutral-900">{product.title}</h3>
         <p className="shrink-0 text-neutral-600">{formatMoney(product.price)}</p>
       </div>
+      {preview && <p className="mt-1.5 line-clamp-3 text-sm leading-relaxed text-neutral-500">{preview}</p>}
       {!product.availableForSale && <p className="mt-1 text-xs uppercase tracking-wider text-neutral-500">Sold out</p>}
     </Link>
   );
 }
 
-export function ProductGrid({ products }: { products: Product[] }) {
+/** Pass `stories` (handle → MORE INFO text) to show a short story preview under each title. */
+export function ProductGrid({ products, stories }: { products: Product[]; stories?: Map<string, string> }) {
   if (products.length === 0) return <p className="text-sm text-neutral-500">No products yet.</p>;
   return (
     <div className="grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-3 lg:grid-cols-4">
       {products.map((p) => (
-        <ProductCard key={p.id} product={p} />
+        <ProductCard key={p.id} product={p} story={stories?.get(p.handle)} />
       ))}
     </div>
   );

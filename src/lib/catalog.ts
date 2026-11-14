@@ -37,6 +37,16 @@ export async function getRelatedProducts(handle: string, limit = 4): Promise<Pro
 }
 
 /** The "MORE INFO" story: admin-edited text wins, then the sample default. */
+/**
+ * MORE INFO text for many products at once (one database query), keyed by handle.
+ * Uses the admin-written story, falling back to the product's default story.
+ */
+export async function getProductStories(products: Product[]): Promise<Map<string, string>> {
+  const rows = await prisma.productStory.findMany({ where: { handle: { in: products.map((p) => p.handle) } } });
+  const custom = new Map(rows.filter((r) => r.story.trim()).map((r) => [r.handle, r.story]));
+  return new Map(products.map((p) => [p.handle, custom.get(p.handle) ?? p.defaultStory ?? ""]));
+}
+
 export async function getProductStory(product: Product): Promise<{ story: string; imageUrl: string }> {
   const row = await prisma.productStory.findUnique({ where: { handle: product.handle } });
   if (row && (row.story.trim() || row.imageUrl.trim())) return { story: row.story, imageUrl: row.imageUrl };
