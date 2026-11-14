@@ -40,7 +40,7 @@ Every variable is documented in [`.env.example`](.env.example). These are the im
 | `SHOPIFY_STOREFRONT_ACCESS_TOKEN` | Real products + checkout | Shopify admin → Sales channels → **Headless** → Create storefront → public access token |
 | `SHOPIFY_ADMIN_ACCESS_TOKEN` | Orders page (optional) | Shopify admin → Settings → Apps → Develop apps → scope `read_orders` |
 | `PRINTFUL_API_KEY` | Optional direct API use | Printful → Settings → API |
-| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` | Contact form | The mailbox's SMTP login. Hostinger: `smtp.hostinger.com`, port `465`, user `info@truthpitch.com`. |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` | Contact form | The mailbox's SMTP login. Titan (truthpitch.com): `smtp.titan.email`, port `465`, user `info@truthpitch.com`. |
 | `CONTACT_TO_EMAIL` | Contact form recipient (optional) | Defaults to `info@truthpitch.com`. |
 | `UPLOAD_DIR` | Admin image uploads | Defaults to `./uploads`. Use an absolute path in production. |
 

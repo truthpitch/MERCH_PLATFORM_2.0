@@ -1,6 +1,6 @@
 // Sends the contact form as an email over SMTP. Nothing is stored on the website.
 // ⚠️ Set SMTP_HOST, SMTP_PORT, SMTP_USER and SMTP_PASS in the environment variables.
-// Hostinger email: SMTP_HOST=smtp.hostinger.com, SMTP_PORT=465,
+// Titan email (used by truthpitch.com, via Hostinger): SMTP_HOST=smtp.titan.email, SMTP_PORT=465,
 // SMTP_USER=info@truthpitch.com and that mailbox's password.
 import nodemailer from "nodemailer";
 
