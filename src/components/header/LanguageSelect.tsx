@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { LANGUAGES, SITE_LANGUAGE, findLanguage, matchBrowserLanguage } from "@/lib/languages";
 
 // How it works
@@ -125,31 +125,110 @@ export function LanguageSelect() {
   }
 
   const active = findLanguage(lang);
+  const [open, setOpen] = useState(false);
+  const wrapper = useRef<HTMLDivElement>(null);
+  const list = useRef<HTMLUListElement>(null);
+
+  // Close on Escape or a click outside; focus the current language when opening.
+  useEffect(() => {
+    if (!open) return;
+    list.current?.querySelector<HTMLButtonElement>('[data-selected="true"]')?.focus({ preventScroll: false });
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setOpen(false);
+        wrapper.current?.querySelector<HTMLButtonElement>("button")?.focus();
+      }
+    };
+    const onClick = (e: MouseEvent) => {
+      if (wrapper.current && !wrapper.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
+    document.addEventListener("click", onClick);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("click", onClick);
+    };
+  }, [open]);
+
+  /** Arrow keys, Home and End move between languages. */
+  function onListKey(e: React.KeyboardEvent<HTMLUListElement>) {
+    const items = [...(list.current?.querySelectorAll<HTMLButtonElement>("button") ?? [])];
+    const i = items.indexOf(document.activeElement as HTMLButtonElement);
+    const go = (n: number) => {
+      e.preventDefault();
+      items[Math.max(0, Math.min(items.length - 1, n))]?.focus();
+    };
+    if (e.key === "ArrowDown") go(i + 1);
+    else if (e.key === "ArrowUp") go(i - 1);
+    else if (e.key === "Home") go(0);
+    else if (e.key === "End") go(items.length - 1);
+  }
+
   return (
     // "notranslate" keeps the language names in their own language.
-    <label className="notranslate relative flex h-9 shrink-0 cursor-pointer items-center gap-1.5 px-2 text-xs font-medium text-neutral-700 hover:text-black">
-      <span className="sr-only">Language</span>
-      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
-        <circle cx="12" cy="12" r="9" />
-        <path d="M3 12h18M12 3c2.5 2.7 3.8 5.7 3.8 9s-1.3 6.3-3.8 9c-2.5-2.7-3.8-5.7-3.8-9S9.5 5.7 12 3Z" />
-      </svg>
-      <span aria-hidden>{active.short}</span>
-      <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
-        <path d="m6 9 6 6 6-6" />
-      </svg>
-      {/* The real (native) select sits invisibly on top: the phone's own picker opens on tap. */}
-      <select
-        value={active.code}
-        onChange={(e) => choose(e.target.value)}
-        className="absolute inset-0 h-full w-full cursor-pointer appearance-none bg-white text-black opacity-0"
-        aria-label="Language"
+    <div ref={wrapper} className="notranslate relative shrink-0">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        aria-label={`Language: ${active.name}`}
+        className="flex h-9 items-center gap-1.5 px-2 text-xs font-medium text-neutral-700 hover:text-black"
       >
-        {LANGUAGES.map((l) => (
-          <option key={l.code} value={l.code}>
-            {l.name}
-          </option>
-        ))}
-      </select>
-    </label>
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
+          <circle cx="12" cy="12" r="9" />
+          <path d="M3 12h18M12 3c2.5 2.7 3.8 5.7 3.8 9s-1.3 6.3-3.8 9c-2.5-2.7-3.8-5.7-3.8-9S9.5 5.7 12 3Z" />
+        </svg>
+        <span aria-hidden>{active.short}</span>
+        <svg
+          viewBox="0 0 24 24"
+          width="12"
+          height="12"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          aria-hidden
+          className={`transition-transform ${open ? "rotate-180" : ""}`}
+        >
+          <path d="m6 9 6 6 6-6" />
+        </svg>
+      </button>
+
+      {open && (
+        <ul
+          ref={list}
+          role="listbox"
+          aria-label="Language"
+          onKeyDown={onListKey}
+          className="absolute right-0 top-full z-30 mt-1 max-h-[min(24rem,70vh)] w-56 overflow-y-auto border border-neutral-200 bg-white py-1 shadow-lg"
+        >
+          {LANGUAGES.map((l) => {
+            const selected = l.code === active.code;
+            return (
+              <li key={l.code}>
+                <button
+                  type="button"
+                  role="option"
+                  aria-selected={selected}
+                  data-selected={selected}
+                  lang={l.code}
+                  onClick={() => (selected ? setOpen(false) : choose(l.code))}
+                  className={`flex w-full items-center justify-between gap-3 px-4 py-2 text-left text-sm outline-none hover:bg-neutral-100 focus-visible:bg-neutral-100 ${
+                    selected ? "font-semibold text-black" : "text-neutral-700"
+                  }`}
+                >
+                  <span>{l.name}</span>
+                  {selected && (
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden>
+                      <path d="m5 12 5 5 9-10" />
+                    </svg>
+                  )}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </div>
   );
 }
