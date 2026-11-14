@@ -41,7 +41,6 @@ export function LoginForm({ rememberedEmail }: { rememberedEmail: string }) {
         <input
           type="checkbox"
           name="remember"
-          defaultChecked
           className="mt-0.5 h-4 w-4 accent-black"
         />
         <span>
