@@ -7,11 +7,11 @@ export function SiteHeader({ cartCount }: { cartCount: number }) {
         <Link href="/" className="text-sm font-bold tracking-[0.3em] text-black">
           TRUTHPITCH
         </Link>
-        <nav className="flex items-center gap-6 text-sm text-neutral-700">
+        <nav className="flex items-center gap-4 text-sm text-neutral-700 sm:gap-6">
           <Link href="/products" className="hover:text-black">
             Shop
           </Link>
-          <Link href="/#about" className="hidden hover:text-black sm:inline">
+          <Link href="/about" className="hover:text-black">
             About
           </Link>
           <Link href="/contact" className="hover:text-black">
@@ -33,6 +33,10 @@ export function SiteFooter() {
         <p>© {new Date().getFullYear()} TruthPitch. All rights reserved.</p>
         <p>
           Printed on demand. Secure checkout by Shopify.{" "}
+          <Link href="/about" className="underline underline-offset-2 hover:text-black">
+            About
+          </Link>{" "}
+          ·{" "}
           <Link href="/contact" className="underline underline-offset-2 hover:text-black">
             Contact us
           </Link>

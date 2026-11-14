@@ -20,6 +20,7 @@ export function SubmitButton({ children, variant = "primary" }: { children: Reac
 const NAV = [
   { href: "/admin", label: "Dashboard" },
   { href: "/admin/homepage", label: "Homepage" },
+  { href: "/admin/about", label: "About" },
   { href: "/admin/products", label: "Products" },
   { href: "/admin/media", label: "Media" },
   { href: "/admin/orders", label: "Orders" },

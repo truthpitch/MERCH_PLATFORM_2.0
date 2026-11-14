@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { ProductGrid } from "@/components/ProductCard";
 import { getFeaturedProducts } from "@/lib/catalog";
-import { toParagraphs } from "@/lib/format";
 import { getSettings } from "@/lib/settings";
 
 export default async function HomePage() {
@@ -42,17 +41,6 @@ export default async function HomePage() {
         <ProductGrid products={featured} />
       </section>
 
-      {/* About */}
-      <section id="about" className="scroll-mt-20 bg-neutral-100">
-        <div className="mx-auto max-w-3xl px-4 py-20 sm:px-6">
-          <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-black">{settings.aboutTitle}</h2>
-          <div className="mt-6 space-y-4 text-lg leading-relaxed text-neutral-700">
-            {toParagraphs(settings.aboutText).map((p, i) => (
-              <p key={i}>{p}</p>
-            ))}
-          </div>
-        </div>
-      </section>
     </>
   );
 }

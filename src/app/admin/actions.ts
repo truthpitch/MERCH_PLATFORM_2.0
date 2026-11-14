@@ -82,12 +82,31 @@ export async function saveHomepageAction(formData: FormData) {
     heroImageUrl: imageUrl(formData, "heroImageUrl"),
     announcementEnabled: formData.get("announcementEnabled") === "on",
     announcementText: text(formData, "announcementText", 200),
-    aboutTitle: text(formData, "aboutTitle", 120),
-    aboutText: text(formData, "aboutText", 5000),
   };
   await prisma.siteSettings.upsert({ where: { id: 1 }, update: data, create: { id: 1, ...data } });
   refreshSite();
   redirect("/admin/homepage?saved=1");
+}
+
+// ── About page ──────────────────────────────────────────────
+
+export async function saveAboutAction(formData: FormData) {
+  await requireAdmin();
+  const data = {
+    aboutTitle: text(formData, "aboutTitle", 120),
+    aboutIntro: text(formData, "aboutIntro", 500),
+    aboutText: text(formData, "aboutText", 10000),
+    aboutImageUrl: imageUrl(formData, "aboutImageUrl"),
+    aboutValue1Title: text(formData, "aboutValue1Title", 80),
+    aboutValue1Text: text(formData, "aboutValue1Text", 500),
+    aboutValue2Title: text(formData, "aboutValue2Title", 80),
+    aboutValue2Text: text(formData, "aboutValue2Text", 500),
+    aboutValue3Title: text(formData, "aboutValue3Title", 80),
+    aboutValue3Text: text(formData, "aboutValue3Text", 500),
+  };
+  await prisma.siteSettings.upsert({ where: { id: 1 }, update: data, create: { id: 1, ...data } });
+  refreshSite();
+  redirect("/admin/about?saved=1");
 }
 
 // ── Featured products ───────────────────────────────────────

@@ -20,7 +20,7 @@ export default async function HomepageAdmin({ searchParams }: { searchParams: Pr
 
   return (
     <>
-      <PageTitle title="Homepage" description="Hero, announcement bar, about text, featured products and the contact page." />
+      <PageTitle title="Homepage" description="Hero, announcement bar, featured products and the contact page. The About page has its own tab." />
       <SavedNotice show={sp.saved === "1"}>Homepage saved.</SavedNotice>
       <SavedNotice show={sp.saved === "contact"}>Contact page saved.</SavedNotice>
 
@@ -66,24 +66,6 @@ export default async function HomepageAdmin({ searchParams }: { searchParams: Pr
                 </div>
               </div>
               <p className="text-xs text-neutral-500">Tip: upload an image under Media, then paste its URL here.</p>
-            </div>
-          </Card>
-
-          <Card title="About section">
-            <div className="grid gap-4">
-              <div>
-                <label className={labelClass} htmlFor="aboutTitle">
-                  Heading
-                </label>
-                <input id="aboutTitle" name="aboutTitle" defaultValue={settings.aboutTitle} className={inputClass} />
-              </div>
-              <div>
-                <label className={labelClass} htmlFor="aboutText">
-                  Text
-                </label>
-                <textarea id="aboutText" name="aboutText" defaultValue={settings.aboutText} rows={6} className={inputClass} />
-                <p className="mt-1 text-xs text-neutral-500">Leave a blank line between paragraphs.</p>
-              </div>
             </div>
           </Card>
 
