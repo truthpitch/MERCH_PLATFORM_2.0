@@ -1,7 +1,7 @@
 "use server";
 
 import { headers } from "next/headers";
-import { contactRecipient, isMailConfigured, sendMail } from "@/lib/mail";
+import { contactRecipient, describeMailError, isMailConfigured, sendMail } from "@/lib/mail";
 
 export type ContactField = "name" | "email" | "subject" | "orderNumber" | "message";
 export type ContactState = {
@@ -82,7 +82,7 @@ export async function submitContactAction(_prev: ContactState, formData: FormDat
       text: lines.join("\n"),
     });
   } catch (err) {
-    console.error("Contact form: sending the email failed", err);
+    console.error("Contact form: sending the email failed", describeMailError(err));
     return { error: unavailable, values };
   }
 

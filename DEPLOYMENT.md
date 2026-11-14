@@ -42,7 +42,7 @@ git push -u origin main
    - `AUTH_SECRET`: a new random value, not the one from your local `.env`
    - `SHOPIFY_*` and optionally `PRINTFUL_API_KEY`
 5. Deploy. The build runs `scripts/prepare-db.mjs`, which creates the database folder and applies the migrations. If `DATABASE_URL` is wrong, the build stops with a readable error. Hostinger starts the server itself, so this can't depend on `npm start`.
-6. Open `https://<your-domain>/api/health`. It should say `"ok": true`. If it doesn't, the `databaseError` field tells you what's wrong.
+6. Open `https://<your-domain>/api/health`. It should say `"ok": true`. If it doesn't, the `databaseError` field tells you what's wrong. Open `/api/health?mail=1` to also test the contact form's mail login: `"mailLogin": "ok"`, or an error with a hint.
 7. Point **truthpitch.com** (or a subdomain such as `shop.truthpitch.com`) to the app and turn on **SSL**. HTTPS is required, because the admin cookie is marked `secure` in production.
 
 Each new `git push` to `main` redeploys automatically, if auto-deploy is enabled.
