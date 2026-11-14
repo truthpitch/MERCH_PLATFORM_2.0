@@ -72,9 +72,9 @@ The code is commented where credentials go. See:
 | Page | What it does |
 | --- | --- |
 | **Dashboard** | Maintenance ON/OFF switch and message, quick stats, connection status |
-| **Homepage** | Announcement bar, hero text/image/button, featured products (add, remove, reorder) |
-| **About page** | The `/about` page: intro statement, the story behind TruthPitch, optional image and three principles |
-| **Contact page** | The `/contact` page: heading, intro text and the optional email address shown next to the form |
+| **Home** | Announcement bar, hero text/image/button, featured products (add, remove, reorder) |
+| **About** | The `/about` page: intro statement, the story behind TruthPitch, optional image and three principles |
+| **Contact** | The `/contact` page: heading, intro text and the optional email address shown next to the form |
 | **Products** | Edit the **MORE INFO** story (and optional image) for each product |
 | **Media** | Upload images (JPG/PNG/WebP/GIF, 5 MB max) and copy their URLs |
 | **Orders** | Latest 25 Shopify orders with payment and fulfillment status |

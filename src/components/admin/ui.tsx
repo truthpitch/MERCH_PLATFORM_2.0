@@ -19,9 +19,9 @@ export function SubmitButton({ children, variant = "primary" }: { children: Reac
 
 const NAV = [
   { href: "/admin", label: "Dashboard" },
-  { href: "/admin/homepage", label: "Homepage" },
-  { href: "/admin/about", label: "About page" },
-  { href: "/admin/contact", label: "Contact page" },
+  { href: "/admin/homepage", label: "Home" },
+  { href: "/admin/about", label: "About" },
+  { href: "/admin/contact", label: "Contact" },
   { href: "/admin/products", label: "Products" },
   { href: "/admin/media", label: "Media" },
   { href: "/admin/orders", label: "Orders" },
