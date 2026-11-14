@@ -23,3 +23,7 @@ next-env.d.ts
 Thumbs.db
 npm-debug.log*
 /coverage
+
+# Any SQLite database file
+*.db
+*.db-journal
