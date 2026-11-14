@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { AdminNav } from "@/components/admin/ui";
 import { requireAdmin } from "@/lib/auth";
-import { prisma } from "@/lib/db";
 import { getSettings } from "@/lib/settings";
 import { logoutAction } from "../actions";
 
@@ -11,7 +10,7 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   await requireAdmin();
-  const [settings, unreadMessages] = await Promise.all([getSettings(), prisma.contactMessage.count({ where: { read: false } })]);
+  const settings = await getSettings();
 
   return (
     <div className="flex-1 bg-neutral-50">
@@ -34,7 +33,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             </form>
           </div>
         </div>
-        <AdminNav unreadMessages={unreadMessages} />
+        <AdminNav />
       </header>
       <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6">{children}</div>
     </div>

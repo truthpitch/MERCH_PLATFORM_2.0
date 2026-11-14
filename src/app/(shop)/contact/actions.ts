@@ -1,8 +1,7 @@
 "use server";
 
 import { headers } from "next/headers";
-import { prisma } from "@/lib/db";
-import { isMailConfigured, notificationAddress, sendMail } from "@/lib/mail";
+import { contactRecipient, isMailConfigured, sendMail } from "@/lib/mail";
 
 export type ContactField = "name" | "email" | "subject" | "orderNumber" | "message";
 export type ContactState = {
@@ -31,6 +30,11 @@ function rateLimited(key: string): boolean {
   return limited;
 }
 
+/**
+ * Sends the contact form straight to the shop's mailbox (info@truthpitch.com by default).
+ * Nothing is stored on the website. Reply-To is the visitor, so "Reply" in your
+ * mail program answers them directly.
+ */
 export async function submitContactAction(_prev: ContactState, formData: FormData): Promise<ContactState> {
   const values = Object.fromEntries(
     (Object.keys(LIMITS) as ContactField[]).map((k) => [k, String(formData.get(k) ?? "").trim().slice(0, LIMITS[k])]),
@@ -46,36 +50,40 @@ export async function submitContactAction(_prev: ContactState, formData: FormDat
   if (values.message.length < 10) fieldErrors.message = "Please write a message of at least 10 characters.";
   if (Object.keys(fieldErrors).length) return { fieldErrors, values };
 
+  const to = contactRecipient();
+  const unavailable = `Sorry, the form isn't working right now. Please email us at ${to}.`;
+  if (!isMailConfigured()) {
+    console.error("Contact form: SMTP is not configured (set SMTP_HOST, SMTP_USER, SMTP_PASS).");
+    return { error: unavailable, values };
+  }
+
   const h = await headers();
   const ip = (h.get("x-forwarded-for") ?? "").split(",")[0].trim() || h.get("x-real-ip") || "unknown";
   if (rateLimited(ip)) {
     return { error: "You've sent several messages in a short time. Please try again in a few minutes.", values };
   }
 
-  const saved = await prisma.contactMessage.create({ data: values });
+  const lines = [
+    `Name: ${values.name}`,
+    `Email: ${values.email}`,
+    ...(values.orderNumber ? [`Order number: ${values.orderNumber}`] : []),
+    ...(values.subject ? [`Subject: ${values.subject}`] : []),
+    "",
+    values.message,
+    "",
+    `-- Sent from the contact form on truthpitch.com. Reply to this email to answer ${values.name} directly.`,
+  ];
 
-  // Email the shop owner if SMTP is set up. A mail failure never loses the message: it's already saved.
-  const to = notificationAddress();
-  if (isMailConfigured() && to) {
-    const lines = [
-      `From: ${values.name} <${values.email}>`,
-      ...(values.orderNumber ? [`Order number: ${values.orderNumber}`] : []),
-      ...(values.subject ? [`Subject: ${values.subject}`] : []),
-      "",
-      values.message,
-      "",
-      `-- Message #${saved.id}. Reply to this email to answer ${values.name} directly.`,
-    ];
-    try {
-      await sendMail({
-        to,
-        replyTo: values.email,
-        subject: `Contact form: ${values.subject || "New message"} (${values.name})`,
-        text: lines.join("\n"),
-      });
-    } catch (err) {
-      console.error("Contact form: notification email failed", err);
-    }
+  try {
+    await sendMail({
+      to,
+      replyTo: { name: values.name, address: values.email },
+      subject: `Contact form: ${values.subject || "New message"} (${values.name})`,
+      text: lines.join("\n"),
+    });
+  } catch (err) {
+    console.error("Contact form: sending the email failed", err);
+    return { error: unavailable, values };
   }
 
   return { ok: true };

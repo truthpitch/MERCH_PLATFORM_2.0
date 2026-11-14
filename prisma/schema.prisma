@@ -59,17 +59,3 @@ model Media {
   size         Int
   createdAt    DateTime @default(now())
 }
-
-// Messages sent through the contact form, read in the admin "Messages" page.
-model ContactMessage {
-  id          Int      @id @default(autoincrement())
-  name        String
-  email       String
-  subject     String   @default("")
-  orderNumber String   @default("")
-  message     String
-  read        Boolean  @default(false)
-  createdAt   DateTime @default(now())
-
-  @@index([read, createdAt])
-}

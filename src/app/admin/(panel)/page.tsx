@@ -10,12 +10,12 @@ import { isShopifyAdminConfigured } from "@/lib/shopify/admin";
 import { saveMaintenanceMessageAction, setMaintenanceAction } from "../actions";
 
 export default async function DashboardPage({ searchParams }: { searchParams: Promise<{ saved?: string }> }) {
-  const [settings, products, featuredCount, storyCount, unreadCount, sp] = await Promise.all([
+  const [settings, products, featuredCount, storyCount, mediaCount, sp] = await Promise.all([
     getSettings(),
     getProducts().catch(() => []),
     prisma.featuredProduct.count(),
     prisma.productStory.count({ where: { story: { not: "" } } }),
-    prisma.contactMessage.count({ where: { read: false } }),
+    prisma.media.count(),
     searchParams,
   ]);
   const on = settings.maintenanceMode;
@@ -61,7 +61,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
             { label: "Products", value: products.length, href: "/admin/products" },
             { label: "Featured", value: featuredCount || "Auto", href: "/admin/homepage#featured" },
             { label: "Custom stories", value: storyCount, href: "/admin/products" },
-            { label: "Unread messages", value: unreadCount, href: "/admin/messages" },
+            { label: "Images", value: mediaCount, href: "/admin/media" },
           ].map((s) => (
             <Link key={s.label} href={s.href} className="border border-neutral-200 bg-white p-5 hover:border-black">
               <p className="text-xs uppercase tracking-wider text-neutral-500">{s.label}</p>
