@@ -4,8 +4,7 @@ import { SubmitButton } from "@/components/admin/ui";
 import { getProducts } from "@/lib/catalog";
 import { prisma } from "@/lib/db";
 import { getSettings } from "@/lib/settings";
-import { contactRecipient } from "@/lib/mail";
-import { addFeaturedAction, moveFeaturedAction, removeFeaturedAction, saveContactPageAction, saveHomepageAction } from "../../actions";
+import { addFeaturedAction, moveFeaturedAction, removeFeaturedAction, saveHomepageAction } from "../../actions";
 
 export default async function HomepageAdmin({ searchParams }: { searchParams: Promise<{ saved?: string }> }) {
   const [settings, products, featured, sp] = await Promise.all([
@@ -20,9 +19,8 @@ export default async function HomepageAdmin({ searchParams }: { searchParams: Pr
 
   return (
     <>
-      <PageTitle title="Homepage" description="Hero, announcement bar, featured products and the contact page. The About page has its own tab." />
+      <PageTitle title="Homepage" description="Announcement bar, hero and featured products. The About and Contact pages have their own tabs." />
       <SavedNotice show={sp.saved === "1"}>Homepage saved.</SavedNotice>
-      <SavedNotice show={sp.saved === "contact"}>Contact page saved.</SavedNotice>
 
       <div className="grid gap-6">
         <form action={saveHomepageAction} className="grid gap-6">
@@ -132,41 +130,6 @@ export default async function HomepageAdmin({ searchParams }: { searchParams: Pr
                 <SubmitButton variant="secondary">Add to featured</SubmitButton>
               </form>
             )}
-          </Card>
-        </div>
-
-        {/* Contact page text. The form itself emails the shop's mailbox directly. */}
-        <div id="contact" className="scroll-mt-6">
-          <Card title="Contact page">
-            <form action={saveContactPageAction} className="grid gap-4">
-              <p className="text-sm text-neutral-600">
-                Messages from the form on <span className="text-black">/contact</span> are emailed straight to{" "}
-                <span className="font-medium text-black">{contactRecipient()}</span>. Nothing is stored on the website.
-              </p>
-              <div>
-                <label className={labelClass} htmlFor="contactTitle">
-                  Heading
-                </label>
-                <input id="contactTitle" name="contactTitle" defaultValue={settings.contactTitle} className={inputClass} />
-              </div>
-              <div>
-                <label className={labelClass} htmlFor="contactIntro">
-                  Intro text
-                </label>
-                <textarea id="contactIntro" name="contactIntro" rows={3} defaultValue={settings.contactIntro} className={inputClass} />
-                <p className="mt-1 text-xs text-neutral-500">Leave a blank line between paragraphs.</p>
-              </div>
-              <div>
-                <label className={labelClass} htmlFor="contactEmail">
-                  Email address shown on the page (optional)
-                </label>
-                <input id="contactEmail" name="contactEmail" type="email" defaultValue={settings.contactEmail} placeholder="info@truthpitch.com" className={inputClass} />
-                <p className="mt-1 text-xs text-neutral-500">Shown next to the form. Leave empty to show only the form.</p>
-              </div>
-              <div>
-                <SubmitButton>Save contact page</SubmitButton>
-              </div>
-            </form>
           </Card>
         </div>
       </div>

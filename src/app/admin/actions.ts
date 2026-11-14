@@ -183,5 +183,5 @@ export async function saveContactPageAction(formData: FormData) {
   };
   await prisma.siteSettings.upsert({ where: { id: 1 }, update: data, create: { id: 1, ...data } });
   refreshSite();
-  redirect("/admin/homepage?saved=contact#contact");
+  redirect("/admin/contact?saved=1");
 }
