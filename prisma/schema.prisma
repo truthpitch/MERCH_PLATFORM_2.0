@@ -20,6 +20,8 @@ model SiteSettings {
   id                     Int       @id @default(1)
   maintenanceMode        Boolean   @default(false)
   maintenanceMessage     String    @default("We're making a few changes behind the scenes. Please check back shortly.")
+  // Browser-tab icon uploaded on the Dashboard (/media/favicon-….png), empty = none
+  faviconUrl             String    @default("")
   announcementEnabled    Boolean   @default(false)
   announcementText       String    @default("")
   // Optional countdown and button in the announcement bar

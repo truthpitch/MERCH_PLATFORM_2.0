@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { checkCredentials, endSession, isAuthConfigured, requireAdmin, startSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { getUploadDir, isSafeFilename } from "@/lib/uploads";
+import { getUploadDir, isSafeFilename, removeFaviconFile } from "@/lib/uploads";
 
 // ── Helpers ─────────────────────────────────────────────────
 
@@ -72,6 +72,17 @@ export async function setMaintenanceAction(formData: FormData) {
   const on = formData.get("on") === "1";
   await prisma.siteSettings.upsert({ where: { id: 1 }, update: { maintenanceMode: on }, create: { id: 1, maintenanceMode: on } });
   refreshSite();
+}
+
+// ── Favicon (upload goes through /admin/favicon) ─────────────
+
+export async function removeFaviconAction() {
+  await requireAdmin();
+  const { faviconUrl } = await prisma.siteSettings.upsert({ where: { id: 1 }, update: {}, create: { id: 1 } });
+  await prisma.siteSettings.update({ where: { id: 1 }, data: { faviconUrl: "" } });
+  await removeFaviconFile(faviconUrl);
+  refreshSite();
+  redirect("/admin?favicon=removed#favicon");
 }
 
 export async function saveMaintenanceMessageAction(formData: FormData) {

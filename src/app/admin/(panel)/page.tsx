@@ -7,9 +7,17 @@ import { prisma } from "@/lib/db";
 import { isPrintfulConfigured } from "@/lib/printful";
 import { getSettings } from "@/lib/settings";
 import { isShopifyAdminConfigured } from "@/lib/shopify/admin";
-import { saveMaintenanceMessageAction, setMaintenanceAction } from "../actions";
+import { removeFaviconAction, saveMaintenanceMessageAction, setMaintenanceAction } from "../actions";
 
-export default async function DashboardPage({ searchParams }: { searchParams: Promise<{ saved?: string }> }) {
+const FAVICON_MESSAGES: Record<string, string> = {
+  saved: "Favicon saved. Browsers can take a moment to show the new icon; reload the tab if you still see the old one.",
+  removed: "Favicon removed.",
+  missing: "Choose a file first.",
+  type: "That file isn't a PNG, ICO, JPG, WebP or GIF image.",
+  size: "That file is too large. The maximum is 1 MB.",
+};
+
+export default async function DashboardPage({ searchParams }: { searchParams: Promise<{ saved?: string; favicon?: string }> }) {
   const [settings, products, featuredCount, storyCount, mediaCount, sp] = await Promise.all([
     getSettings(),
     getProducts().catch(() => []),
@@ -54,6 +62,54 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
             <SubmitButton variant="secondary">Save message</SubmitButton>
           </form>
         </Card>
+
+        {/* Favicon */}
+        <div id="favicon" className="scroll-mt-6">
+          <Card title="Favicon">
+            {sp.favicon && FAVICON_MESSAGES[sp.favicon] && (
+              <p role="status" className="mb-5 border border-neutral-300 bg-neutral-100 px-4 py-3 text-sm text-neutral-800">
+                {FAVICON_MESSAGES[sp.favicon]}
+              </p>
+            )}
+            <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
+              {/* Preview at the sizes a browser tab and a phone home screen use */}
+              <div className="flex shrink-0 items-end gap-4">
+                {settings.faviconUrl ? (
+                  <>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={settings.faviconUrl} alt="Current favicon" width={64} height={64} className="h-16 w-16 border border-neutral-200 object-contain p-1" />
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={settings.faviconUrl} alt="" width={16} height={16} className="h-4 w-4 object-contain" />
+                  </>
+                ) : (
+                  <div className="flex h-16 w-16 items-center justify-center border border-dashed border-neutral-300 text-xs text-neutral-400">None</div>
+                )}
+              </div>
+              <div className="flex-1 text-sm text-neutral-600">
+                <p>The small icon in the browser tab and in bookmarks.</p>
+                <p className="mt-1">Use a square PNG or ICO (at least 64×64, ideally 512×512). JPG, WebP and GIF also work. Max 1 MB.</p>
+              </div>
+            </div>
+            <div className="mt-6 flex flex-col gap-3 border-t border-neutral-200 pt-6 sm:flex-row sm:items-center">
+              <form action="/admin/favicon" method="post" encType="multipart/form-data" className="flex flex-1 flex-col gap-3 sm:flex-row sm:items-center">
+                <input
+                  type="file"
+                  name="file"
+                  required
+                  accept="image/png,image/x-icon,image/vnd.microsoft.icon,.ico,image/jpeg,image/webp,image/gif"
+                  aria-label="Favicon file"
+                  className="min-w-0 flex-1 text-sm text-neutral-700 file:mr-3 file:border file:border-neutral-300 file:bg-white file:px-3 file:py-2 file:text-sm file:text-black hover:file:border-black"
+                />
+                <SubmitButton>{settings.faviconUrl ? "Replace favicon" : "Upload favicon"}</SubmitButton>
+              </form>
+              {settings.faviconUrl && (
+                <form action={removeFaviconAction}>
+                  <SubmitButton variant="secondary">Remove</SubmitButton>
+                </form>
+              )}
+            </div>
+          </Card>
+        </div>
 
         {/* Quick stats */}
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4">

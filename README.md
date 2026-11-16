@@ -78,7 +78,7 @@ The code is commented where credentials go. See:
 
 | Page | What it does |
 | --- | --- |
-| **Dashboard** | Maintenance ON/OFF switch and message, quick stats, connection status |
+| **Dashboard** | Maintenance ON/OFF switch and message, favicon upload (PNG, ICO, JPG, WebP or GIF, max 1 MB), quick stats, connection status |
 | **Home** | Announcement bar (headline, button, countdown), hero text/image/button, featured products (add, remove, reorder) |
 | **About** | The `/about` page: intro statement, the story behind TruthPitch, optional image and three principles |
 | **Contact** | The `/contact` page: heading, intro text and the optional email address shown next to the form |
