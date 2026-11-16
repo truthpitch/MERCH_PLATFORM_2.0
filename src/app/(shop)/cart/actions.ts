@@ -3,6 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { addToCart, getCart, removeCartLine, updateCartLine } from "@/lib/cart";
+import { getCurrentCustomer } from "@/lib/customers";
+import { isShopifyConfigured, shopifySetBuyerEmail } from "@/lib/shopify/storefront";
 
 export async function addToCartAction(variantId: string, quantity = 1): Promise<{ ok: boolean }> {
   if (typeof variantId !== "string" || !variantId) return { ok: false };
@@ -30,9 +32,22 @@ export async function removeLineAction(formData: FormData) {
   revalidatePath("/", "layout");
 }
 
-/** Sends the customer to Shopify's hosted checkout (Printful fulfils the order from there). */
+/**
+ * Sends the customer to Shopify's hosted checkout (Printful fulfils the order from there).
+ * Guests fill in their details at checkout. For signed-in customers the account email is
+ * passed along, so it's pre-filled and the order is linked to it.
+ */
 export async function checkoutAction() {
   const cart = await getCart();
   if (!cart.checkoutUrl) redirect("/cart?demo=1");
-  redirect(cart.checkoutUrl);
+  let checkoutUrl = cart.checkoutUrl;
+  const customer = await getCurrentCustomer();
+  if (customer && cart.id && isShopifyConfigured()) {
+    try {
+      checkoutUrl = (await shopifySetBuyerEmail(cart.id, customer.email)).checkoutUrl ?? checkoutUrl;
+    } catch (err) {
+      console.error("Could not attach the customer email to the cart", err); // checkout still works as guest
+    }
+  }
+  redirect(checkoutUrl);
 }

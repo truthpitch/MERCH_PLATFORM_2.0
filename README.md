@@ -61,7 +61,13 @@ The code is commented where credentials go. See:
 
 ## Storefront features
 
-- **Header**: two bars. The top bar has the search field (magnifier button or Enter opens `/search`), the language menu and the light/dark switch. On phones the search fills the bar; from tablet up it sits on the right. The main bar (logo + Shop, About, Contact, Cart) stays at the top while scrolling; on phones the menu folds into a hamburger button (Cart stays visible next to it).
+- **Announcement bar** (optional, set under Admin → Home): headline, optional button and optional live countdown (`68 H 26 M 21 S`). Visitors can close it with the ×; it comes back when you change the offer, and hides itself when the countdown ends.
+- **Menu bar** (mobile first, sticks to the top):
+  - Phone / tablet: hamburger + logo on the left, language and light/dark switch in the middle, account, favorites and cart icons on the right, search bar underneath. The hamburger opens a menu that slides in from the left: SHOP (folds open to every category), ABOUT, CONTACT.
+  - Desktop (1024px+): one row with the logo, SHOP (opens a panel with every category), ABOUT, CONTACT, the search field and the icons.
+- **Categories** (`/products?category=t-shirts` etc.): T-shirts, Hoodies & sweatshirts, Beanies, Hats & caps, Stickers & decals, Posters & prints, Mugs & drinkware, Tote bags & backpacks, Phone cases, Pins & patches, Socks. A product is placed by its Shopify **Product type**, then its tags, then its title. Edit the list in `src/lib/categories.ts`.
+- **Accounts** (`/account`): customers can register, sign in, sign out and delete their account. Passwords are hashed (scrypt); sessions last 30 days. Accounts are optional: the cart offers **Checkout as guest** or **Sign in to check out**. Signed-in customers get their email pre-filled at Shopify's checkout.
+- **Favorites** (`/favorites`): the heart on every product. Guests' favorites are kept on their device and move into their account when they sign in.
 - **Search** (`/search?q=`): every word must appear in a product's title, description or MORE INFO story.
 - **Shop page**: each product has a foldable **MORE INFO** under its title; the full story only shows once it's opened.
 - **Dark mode**: follows the device setting until the visitor picks one; the choice is remembered on that device. It only affects the storefront, not the admin panel.
@@ -72,7 +78,7 @@ The code is commented where credentials go. See:
 | Page | What it does |
 | --- | --- |
 | **Dashboard** | Maintenance ON/OFF switch and message, quick stats, connection status |
-| **Home** | Announcement bar, hero text/image/button, featured products (add, remove, reorder) |
+| **Home** | Announcement bar (headline, button, countdown), hero text/image/button, featured products (add, remove, reorder) |
 | **About** | The `/about` page: intro statement, the story behind TruthPitch, optional image and three principles |
 | **Contact** | The `/contact` page: heading, intro text and the optional email address shown next to the form |
 | **Products** | Edit the **MORE INFO** story (and optional image) for each product |

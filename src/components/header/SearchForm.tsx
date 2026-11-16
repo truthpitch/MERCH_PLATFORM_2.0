@@ -3,20 +3,20 @@
 import { usePathname, useSearchParams } from "next/navigation";
 
 /** Header search: type keywords, then press the magnifier (or Enter) to open /search. */
-export function SearchForm() {
+export function SearchForm({ id, className = "" }: { id: string; className?: string }) {
   const pathname = usePathname();
   const params = useSearchParams();
   const current = pathname === "/search" ? (params.get("q") ?? "") : "";
 
   return (
-    <form action="/search" method="get" role="search" className="flex h-9 min-w-0 flex-1 md:w-80 md:flex-none">
-      <label htmlFor="site-search" className="sr-only">
+    <form action="/search" method="get" role="search" className={`flex min-w-0 ${className}`}>
+      <label htmlFor={id} className="sr-only">
         Search products
       </label>
       <input
         // key: refill the field when the search page's query changes
         key={current}
-        id="site-search"
+        id={id}
         name="q"
         type="search"
         required
@@ -31,9 +31,9 @@ export function SearchForm() {
         type="submit"
         aria-label="Search"
         title="Search"
-        className="flex w-10 shrink-0 items-center justify-center bg-black text-white hover:bg-neutral-800"
+        className="flex w-11 shrink-0 items-center justify-center bg-black text-white hover:bg-neutral-800"
       >
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
           <circle cx="11" cy="11" r="7" />
           <path d="m20 20-3.5-3.5" strokeLinecap="round" />
         </svg>

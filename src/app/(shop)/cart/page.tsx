@@ -2,13 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getCart } from "@/lib/cart";
 import { isDemoMode } from "@/lib/catalog";
+import { getCurrentCustomer } from "@/lib/customers";
 import { formatMoney } from "@/lib/format";
 import { checkoutAction, removeLineAction, updateLineAction } from "./actions";
 
 export const metadata: Metadata = { title: "Cart" };
 
 export default async function CartPage({ searchParams }: { searchParams: Promise<{ demo?: string }> }) {
-  const [cart, sp] = await Promise.all([getCart(), searchParams]);
+  const [cart, sp, customer] = await Promise.all([getCart(), searchParams, getCurrentCustomer()]);
   const demo = isDemoMode();
 
   return (
@@ -75,11 +76,37 @@ export default async function CartPage({ searchParams }: { searchParams: Promise
           </div>
           <p className="mt-1 text-sm text-neutral-500">Shipping and taxes are calculated at checkout.</p>
 
-          <form action={checkoutAction} className="mt-8">
-            <button className="w-full bg-black px-6 py-4 text-sm font-medium uppercase tracking-wider text-white hover:bg-neutral-800">
-              Checkout
-            </button>
-          </form>
+          {customer ? (
+            <form action={checkoutAction} className="mt-8">
+              <button className="w-full bg-black px-6 py-4 text-sm font-medium uppercase tracking-wider text-white hover:bg-neutral-800">
+                Checkout
+              </button>
+              <p className="mt-3 text-center text-sm text-neutral-600">
+                Signed in as <span className="font-medium text-black">{customer.email}</span>
+              </p>
+            </form>
+          ) : (
+            <div className="mt-8 grid gap-3 sm:grid-cols-2">
+              <form action={checkoutAction}>
+                <button className="w-full bg-black px-6 py-4 text-sm font-medium uppercase tracking-wider text-white hover:bg-neutral-800">
+                  Checkout as guest
+                </button>
+              </form>
+              <Link
+                href="/account/login?next=/cart"
+                className="flex items-center justify-center border border-black px-6 py-4 text-sm font-medium uppercase tracking-wider text-black hover:bg-black hover:text-white"
+              >
+                Sign in to check out
+              </Link>
+              <p className="text-center text-xs text-neutral-500 sm:col-span-2">
+                No account needed.{" "}
+                <Link href="/account/register?next=/cart" className="underline underline-offset-2 hover:text-black">
+                  Create one
+                </Link>{" "}
+                to save favorites and check out faster.
+              </p>
+            </div>
+          )}
 
           {(demo || sp.demo) && (
             <p className="mt-4 border border-neutral-300 bg-neutral-50 p-4 text-sm text-neutral-700">

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { AddToCart } from "@/components/AddToCart";
 import { MoreInfo } from "@/components/MoreInfo";
+import { FavoriteButton } from "@/components/favorites/FavoritesProvider";
 import { ProductGrid } from "@/components/ProductCard";
 import { getProduct, getProductStory, getRelatedProducts } from "@/lib/catalog";
 
@@ -42,6 +43,9 @@ export default async function ProductPage({ params }: Props) {
           <h1 className="text-3xl font-semibold tracking-tight text-black">{product.title}</h1>
           <div className="mt-6">
             <AddToCart variants={product.variants} />
+          </div>
+          <div className="mt-3">
+            <FavoriteButton handle={product.handle} title={product.title} variant="full" />
           </div>
           {product.description && <p className="mt-10 text-sm leading-relaxed text-neutral-700">{product.description}</p>}
           <div className="mt-10">

@@ -51,6 +51,8 @@ const PRODUCT_FIELDS = /* GraphQL */ `
     title
     description
     availableForSale
+    productType
+    tags
     featuredImage { url altText }
     images(first: 10) { nodes { url altText } }
     priceRange { minVariantPrice { amount currencyCode } }
@@ -66,6 +68,8 @@ type ShopifyProduct = {
   title: string;
   description: string;
   availableForSale: boolean;
+  productType: string;
+  tags: string[];
   featuredImage: ProductImage | null;
   images: { nodes: ProductImage[] };
   priceRange: { minVariantPrice: Money };
@@ -83,6 +87,8 @@ function mapProduct(p: ShopifyProduct): Product {
     images: p.images.nodes,
     price: p.priceRange.minVariantPrice,
     variants: p.variants.nodes,
+    productType: p.productType,
+    tags: p.tags,
   };
 }
 
@@ -231,4 +237,17 @@ export async function shopifyRemoveLine(cartId: string, lineId: string): Promise
     { noStore: true },
   );
   return unwrap(data.cartLinesRemove);
+}
+
+/** Signed-in customers: pre-fills their email (and links the order to it) in Shopify's checkout. */
+export async function shopifySetBuyerEmail(cartId: string, email: string): Promise<Cart> {
+  const data = await storefront<{ cartBuyerIdentityUpdate: CartPayload }>(
+    `${CART_FIELDS}
+     mutation Buyer($cartId: ID!, $buyerIdentity: CartBuyerIdentityInput!) {
+       cartBuyerIdentityUpdate(cartId: $cartId, buyerIdentity: $buyerIdentity) { cart { ...CartFields } userErrors { message } }
+     }`,
+    { cartId, buyerIdentity: { email } },
+    { noStore: true },
+  );
+  return unwrap(data.cartBuyerIdentityUpdate);
 }

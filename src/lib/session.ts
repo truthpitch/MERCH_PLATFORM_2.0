@@ -10,7 +10,7 @@ export const SHORT_MAX_AGE = 60 * 60 * 12;
 /** Remembers the admin email (never the password) so the login form is pre-filled. */
 export const REMEMBER_EMAIL_COOKIE = "tp_admin_email";
 
-function getSecret(): Uint8Array {
+export function getSecret(): Uint8Array {
   // ⚠️ Set AUTH_SECRET in .env (random, 32+ characters).
   const secret = process.env.AUTH_SECRET;
   if (!secret || secret.length < 32) {

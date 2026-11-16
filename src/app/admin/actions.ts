@@ -27,6 +27,17 @@ function imageUrl(formData: FormData, key: string): string {
   }
 }
 
+/** Same rules as imageUrl: a page on this site (/products…) or an http(s) link. */
+const linkUrl = imageUrl;
+
+/** An exact moment sent as an ISO string by the admin's date picker, or null when empty/invalid. */
+function dateOrNull(formData: FormData, key: string): Date | null {
+  const value = text(formData, key, 40);
+  if (!value) return null;
+  const d = new Date(value);
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+
 function refreshSite() {
   revalidatePath("/", "layout");
 }
@@ -82,6 +93,10 @@ export async function saveHomepageAction(formData: FormData) {
     heroImageUrl: imageUrl(formData, "heroImageUrl"),
     announcementEnabled: formData.get("announcementEnabled") === "on",
     announcementText: text(formData, "announcementText", 200),
+    announcementTimerLabel: text(formData, "announcementTimerLabel", 80),
+    announcementCtaLabel: text(formData, "announcementCtaLabel", 40),
+    announcementCtaUrl: linkUrl(formData, "announcementCtaUrl"),
+    announcementEndsAt: dateOrNull(formData, "announcementEndsAt"),
   };
   await prisma.siteSettings.upsert({ where: { id: 1 }, update: data, create: { id: 1, ...data } });
   refreshSite();

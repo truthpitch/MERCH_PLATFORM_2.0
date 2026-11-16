@@ -22,6 +22,7 @@ function product(p: {
   image: string;
   variants?: ProductVariant[];
   story: string;
+  productType: string;
 }): Product {
   const image = { url: `/samples/${p.image}`, altText: p.title };
   return {
@@ -35,12 +36,15 @@ function product(p: {
     price: usd(p.price),
     variants: p.variants ?? [{ id: `demo-${p.handle}-default`, title: "Default Title", availableForSale: true, price: usd(p.price) }],
     defaultStory: p.story,
+    productType: p.productType,
+    tags: [],
   };
 }
 
 export const SAMPLE_PRODUCTS: Product[] = [
   product({
     handle: "truth-tee-black",
+    productType: "T-Shirt",
     title: "Truth Tee — Black",
     description: "Heavyweight cotton tee with a small TRUTH mark on the chest. Relaxed fit.",
     price: 32,
@@ -51,6 +55,7 @@ export const SAMPLE_PRODUCTS: Product[] = [
   }),
   product({
     handle: "truth-tee-white",
+    productType: "T-Shirt",
     title: "Truth Tee — White",
     description: "The same heavyweight tee in white with a black chest print.",
     price: 32,
@@ -60,6 +65,7 @@ export const SAMPLE_PRODUCTS: Product[] = [
   }),
   product({
     handle: "pitch-hoodie",
+    productType: "Hoodie",
     title: "Pitch Hoodie",
     description: "Midweight brushed-fleece hoodie. PITCH printed across the back.",
     price: 64,
@@ -70,6 +76,7 @@ export const SAMPLE_PRODUCTS: Product[] = [
   }),
   product({
     handle: "signal-cap",
+    productType: "Cap",
     title: "Signal Cap",
     description: "Unstructured six-panel cap with an embroidered TP monogram. One size.",
     price: 28,
@@ -78,6 +85,7 @@ export const SAMPLE_PRODUCTS: Product[] = [
   }),
   product({
     handle: "statement-tote",
+    productType: "Tote Bag",
     title: "Statement Tote",
     description: "Sturdy cotton canvas tote with a long-strap carry.",
     price: 24,
@@ -86,6 +94,7 @@ export const SAMPLE_PRODUCTS: Product[] = [
   }),
   product({
     handle: "morning-mug",
+    productType: "Mug",
     title: "Morning Mug",
     description: "11 oz ceramic mug, matte black. Dishwasher and microwave safe.",
     price: 18,

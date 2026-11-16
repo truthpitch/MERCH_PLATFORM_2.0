@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { FavoriteButton } from "./favorites/FavoritesProvider";
 import { formatMoney, toParagraphs } from "@/lib/format";
 import type { Product } from "@/lib/types";
 
@@ -7,6 +8,7 @@ export function ProductCard({ product, story }: { product: Product; story?: stri
   const paragraphs = story ? toParagraphs(story) : [];
   return (
     <div>
+      <div className="relative">
       <Link href={`/products/${product.handle}`} className="group block">
         <div className="aspect-[4/5] overflow-hidden bg-neutral-100">
           {image ? (
@@ -25,6 +27,11 @@ export function ProductCard({ product, story }: { product: Product; story?: stri
           <p className="notranslate shrink-0 text-neutral-600">{formatMoney(product.price)}</p>
         </div>
       </Link>
+      {/* The heart sits on the image, outside the link so it can be clicked on its own. */}
+      <div className="absolute right-2 top-2">
+        <FavoriteButton handle={product.handle} title={product.title} />
+      </div>
+      </div>
       {!product.availableForSale && <p className="mt-1 text-xs uppercase tracking-wider text-neutral-500">Sold out</p>}
 
       {/* Foldable MORE INFO: the full story only shows once it's opened. Native <details>, no JavaScript needed. */}

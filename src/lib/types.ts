@@ -21,6 +21,9 @@ export type Product = {
   featuredImage: ProductImage | null;
   price: Money; // lowest variant price
   variants: ProductVariant[];
+  /** Shopify "Product type" and tags, used to sort products into menu categories. */
+  productType?: string;
+  tags?: string[];
   /** Fallback "MORE INFO" story (sample products only). Admin-edited stories override it. */
   defaultStory?: string;
 };

@@ -173,13 +173,16 @@ export function LanguageSelect() {
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-label={`Language: ${active.name}`}
-        className="flex h-9 items-center gap-1.5 px-2 text-xs font-medium text-neutral-700 hover:text-black"
+        className="flex h-10 items-center gap-1.5 px-2 text-sm font-medium text-black hover:text-neutral-600"
       >
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
           <circle cx="12" cy="12" r="9" />
           <path d="M3 12h18M12 3c2.5 2.7 3.8 5.7 3.8 9s-1.3 6.3-3.8 9c-2.5-2.7-3.8-5.7-3.8-9S9.5 5.7 12 3Z" />
         </svg>
-        <span aria-hidden>{active.short}</span>
+        {/* Very narrow phones show just the globe, so everything fits on one row. */}
+        <span aria-hidden className="hidden min-[390px]:inline">
+          {active.short}
+        </span>
         <svg
           viewBox="0 0 24 24"
           width="12"
@@ -188,7 +191,7 @@ export function LanguageSelect() {
           stroke="currentColor"
           strokeWidth="2"
           aria-hidden
-          className={`transition-transform ${open ? "rotate-180" : ""}`}
+          className={`hidden transition-transform min-[390px]:block ${open ? "rotate-180" : ""}`}
         >
           <path d="m6 9 6 6 6-6" />
         </svg>
@@ -200,7 +203,7 @@ export function LanguageSelect() {
           role="listbox"
           aria-label="Language"
           onKeyDown={onListKey}
-          className="absolute right-0 top-full z-30 mt-1 max-h-[min(24rem,70vh)] w-56 overflow-y-auto border border-neutral-200 bg-white py-1 shadow-lg"
+          className="absolute left-1/2 top-full z-30 mt-1 -translate-x-1/2 lg:left-auto lg:right-0 lg:translate-x-0max-h-[min(24rem,70vh)] w-56 overflow-y-auto border border-neutral-200 bg-white py-1 shadow-lg"
         >
           {LANGUAGES.map((l) => {
             const selected = l.code === active.code;

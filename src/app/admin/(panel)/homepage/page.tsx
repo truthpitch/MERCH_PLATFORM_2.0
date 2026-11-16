@@ -1,5 +1,6 @@
 import { Card, PageTitle, SavedNotice } from "@/components/admin/Card";
 import { inputClass, labelClass, smallButtonClass } from "@/components/admin/styles";
+import { DateTimeField } from "@/components/admin/DateTimeField";
 import { SubmitButton } from "@/components/admin/ui";
 import { getProducts } from "@/lib/catalog";
 import { prisma } from "@/lib/db";
@@ -27,12 +28,45 @@ export default async function HomepageAdmin({ searchParams }: { searchParams: Pr
           <Card title="Announcement bar">
             <label className="mb-4 flex items-center gap-2 text-sm text-black">
               <input type="checkbox" name="announcementEnabled" defaultChecked={settings.announcementEnabled} className="h-4 w-4 accent-black" />
-              Show announcement bar at the top of the site
+              Show the announcement bar above the menu
             </label>
-            <label className={labelClass} htmlFor="announcementText">
-              Text
-            </label>
-            <input id="announcementText" name="announcementText" defaultValue={settings.announcementText} placeholder="Free shipping on orders over $75" className={inputClass} />
+            <div className="grid gap-4">
+              <div>
+                <label className={labelClass} htmlFor="announcementText">
+                  Headline
+                </label>
+                <input id="announcementText" name="announcementText" defaultValue={settings.announcementText} placeholder="Up to 35% off sitewide" className={inputClass} />
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label className={labelClass} htmlFor="announcementCtaLabel">
+                    Button text (optional)
+                  </label>
+                  <input id="announcementCtaLabel" name="announcementCtaLabel" defaultValue={settings.announcementCtaLabel} placeholder="Shop now" className={inputClass} />
+                </div>
+                <div>
+                  <label className={labelClass} htmlFor="announcementCtaUrl">
+                    Button link
+                  </label>
+                  <input id="announcementCtaUrl" name="announcementCtaUrl" defaultValue={settings.announcementCtaUrl} placeholder="/products" className={inputClass} />
+                  <p className="mt-1 text-xs text-neutral-500">A page on this site (/products, /products?category=t-shirts) or a full https:// link.</p>
+                </div>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label className={labelClass} htmlFor="announcementEndsAt">
+                    Countdown ends (optional)
+                  </label>
+                  <DateTimeField id="announcementEndsAt" name="announcementEndsAt" defaultIso={settings.announcementEndsAt?.toISOString() ?? null} />
+                </div>
+                <div>
+                  <label className={labelClass} htmlFor="announcementTimerLabel">
+                    Text before the countdown
+                  </label>
+                  <input id="announcementTimerLabel" name="announcementTimerLabel" defaultValue={settings.announcementTimerLabel} placeholder="Current offer expires in" className={inputClass} />
+                </div>
+              </div>
+            </div>
           </Card>
 
           <Card title="Hero">

@@ -1,39 +1,59 @@
 import Link from "next/link";
 import { Suspense } from "react";
+import { DesktopNav } from "./header/DesktopNav";
+import { HeaderIcons } from "./header/HeaderIcons";
 import { LanguageSelect } from "./header/LanguageSelect";
-import { MainNav } from "./header/MainNav";
+import { MenuDrawer } from "./header/MenuDrawer";
 import { SearchForm } from "./header/SearchForm";
 import { ThemeToggle } from "./header/ThemeToggle";
 
 /**
- * Two-bar header.
- * 1. Top bar (scrolls away): search on the left (full width on phones, fixed width from
- *    tablet up, right-aligned), language and light/dark switch on the right.
- * 2. Main bar (sticks to the top): logo and the shop menu (hamburger menu on phones).
+ * Menu bar, built mobile first.
+ *
+ * Phone / tablet (< 1024px):
+ *   [☰ TRUTHPITCH]   [🌐 EN ⌄ ☾]   [👤 ♡ 🛒]      ← sticks to the top
+ *   [ Search products               🔍 ]
+ *
+ * Desktop (≥ 1024px), one row:
+ *   [TRUTHPITCH  SHOP ⌄  ABOUT  CONTACT]  [ Search 🔍 ]  [🌐 EN ⌄ ☾]  [👤 ♡ 🛒]
  */
-export function SiteHeader({ cartCount }: { cartCount: number }) {
+export function SiteHeader({ cartCount, signedIn }: { cartCount: number; signedIn: boolean }) {
   return (
     <>
-      <div className="border-b border-neutral-200 bg-neutral-50">
-        <div className="mx-auto flex h-12 max-w-6xl items-center gap-2 px-4 sm:px-6 md:justify-end md:gap-3">
-          <Suspense fallback={<div className="h-9 flex-1 md:w-80 md:flex-none" />}>
-            <SearchForm />
-          </Suspense>
-          <div className="flex shrink-0 items-center">
+      {/* No backdrop blur here: it would trap the slide-out menu inside the bar. */}
+      <header className="sticky top-0 z-30 border-b border-neutral-200 bg-white">
+        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-2 px-3 sm:px-6 lg:gap-8">
+          <div className="flex min-w-0 items-center gap-1 sm:gap-2 lg:gap-10">
+            <MenuDrawer signedIn={signedIn} />
+            <Link
+              href="/"
+              className="notranslate shrink-0 text-[13px] font-bold tracking-[0.18em] text-black sm:text-sm sm:tracking-[0.3em]"
+            >
+              TRUTHPITCH
+            </Link>
+            <DesktopNav />
+          </div>
+
+          <div className="hidden min-w-0 flex-1 justify-end lg:flex">
+            <Suspense fallback={<div className="h-10 w-full max-w-sm" />}>
+              <SearchForm id="site-search-desktop" className="h-10 w-full max-w-sm" />
+            </Suspense>
+          </div>
+
+          <div className="flex items-center self-stretch bg-neutral-50 px-0.5 sm:px-1">
             <LanguageSelect />
             <ThemeToggle />
           </div>
-        </div>
-      </div>
 
-      <header className="sticky top-0 z-20 border-b border-neutral-200 bg-white/95 backdrop-blur">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4 sm:px-6">
-          <Link href="/" className="notranslate shrink-0 text-sm font-bold tracking-[0.2em] text-black sm:tracking-[0.3em]">
-            TRUTHPITCH
-          </Link>
-          <MainNav cartCount={cartCount} />
+          <HeaderIcons cartCount={cartCount} signedIn={signedIn} />
         </div>
       </header>
+
+      <div className="border-b border-neutral-200 bg-neutral-50 px-3 py-2 sm:px-6 lg:hidden">
+        <Suspense fallback={<div className="h-11" />}>
+          <SearchForm id="site-search" className="mx-auto h-11 w-full max-w-6xl" />
+        </Suspense>
+      </div>
     </>
   );
 }
