@@ -34,7 +34,7 @@ export default async function SearchPage({ searchParams }: Props) {
         <div className="max-w-xl text-neutral-600">
           {q ? <p>Nothing matched your search. Try a different word, or browse everything in the shop.</p> : <p>Type a word in the search bar at the top of the page.</p>}
           <Link href="/products" className="mt-6 inline-block bg-black px-6 py-3 text-sm font-medium text-white hover:bg-neutral-800">
-            Shop all
+            All Products
           </Link>
         </div>
       )}

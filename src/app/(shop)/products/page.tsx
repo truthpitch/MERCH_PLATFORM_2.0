@@ -8,7 +8,7 @@ type Props = { searchParams: Promise<{ category?: string }> };
 
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
   const category = findCategory((await searchParams).category);
-  return { title: category ? category.label : "Shop" };
+  return { title: category ? category.label : "All Products" };
 }
 
 export default async function ProductsPage({ searchParams }: Props) {
@@ -24,7 +24,7 @@ export default async function ProductsPage({ searchParams }: Props) {
   return (
     <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
       <div className="mb-6 flex items-end justify-between gap-4">
-        <h1 className="text-3xl font-semibold tracking-tight text-black">{category ? category.label : "Shop all"}</h1>
+        <h1 className="text-3xl font-semibold tracking-tight text-black">{category ? category.label : "All Products"}</h1>
         <p className="shrink-0 text-sm text-neutral-500">
           {products.length} {products.length === 1 ? "item" : "items"}
         </p>
