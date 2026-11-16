@@ -64,8 +64,8 @@ export const getCustomerId = cache(async (): Promise<number | null> => {
     const { payload } = await jwtVerify(token, getSecret(), { algorithms: ["HS256"] });
     const id = Number(payload.sub);
     if (payload.role !== "customer" || !Number.isInteger(id)) return null;
-    const row = await prisma.customer.findUnique({ where: { id }, select: { sessionVersion: true } });
-    return row && row.sessionVersion === Number(payload.v ?? 0) ? id : null;
+    const row = await prisma.customer.findUnique({ where: { id }, select: { sessionVersion: true, activatedAt: true } });
+    return row && row.activatedAt && row.sessionVersion === Number(payload.v ?? 0) ? id : null;
   } catch {
     return null;
   }

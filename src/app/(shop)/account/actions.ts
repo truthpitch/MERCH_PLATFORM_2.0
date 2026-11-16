@@ -12,6 +12,7 @@ import {
   startCustomerSession,
   verifyPassword,
 } from "@/lib/customers";
+import { ACTIVATION_SEND_FAILED, ACTIVATION_UNAVAILABLE, isMailConfigured, sendActivationEmail } from "@/lib/activation";
 import { prisma } from "@/lib/db";
 import { mergeGuestFavorites } from "@/lib/favorites";
 import { isRateLimited } from "@/lib/rate-limit";
@@ -21,6 +22,8 @@ export type AccountState = {
   error?: string;
   fieldErrors?: Partial<Record<AccountField, string>>;
   values?: { name?: string; email?: string };
+  /** Set after registering: the activation email went to this address. */
+  activationSentTo?: string;
 };
 
 /** Against password guessing: 10 tries per 15 minutes per visitor. */
@@ -46,12 +49,17 @@ export async function registerAction(_prev: AccountState, formData: FormData): P
   if (await prisma.customer.findUnique({ where: { email }, select: { id: true } })) {
     return { fieldErrors: { email: "An account with this email already exists. Sign in instead." }, values };
   }
+  // The account only works after the emailed link is clicked, so mail must be set up.
+  if (!isMailConfigured()) return { error: ACTIVATION_UNAVAILABLE, values };
 
   const customer = await prisma.customer.create({ data: { name, email, passwordHash: await hashPassword(password) } });
-  await startCustomerSession(customer.id, customer.sessionVersion);
-  await mergeGuestFavorites(customer.id);
-  revalidatePath("/", "layout");
-  redirect(safeNext(formData.get("next")));
+  const result = await sendActivationEmail(customer, safeNext(formData.get("next")), { force: true });
+  if (result === "failed") {
+    // Nothing usable was created: remove it so the visitor can simply try again.
+    await prisma.customer.delete({ where: { id: customer.id } }).catch(() => null);
+    return { error: ACTIVATION_SEND_FAILED, values };
+  }
+  return { activationSentTo: email };
 }
 
 export async function loginAction(_prev: AccountState, formData: FormData): Promise<AccountState> {
@@ -65,6 +73,21 @@ export async function loginAction(_prev: AccountState, formData: FormData): Prom
   // Same message whether the email or the password is wrong, so emails can't be probed.
   if (!customer || !(await verifyPassword(password, customer.passwordHash))) {
     return { error: "That email and password don't match.", values };
+  }
+
+  // Right password, but the activation link hasn't been clicked yet: send a new one.
+  if (!customer.activatedAt) {
+    if (!isMailConfigured()) return { error: ACTIVATION_UNAVAILABLE, values };
+    const limited = await isRateLimited("activate", 5, 15 * 60 * 1000);
+    const result = limited ? "recent" : await sendActivationEmail(customer, safeNext(formData.get("next")));
+    if (result === "failed") return { error: ACTIVATION_SEND_FAILED, values };
+    return {
+      error:
+        result === "sent"
+          ? `Your account isn't activated yet. We've sent a new activation link to ${email}. Click it to activate your account.`
+          : `Your account isn't activated yet. Click the activation link we emailed to ${email}. Can't find it? Check your spam folder, or try again in a few minutes for a new link.`,
+      values,
+    };
   }
 
   await startCustomerSession(customer.id, customer.sessionVersion);

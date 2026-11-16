@@ -85,8 +85,24 @@ model Customer {
   createdAt      DateTime        @default(now())
   // Goes up on a password reset, which signs the account out everywhere.
   sessionVersion Int             @default(0)
+  // Set once when the emailed activation link is clicked. Until then the account can't sign in.
+  activatedAt    DateTime?
   favorites      Favorite[]
   resets         PasswordReset[]
+  activations    EmailActivation[]
+}
+
+// Activation link sent after registering. Only the token's SHA-256 hash is stored.
+model EmailActivation {
+  id         Int       @id @default(autoincrement())
+  customerId Int
+  tokenHash  String    @unique
+  expiresAt  DateTime
+  usedAt     DateTime?
+  createdAt  DateTime  @default(now())
+  customer   Customer  @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@index([customerId])
 }
 
 // Products a signed-in customer saved. Guests keep favorites in a cookie instead.

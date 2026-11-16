@@ -76,6 +76,9 @@ export async function resetPasswordAction(_prev: ResetState, formData: FormData)
       data: { passwordHash, sessionVersion: { increment: 1 } },
     }),
     prisma.passwordReset.deleteMany({ where: { customerId: reset.customerId } }),
+    // The reset link came by email, which proves the address: activate the account if it wasn't yet.
+    prisma.customer.updateMany({ where: { id: reset.customerId, activatedAt: null }, data: { activatedAt: new Date() } }),
+    prisma.emailActivation.deleteMany({ where: { customerId: reset.customerId, usedAt: null } }),
   ]);
 
   await startCustomerSession(customer.id, customer.sessionVersion);

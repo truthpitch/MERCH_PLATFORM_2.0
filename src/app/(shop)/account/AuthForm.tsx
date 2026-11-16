@@ -38,6 +38,21 @@ export function AuthForm({ mode, next }: { mode: "login" | "register"; next: str
   const nextQuery = next !== "/account" ? `?next=${encodeURIComponent(next)}` : "";
   const [showPassword, setShowPassword] = useState(false);
 
+  if (state.activationSentTo) {
+    return (
+      <div role="status" className="border border-neutral-200 bg-neutral-50 p-6">
+        <p className="font-semibold text-black">Check your inbox</p>
+        <p className="mt-2 text-sm text-neutral-600">
+          We&apos;ve sent an activation link to <span className="break-all font-medium text-black">{state.activationSentTo}</span>. Click it to
+          activate your account; after that you can sign in.
+        </p>
+        <p className="mt-4 text-xs text-neutral-500">
+          No email after a few minutes? Check your spam folder. Signing in with your email and password also sends a new link.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <form action={action} className="space-y-5" noValidate>
       <input type="hidden" name="next" value={next} />
