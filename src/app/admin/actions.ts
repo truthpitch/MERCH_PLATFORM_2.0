@@ -7,6 +7,7 @@ import { redirect } from "next/navigation";
 import { checkCredentials, endSession, isAuthConfigured, requireAdmin, startSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { getUploadDir, isSafeFilename, removeFaviconFile } from "@/lib/uploads";
+import { isMailConfigured, sendActivationEmail } from "@/lib/activation";
 
 // ── Helpers ─────────────────────────────────────────────────
 
@@ -210,4 +211,47 @@ export async function saveContactPageAction(formData: FormData) {
   await prisma.siteSettings.upsert({ where: { id: 1 }, update: data, create: { id: 1, ...data } });
   refreshSite();
   redirect("/admin/contact?saved=1");
+}
+
+// ── User accounts ───────────────────────────────────────────
+
+/** Back to the accounts list the admin was looking at (only that page is allowed). */
+function accountsBack(formData: FormData, result: string): never {
+  const back = text(formData, "back", 500);
+  const base = back.startsWith("/admin/accounts") && !back.startsWith("//") ? back : "/admin/accounts";
+  redirect(`${base}${base.includes("?") ? "&" : "?"}done=${result}`);
+}
+
+const customerIdFrom = (formData: FormData) => {
+  const id = Number(formData.get("id"));
+  return Number.isInteger(id) && id > 0 ? id : null;
+};
+
+/**
+ * Marks the account as not activated and emails a new activation link.
+ * The customer is signed out everywhere until they click it.
+ */
+export async function sendActivationLinkAction(formData: FormData) {
+  await requireAdmin();
+  const id = customerIdFrom(formData);
+  const customer = id ? await prisma.customer.findUnique({ where: { id } }) : null;
+  if (!customer) accountsBack(formData, "missing");
+  if (!isMailConfigured()) accountsBack(formData, "nomail");
+
+  await prisma.customer.update({ where: { id: customer.id }, data: { activatedAt: null, sessionVersion: { increment: 1 } } });
+  const result = await sendActivationEmail(customer, "/account", { force: true });
+  if (result !== "sent") {
+    // The email didn't go out: put the account back the way it was.
+    await prisma.customer.update({ where: { id: customer.id }, data: { activatedAt: customer.activatedAt } });
+    accountsBack(formData, "failed");
+  }
+  accountsBack(formData, "sent");
+}
+
+/** Permanently deletes a customer account and its favorites. Orders stay in Shopify. */
+export async function deleteCustomerAction(formData: FormData) {
+  await requireAdmin();
+  const id = customerIdFrom(formData);
+  if (id) await prisma.customer.delete({ where: { id } }).catch(() => null);
+  accountsBack(formData, "deleted");
 }

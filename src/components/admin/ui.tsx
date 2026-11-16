@@ -47,3 +47,20 @@ export function AdminNav() {
     </nav>
   );
 }
+
+/** Submit button that asks "are you sure?" first, for actions that can't be undone. */
+export function ConfirmButton({ children, message, className }: { children: React.ReactNode; message: string; className?: string }) {
+  const { pending } = useFormStatus();
+  return (
+    <button
+      type="submit"
+      disabled={pending}
+      onClick={(e) => {
+        if (!window.confirm(message)) e.preventDefault();
+      }}
+      className={className}
+    >
+      {pending ? "Working…" : children}
+    </button>
+  );
+}

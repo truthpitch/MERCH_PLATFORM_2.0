@@ -1,10 +1,20 @@
 import Link from "next/link";
 import type { Prisma } from "@prisma/client";
-import { Card, PageTitle } from "@/components/admin/Card";
-import { inputClass } from "@/components/admin/styles";
+import { Card, PageTitle, SavedNotice } from "@/components/admin/Card";
+import { inputClass, smallButtonClass } from "@/components/admin/styles";
+import { ConfirmButton } from "@/components/admin/ui";
 import { prisma } from "@/lib/db";
+import { deleteCustomerAction, sendActivationLinkAction } from "../../actions";
 
 const PAGE_SIZE = 50;
+
+const DONE_MESSAGES: Record<string, string> = {
+  sent: "Activation link sent. The account shows as Not activated until the link is clicked.",
+  deleted: "Account deleted.",
+  failed: "The email couldn't be sent, so nothing was changed. Check the mail settings (/api/health?mail=1) and try again.",
+  nomail: "Email isn't set up on this server, so no link can be sent. Nothing was changed.",
+  missing: "That account no longer exists.",
+};
 
 const FILTERS = [
   { key: "all", label: "All" },
@@ -16,7 +26,7 @@ type FilterKey = (typeof FILTERS)[number]["key"];
 const dateTime = (d: Date) =>
   d.toLocaleString("en-GB", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", timeZone: "Europe/Amsterdam" });
 
-export default async function AccountsAdmin({ searchParams }: { searchParams: Promise<{ q?: string; status?: string; page?: string }> }) {
+export default async function AccountsAdmin({ searchParams }: { searchParams: Promise<{ q?: string; status?: string; page?: string; done?: string }> }) {
   const sp = await searchParams;
   const q = (sp.q ?? "").trim().slice(0, 100);
   const status: FilterKey = FILTERS.some((f) => f.key === sp.status) ? (sp.status as FilterKey) : "all";
@@ -53,9 +63,13 @@ export default async function AccountsAdmin({ searchParams }: { searchParams: Pr
     return `/admin/accounts${qs ? `?${qs}` : ""}`;
   };
 
+  const back = href({ page });
+  const done = sp.done ? DONE_MESSAGES[sp.done] : undefined;
+
   return (
     <>
       <PageTitle title="User accounts" description="Customers who created an account in the shop. Times are Amsterdam time." />
+      <SavedNotice show={Boolean(done)}>{done}</SavedNotice>
 
       <div className="mb-6 grid grid-cols-3 gap-4">
         {[
@@ -94,15 +108,18 @@ export default async function AccountsAdmin({ searchParams }: { searchParams: Pr
         {customers.length === 0 ? (
           <p className="text-sm text-neutral-600">{total === 0 ? "No accounts yet." : "No accounts match this search."}</p>
         ) : (
-          <div className="-mx-6 overflow-x-auto px-6">
-            <table className="w-full min-w-[40rem] text-left text-sm">
+          <div className="relative -mx-6 overflow-x-auto px-6">
+            <table className="w-full min-w-[52rem] text-left text-sm">
               <thead>
                 <tr className="border-b border-neutral-200 text-xs uppercase tracking-wider text-neutral-500">
                   <th className="py-2 pr-4 font-medium">Name</th>
                   <th className="py-2 pr-4 font-medium">Email</th>
                   <th className="py-2 pr-4 font-medium">Status</th>
                   <th className="py-2 pr-4 font-medium">Created</th>
-                  <th className="py-2 text-right font-medium">Favorites</th>
+                  <th className="py-2 pr-4 text-right font-medium">Favorites</th>
+                  <th className="py-2 text-right font-medium">
+                    <span className="sr-only">Actions</span>
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-neutral-200">
@@ -124,7 +141,35 @@ export default async function AccountsAdmin({ searchParams }: { searchParams: Pr
                       )}
                     </td>
                     <td className="py-3 pr-4 whitespace-nowrap text-neutral-600">{dateTime(c.createdAt)}</td>
-                    <td className="py-3 text-right text-neutral-600">{c._count.favorites}</td>
+                    <td className="py-3 pr-4 text-right text-neutral-600">{c._count.favorites}</td>
+                    <td className="py-3">
+                      <div className="flex justify-end gap-2">
+                        <form action={sendActivationLinkAction}>
+                          <input type="hidden" name="id" value={c.id} />
+                          <input type="hidden" name="back" value={back} />
+                          <ConfirmButton
+                            className={`${smallButtonClass} whitespace-nowrap`}
+                            message={
+                              c.activatedAt
+                                ? `Send a new activation link to ${c.email}?\n\nThe account becomes "Not activated" and is signed out until the link is clicked.`
+                                : `Send a new activation link to ${c.email}?`
+                            }
+                          >
+                            {c.activatedAt ? "Send activation link" : "Resend link"}
+                          </ConfirmButton>
+                        </form>
+                        <form action={deleteCustomerAction}>
+                          <input type="hidden" name="id" value={c.id} />
+                          <input type="hidden" name="back" value={back} />
+                          <ConfirmButton
+                            className={`${smallButtonClass} whitespace-nowrap`}
+                            message={`Permanently delete the account of ${c.email}?\n\nTheir favorites are deleted too. Orders stay in Shopify. This can't be undone.`}
+                          >
+                            Delete
+                          </ConfirmButton>
+                        </form>
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>

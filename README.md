@@ -84,7 +84,7 @@ The code is commented where credentials go. See:
 | **Contact** | The `/contact` page: heading, intro text and the optional email address shown next to the form |
 | **Products** | Edit the **MORE INFO** story (and optional image) for each product |
 | **Media** | Upload images (JPG/PNG/WebP/GIF, 5 MB max) and copy their URLs |
-| **User accounts** | List of customer accounts with activation status, created date and favorites count; search and filter |
+| **User accounts** | List of customer accounts with activation status, created date and favorites count; search and filter. Per account: **Send activation link** (marks it Not activated and emails a new link) and **Delete** (both ask to confirm) |
 | **Orders** | Latest 25 Shopify orders with payment and fulfillment status |
 
 **Login**: tick **Remember me** to stay signed in for 30 days on that device; your email is also remembered after you log out, and your browser can save the password. Untick it on shared computers: you are then signed out when the browser closes.
