@@ -30,9 +30,46 @@ export default async function ProductsPage({ searchParams }: Props) {
         </p>
       </div>
 
-      {/* Category chips: scroll sideways on phones, wrap on larger screens. */}
-      <nav aria-label="Categories" className="-mx-4 mb-10 overflow-x-auto px-4 sm:mx-0 sm:overflow-visible sm:px-0">
-        <ul className="flex gap-2 sm:flex-wrap">
+      {/* Phones: a "Category" button that folds open into a two-column list (no JavaScript needed).
+          The key makes it start closed again after picking a category. */}
+      <details key={category?.slug ?? "all"} className="group mb-8 border border-neutral-300 sm:hidden">
+        <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-sm [&::-webkit-details-marker]:hidden">
+          <span className="flex min-w-0 items-center gap-2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden className="shrink-0 text-black">
+              <path d="M4 6h16M7 12h10M10 18h4" />
+            </svg>
+            <span className="text-neutral-500">Category:</span>
+            <span className="truncate font-medium text-black">{category ? category.label : "All"}</span>
+          </span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden className="shrink-0 text-black transition-transform group-open:rotate-180">
+            <path d="m6 9 6 6 6-6" />
+          </svg>
+        </summary>
+        <nav aria-label="Categories" className="border-t border-neutral-200 p-3">
+          <ul className="grid grid-cols-2 gap-2">
+            <li className="col-span-2">
+              <Link href="/products" aria-current={!category ? "page" : undefined} className={`${!category ? on : off} block py-2.5 text-center`}>
+                All products
+              </Link>
+            </li>
+            {CATEGORIES.map((c) => (
+              <li key={c.slug}>
+                <Link
+                  href={`/products?category=${c.slug}`}
+                  aria-current={category?.slug === c.slug ? "page" : undefined}
+                  className={`${category?.slug === c.slug ? on : off} flex h-full items-center justify-center whitespace-normal py-2.5 text-center leading-tight`}
+                >
+                  {c.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </details>
+
+      {/* Tablet and up: all categories as chips that wrap onto more lines. */}
+      <nav aria-label="Categories" className="mb-10 hidden sm:block">
+        <ul className="flex flex-wrap gap-2">
           <li>
             <Link href="/products" aria-current={!category ? "page" : undefined} className={!category ? on : off}>
               All
