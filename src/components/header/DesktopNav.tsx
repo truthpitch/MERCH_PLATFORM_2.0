@@ -48,7 +48,7 @@ export function DesktopNav() {
         {open && (
           <div id="shop-menu" className="absolute left-0 top-full z-30 mt-5 w-[30rem] border border-neutral-200 bg-white p-6 shadow-lg">
             <Link href="/products" onClick={() => setOpen(false)} className="mb-4 inline-block text-sm font-semibold text-black hover:underline">
-              Shop all →
+              All products →
             </Link>
             <ul className="grid grid-cols-2 gap-x-6 gap-y-1">
               {CATEGORIES.map((c) => (

@@ -203,7 +203,7 @@ export function LanguageSelect() {
           role="listbox"
           aria-label="Language"
           onKeyDown={onListKey}
-          className="absolute left-1/2 top-full z-30 mt-1 -translate-x-1/2 lg:left-auto lg:right-0 lg:translate-x-0max-h-[min(24rem,70vh)] w-56 overflow-y-auto border border-neutral-200 bg-white py-1 shadow-lg"
+          className="absolute left-1/2 top-full z-30 mt-1 -translate-x-1/2 lg:left-auto lg:right-0 lg:translate-x-0 max-h-[min(24rem,70vh)] w-56 overflow-y-auto border border-neutral-200 bg-white py-1 shadow-lg"
         >
           {LANGUAGES.map((l) => {
             const selected = l.code === active.code;

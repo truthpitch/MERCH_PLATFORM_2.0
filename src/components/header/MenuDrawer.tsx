@@ -122,7 +122,7 @@ export function MenuDrawer({ signedIn }: { signedIn: boolean }) {
               <ul id="drawer-categories" hidden={!shopOpen} className="pb-4">
                 <li>
                   <Link href="/products" onClick={close} className="block py-2 pl-3 text-sm font-medium text-black hover:underline">
-                    Shop all
+                    All products
                   </Link>
                 </li>
                 {CATEGORIES.map((c) => (

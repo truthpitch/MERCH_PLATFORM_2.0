@@ -40,7 +40,7 @@ export function SiteHeader({ cartCount, signedIn }: { cartCount: number; signedI
             </Suspense>
           </div>
 
-          <div className="flex items-center self-stretch bg-neutral-50 px-0.5 sm:px-1">
+          <div className="flex items-center self-stretch px-0.5 sm:px-1">
             <LanguageSelect />
             <ThemeToggle />
           </div>
