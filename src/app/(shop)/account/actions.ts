@@ -1,6 +1,5 @@
 "use server";
 
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import {
@@ -15,6 +14,7 @@ import {
 } from "@/lib/customers";
 import { prisma } from "@/lib/db";
 import { mergeGuestFavorites } from "@/lib/favorites";
+import { isRateLimited } from "@/lib/rate-limit";
 
 export type AccountField = "name" | "email" | "password";
 export type AccountState = {
@@ -23,22 +23,8 @@ export type AccountState = {
   values?: { name?: string; email?: string };
 };
 
-// In-memory rate limit against password guessing: 10 tries per 15 minutes per visitor (IP).
-const WINDOW_MS = 15 * 60 * 1000;
-const MAX_TRIES = 10;
-const tries = new Map<string, number[]>();
-
-async function tooManyTries(): Promise<boolean> {
-  const h = await headers();
-  const ip = h.get("x-forwarded-for")?.split(",")[0]?.trim() || h.get("x-real-ip") || "unknown";
-  const now = Date.now();
-  const list = (tries.get(ip) ?? []).filter((t) => now - t < WINDOW_MS);
-  const limited = list.length >= MAX_TRIES;
-  if (!limited) list.push(now);
-  if (tries.size > 5000) tries.clear();
-  tries.set(ip, list);
-  return limited;
-}
+/** Against password guessing: 10 tries per 15 minutes per visitor. */
+const tooManyTries = () => isRateLimited("account", 10, 15 * 60 * 1000);
 
 const read = (formData: FormData, key: string, max: number) => String(formData.get(key) ?? "").trim().slice(0, max);
 
@@ -62,7 +48,7 @@ export async function registerAction(_prev: AccountState, formData: FormData): P
   }
 
   const customer = await prisma.customer.create({ data: { name, email, passwordHash: await hashPassword(password) } });
-  await startCustomerSession(customer.id);
+  await startCustomerSession(customer.id, customer.sessionVersion);
   await mergeGuestFavorites(customer.id);
   revalidatePath("/", "layout");
   redirect(safeNext(formData.get("next")));
@@ -81,7 +67,7 @@ export async function loginAction(_prev: AccountState, formData: FormData): Prom
     return { error: "That email and password don't match.", values };
   }
 
-  await startCustomerSession(customer.id);
+  await startCustomerSession(customer.id, customer.sessionVersion);
   await mergeGuestFavorites(customer.id);
   revalidatePath("/", "layout");
   redirect(safeNext(formData.get("next")));

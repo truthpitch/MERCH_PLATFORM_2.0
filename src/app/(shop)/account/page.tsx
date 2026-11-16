@@ -7,7 +7,7 @@ import { deleteAccountAction, logoutAction } from "./actions";
 
 export const metadata: Metadata = { title: "My account", robots: { index: false } };
 
-export default async function AccountPage({ searchParams }: { searchParams: Promise<{ delete?: string }> }) {
+export default async function AccountPage({ searchParams }: { searchParams: Promise<{ delete?: string; reset?: string }> }) {
   const [customer, sp] = await Promise.all([getCurrentCustomer(), searchParams]);
   if (!customer) redirect("/account/login");
   const favorites = await getFavoriteHandles();
@@ -23,6 +23,12 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
           <button className="border border-neutral-300 px-4 py-2 text-sm font-medium text-black hover:border-black">Sign out</button>
         </form>
       </div>
+
+      {sp.reset === "1" && (
+        <p role="status" className="mt-8 border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm text-black">
+          Your password has been changed. You&apos;re signed out on all other devices.
+        </p>
+      )}
 
       <div className="mt-10 grid gap-4 sm:grid-cols-2">
         <div className="border border-neutral-200 p-6">

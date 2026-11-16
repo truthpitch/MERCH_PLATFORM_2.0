@@ -5,6 +5,7 @@ import { randomBytes, scrypt as scryptCb, timingSafeEqual } from "node:crypto";
 import { promisify } from "node:util";
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
+import { cache } from "react";
 import { prisma } from "./db";
 import { getSecret } from "./session";
 
@@ -29,9 +30,10 @@ export async function verifyPassword(password: string, stored: string): Promise<
   return timingSafeEqual(actual, expected);
 }
 
-export async function startCustomerSession(customerId: number): Promise<void> {
+/** `sessionVersion` comes from the customer row; a password reset raises it to sign out old sessions. */
+export async function startCustomerSession(customerId: number, sessionVersion: number): Promise<void> {
   const maxAge = 60 * 60 * 24 * SESSION_DAYS;
-  const token = await new SignJWT({ role: "customer" })
+  const token = await new SignJWT({ role: "customer", v: sessionVersion })
     .setProtectedHeader({ alg: "HS256" })
     .setSubject(String(customerId))
     .setIssuedAt()
@@ -50,18 +52,24 @@ export async function endCustomerSession(): Promise<void> {
   (await cookies()).delete(CUSTOMER_COOKIE);
 }
 
-/** The signed-in customer's id, or null. */
-export async function getCustomerId(): Promise<number | null> {
+/**
+ * The signed-in customer's id, or null.
+ * Also checks the account still exists and the session wasn't ended by a password reset.
+ * Wrapped in cache() so it's looked up once per page, however many places ask.
+ */
+export const getCustomerId = cache(async (): Promise<number | null> => {
   const token = (await cookies()).get(CUSTOMER_COOKIE)?.value;
   if (!token || !process.env.AUTH_SECRET) return null;
   try {
     const { payload } = await jwtVerify(token, getSecret(), { algorithms: ["HS256"] });
     const id = Number(payload.sub);
-    return payload.role === "customer" && Number.isInteger(id) ? id : null;
+    if (payload.role !== "customer" || !Number.isInteger(id)) return null;
+    const row = await prisma.customer.findUnique({ where: { id }, select: { sessionVersion: true } });
+    return row && row.sessionVersion === Number(payload.v ?? 0) ? id : null;
   } catch {
     return null;
   }
-}
+});
 
 export type CurrentCustomer = { id: number; email: string; name: string; createdAt: Date };
 

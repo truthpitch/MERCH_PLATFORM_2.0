@@ -40,8 +40,9 @@ Every variable is documented in [`.env.example`](.env.example). These are the im
 | `SHOPIFY_STOREFRONT_ACCESS_TOKEN` | Real products + checkout | Shopify admin → Sales channels → **Headless** → Create storefront → public access token |
 | `SHOPIFY_ADMIN_ACCESS_TOKEN` | Orders page (optional) | Shopify admin → Settings → Apps → Develop apps → scope `read_orders` |
 | `PRINTFUL_API_KEY` | Optional direct API use | Printful → Settings → API |
-| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` | Contact form | The mailbox's SMTP login. Titan (truthpitch.com): `smtp.titan.email`, port `465`, user `info@truthpitch.com`. |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` | Contact form and password-reset emails | The mailbox's SMTP login. Titan (truthpitch.com): `smtp.titan.email`, port `465`, user `info@truthpitch.com`. |
 | `CONTACT_TO_EMAIL` | Contact form recipient (optional) | Defaults to `info@truthpitch.com`. |
+| `SITE_URL` | Links in emails (optional) | Defaults to `https://www.truthpitch.com` in production. |
 | `UPLOAD_DIR` | Admin image uploads | Defaults to `./uploads`. Use an absolute path in production. |
 
 ## Connecting Shopify + Printful
@@ -66,7 +67,7 @@ The code is commented where credentials go. See:
   - Phone / tablet: hamburger + logo on the left, language and light/dark switch in the middle, account, favorites and cart icons on the right, search bar underneath. The hamburger opens a menu that slides in from the left: SHOP (folds open to every category), ABOUT, CONTACT.
   - Desktop (1024px+): one row with the logo, SHOP (opens a panel with every category), ABOUT, CONTACT, the search field and the icons.
 - **Categories** (`/products?category=t-shirts` etc.): T-shirts, Hoodies & sweatshirts, Beanies, Hats & caps, Stickers & decals, Posters & prints, Mugs & drinkware, Tote bags & backpacks, Phone cases, Pins & patches, Socks. A product is placed by its Shopify **Product type**, then its tags, then its title. Edit the list in `src/lib/categories.ts`.
-- **Accounts** (`/account`): customers can register, sign in, sign out and delete their account. Passwords are hashed (scrypt); sessions last 30 days. Accounts are optional: the cart offers **Checkout as guest** or **Sign in to check out**. Signed-in customers get their email pre-filled at Shopify's checkout.
+- **Accounts** (`/account`): customers can register, sign in, sign out, reset a forgotten password by email (`/account/forgot`, link valid once for 1 hour; a reset signs the account out on every other device) and delete their account. Passwords are hashed (scrypt); sessions last 30 days. Accounts are optional: the cart offers **Checkout as guest** or **Sign in to check out**. Signed-in customers get their email pre-filled at Shopify's checkout.
 - **Favorites** (`/favorites`): the heart on every product. Guests' favorites are kept on their device and move into their account when they sign in.
 - **Search** (`/search?q=`): every word must appear in a product's title, description or MORE INFO story.
 - **Shop page**: each product has a foldable **MORE INFO** under its title; the full story only shows once it's opened.

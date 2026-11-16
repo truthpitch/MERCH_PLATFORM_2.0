@@ -57,9 +57,16 @@ export function AuthForm({ mode, next }: { mode: "login" | "register"; next: str
         <FieldError name="email" message={errors.email} />
       </div>
       <div>
-        <label htmlFor="password" className={labelClass}>
-          Password
-        </label>
+        <div className="flex items-baseline justify-between gap-4">
+          <label htmlFor="password" className={labelClass}>
+            Password
+          </label>
+          {mode === "login" && (
+            <Link href="/account/forgot" className="text-xs text-neutral-600 underline underline-offset-2 hover:text-black">
+              Forgot password?
+            </Link>
+          )}
+        </div>
         <input
           id="password"
           name="password"

@@ -76,12 +76,15 @@ model Media {
 
 // Shop customers (accounts are optional: guests can always check out).
 model Customer {
-  id           Int        @id @default(autoincrement())
-  email        String     @unique
-  name         String     @default("")
-  passwordHash String
-  createdAt    DateTime   @default(now())
-  favorites    Favorite[]
+  id             Int             @id @default(autoincrement())
+  email          String          @unique
+  name           String          @default("")
+  passwordHash   String
+  createdAt      DateTime        @default(now())
+  // Goes up on a password reset, which signs the account out everywhere.
+  sessionVersion Int             @default(0)
+  favorites      Favorite[]
+  resets         PasswordReset[]
 }
 
 // Products a signed-in customer saved. Guests keep favorites in a cookie instead.
@@ -93,4 +96,15 @@ model Favorite {
   customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
 
   @@unique([customerId, handle])
+}
+
+// "Forgot password" links. Only a hash of the token is stored; links work once, for 1 hour.
+model PasswordReset {
+  id         Int       @id @default(autoincrement())
+  customerId Int
+  tokenHash  String    @unique
+  expiresAt  DateTime
+  usedAt     DateTime?
+  createdAt  DateTime  @default(now())
+  customer   Customer  @relation(fields: [customerId], references: [id], onDelete: Cascade)
 }
