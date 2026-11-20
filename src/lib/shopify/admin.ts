@@ -26,7 +26,7 @@ export function isShopifyAdminConfigured(): boolean {
 }
 
 // Token from the client credentials grant, kept in memory until a minute before it expires.
-let cached: { token: string; expiresAt: number } | null = null;
+let cached: { token: string; scope: string; expiresAt: number } | null = null;
 
 async function getAdminToken(): Promise<string> {
   if (staticToken) return staticToken;
@@ -38,14 +38,24 @@ async function getAdminToken(): Promise<string> {
     body: new URLSearchParams({ grant_type: "client_credentials", client_id: clientId, client_secret: clientSecret }),
     cache: "no-store",
   });
-  const json = (await res.json().catch(() => ({}))) as { access_token?: string; expires_in?: number; error?: string; error_description?: string };
+  const json = (await res.json().catch(() => ({}))) as {
+    access_token?: string;
+    scope?: string;
+    expires_in?: number;
+    error?: string;
+    error_description?: string;
+  };
   if (!res.ok || !json.access_token) {
     const reason = json.error_description || json.error || res.statusText;
     throw new Error(
       `Shopify refused the client ID / secret (${reason}). Check that the app is installed on this store and belongs to the same Shopify organization.`,
     );
   }
-  cached = { token: json.access_token, expiresAt: Date.now() + Math.max(60, (json.expires_in ?? 86399) - 60) * 1000 };
+  cached = {
+    token: json.access_token,
+    scope: json.scope ?? "",
+    expiresAt: Date.now() + Math.max(60, (json.expires_in ?? 86399) - 60) * 1000,
+  };
   return cached.token;
 }
 
@@ -82,8 +92,18 @@ export async function getRecentOrders(limit = 25): Promise<OrderSummary[]> {
   });
   const json = await res.json();
   if (!res.ok || json.errors) {
-    if (res.status === 401) cached = null; // token revoked or expired early: fetch a new one next time
     const msg = Array.isArray(json.errors) ? json.errors.map((e: { message: string }) => e.message).join("; ") : JSON.stringify(json.errors ?? res.statusText);
+    const accessProblem = res.status === 401 || res.status === 403 || /access denied/i.test(msg);
+    if (accessProblem && !staticToken) {
+      // Permissions may have been fixed in Shopify since this token was issued: get a fresh one next time.
+      const granted = cached?.scope;
+      cached = null;
+      throw new Error(
+        `Shopify Admin API error: ${msg} The app currently has these permissions: ${granted || "none"}. ` +
+          `Add read_orders to the app's scopes in the Dev Dashboard, release that version and approve it on the store, then reload this page.`,
+      );
+    }
+    if (res.status === 401) cached = null;
     throw new Error(`Shopify Admin API error: ${msg}`);
   }
   type Node = {
