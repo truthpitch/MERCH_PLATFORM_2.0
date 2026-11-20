@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { AddToCart } from "@/components/AddToCart";
-import { MoreInfo } from "@/components/MoreInfo";
+import { MoreInfo, ProductDetails } from "@/components/MoreInfo";
 import { FavoriteButton } from "@/components/favorites/FavoritesProvider";
 import { ProductGrid } from "@/components/ProductCard";
 import { getProduct, getProductStory, getRelatedProducts } from "@/lib/catalog";
@@ -47,8 +47,9 @@ export default async function ProductPage({ params }: Props) {
           <div className="mt-3">
             <FavoriteButton handle={product.handle} title={product.title} variant="full" />
           </div>
-          {product.description && <p className="mt-10 text-sm leading-relaxed text-neutral-700">{product.description}</p>}
-          <div className="mt-10">
+          {/* Both fold open on click and start closed; one line between them. */}
+          <div className="mt-10 divide-y divide-neutral-200 border-y border-neutral-200 empty:hidden">
+            <ProductDetails description={product.description} />
             <MoreInfo story={story.story} imageUrl={story.imageUrl} />
           </div>
         </div>
