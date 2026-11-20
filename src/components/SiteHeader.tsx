@@ -27,7 +27,7 @@ export function SiteHeader({ cartCount, signedIn }: { cartCount: number; signedI
             <MenuDrawer signedIn={signedIn} />
             <Link
               href="/"
-              className="notranslate shrink-0 text-[13px] font-bold tracking-[0.18em] text-black sm:text-sm sm:tracking-[0.3em]"
+              className="notranslate shrink-0 text-[13px] font-bold tracking-[0.18em] text-black max-[359px]:text-xs max-[359px]:tracking-[0.1em] sm:text-sm sm:tracking-[0.3em]"
             >
               TRUTHPITCH
             </Link>

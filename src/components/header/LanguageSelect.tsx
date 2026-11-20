@@ -173,7 +173,7 @@ export function LanguageSelect() {
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-label={`Language: ${active.name}`}
-        className="flex h-10 items-center gap-1.5 px-2 text-sm font-medium text-black hover:text-neutral-600"
+        className="flex h-10 items-center gap-1.5 px-2 text-sm font-medium text-black hover:text-neutral-600 max-[359px]:px-1.5"
       >
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
           <circle cx="12" cy="12" r="9" />

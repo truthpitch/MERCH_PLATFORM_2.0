@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { HeartIcon, useFavorites } from "@/components/favorites/FavoritesProvider";
 
-const iconLink = "relative flex h-10 w-9 items-center justify-center text-black hover:text-neutral-600 sm:w-10";
+const iconLink = "relative flex h-10 w-9 items-center justify-center text-black hover:text-neutral-600 max-[359px]:w-8 sm:w-10";
 
 function Badge({ count }: { count: number }) {
   if (count <= 0) return null;

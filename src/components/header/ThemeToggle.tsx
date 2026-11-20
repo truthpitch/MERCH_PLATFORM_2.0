@@ -29,7 +29,7 @@ export function ThemeToggle() {
       aria-label={label}
       title={label}
       aria-pressed={dark ?? undefined}
-      className="flex h-10 w-9 shrink-0 items-center justify-center text-black hover:text-neutral-600"
+      className="flex h-10 w-9 shrink-0 items-center justify-center text-black hover:text-neutral-600 max-[359px]:w-8"
     >
       {/* Moon in light mode, sun in dark mode. Hidden until mounted to avoid a wrong icon flash. */}
       {dark === null ? null : dark ? (
