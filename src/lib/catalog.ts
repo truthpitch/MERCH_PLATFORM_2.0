@@ -36,6 +36,12 @@ export async function getRelatedProducts(handle: string, limit = 4): Promise<Pro
   return products.filter((p) => p.handle !== handle).slice(0, limit);
 }
 
+/** Categories chosen by hand in the admin, keyed by product handle. */
+export async function getCategoryOverrides(): Promise<Map<string, string>> {
+  const rows = await prisma.productStory.findMany({ where: { category: { not: "" } }, select: { handle: true, category: true } });
+  return new Map(rows.map((r) => [r.handle, r.category]));
+}
+
 /** The "MORE INFO" story: admin-edited text wins, then the sample default. */
 /**
  * MORE INFO text for many products at once (one database query), keyed by handle.

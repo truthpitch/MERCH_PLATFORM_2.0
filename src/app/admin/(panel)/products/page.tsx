@@ -1,12 +1,17 @@
 import Link from "next/link";
-import { PageTitle } from "@/components/admin/Card";
+import { PageTitle, SavedNotice } from "@/components/admin/Card";
+import { smallButtonClass } from "@/components/admin/styles";
 import { getProducts, isDemoMode } from "@/lib/catalog";
+import { CATEGORIES, explainCategory } from "@/lib/categories";
 import { prisma } from "@/lib/db";
 import { formatMoney } from "@/lib/format";
+import { saveProductCategoryAction } from "../../actions";
 
-export default async function ProductsAdmin() {
-  const [products, stories] = await Promise.all([getProducts().catch(() => []), prisma.productStory.findMany()]);
+export default async function ProductsAdmin({ searchParams }: { searchParams: Promise<{ saved?: string }> }) {
+  const [products, stories, sp] = await Promise.all([getProducts().catch(() => []), prisma.productStory.findMany(), searchParams]);
   const storyByHandle = new Map(stories.map((s) => [s.handle, s]));
+  const overrides = new Map(stories.filter((s) => s.category).map((s) => [s.handle, s.category]));
+  const savedTitle = sp.saved ? products.find((p) => p.handle === sp.saved)?.title : undefined;
 
   return (
     <>
@@ -15,16 +20,18 @@ export default async function ProductsAdmin() {
         description={
           isDemoMode()
             ? "Showing sample products (demo mode). Once Shopify is connected, your real products appear here."
-            : "Products, prices and stock are managed in Shopify / Printful. Here you edit the “MORE INFO” story for each one."
+            : "Products, prices and stock are managed in Shopify / Printful. Here you set each product's shop category and edit its “MORE INFO” story."
         }
       />
+      <SavedNotice show={Boolean(savedTitle)}>Category saved for {savedTitle}.</SavedNotice>
 
       <div className="overflow-x-auto border border-neutral-200 bg-white">
-        <table className="w-full text-left text-sm">
+        <table className="w-full min-w-[48rem] text-left text-sm">
           <thead className="border-b border-neutral-200 text-xs uppercase tracking-wider text-neutral-500">
             <tr>
               <th className="px-4 py-3 font-medium">Product</th>
               <th className="px-4 py-3 font-medium">Price</th>
+              <th className="px-4 py-3 font-medium">Category</th>
               <th className="px-4 py-3 font-medium">Story</th>
               <th className="px-4 py-3" />
             </tr>
@@ -33,8 +40,10 @@ export default async function ProductsAdmin() {
             {products.map((p) => {
               const custom = storyByHandle.get(p.handle);
               const status = custom?.story.trim() ? "Custom" : p.defaultStory ? "Sample text" : "Empty";
+              const chosen = overrides.get(p.handle) ?? "";
+              const auto = explainCategory(p); // what it would be without a hand-picked category
               return (
-                <tr key={p.id}>
+                <tr key={p.id} className="align-top">
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
                       {p.featuredImage && (
@@ -49,10 +58,32 @@ export default async function ProductsAdmin() {
                   </td>
                   <td className="px-4 py-3 text-neutral-700">{formatMoney(p.price)}</td>
                   <td className="px-4 py-3">
+                    <form action={saveProductCategoryAction} className="flex items-center gap-2">
+                      <input type="hidden" name="handle" value={p.handle} />
+                      <select
+                        name="category"
+                        defaultValue={chosen}
+                        aria-label={`Category for ${p.title}`}
+                        className="max-w-[13rem] border border-neutral-300 bg-white px-2 py-1.5 text-sm text-black outline-none focus:border-black"
+                      >
+                        <option value="">Automatic{auto.category ? ` (${auto.category.label})` : " (none)"}</option>
+                        {CATEGORIES.map((c) => (
+                          <option key={c.slug} value={c.slug}>
+                            {c.label}
+                          </option>
+                        ))}
+                      </select>
+                      <button className={smallButtonClass}>Save</button>
+                    </form>
+                    <p className="mt-1.5 max-w-[17rem] text-xs text-neutral-500">
+                      {chosen ? "Chosen by hand." : `Automatic, from ${auto.reason.charAt(0).toLowerCase()}${auto.reason.slice(1)}`}
+                    </p>
+                  </td>
+                  <td className="px-4 py-3">
                     <span className={status === "Custom" ? "text-black" : "text-neutral-500"}>{status}</span>
                   </td>
                   <td className="px-4 py-3 text-right">
-                    <Link href={`/admin/products/${encodeURIComponent(p.handle)}`} className="text-sm underline underline-offset-4 hover:text-black">
+                    <Link href={`/admin/products/${encodeURIComponent(p.handle)}`} className="whitespace-nowrap text-sm underline underline-offset-4 hover:text-black">
                       Edit story
                     </Link>
                   </td>

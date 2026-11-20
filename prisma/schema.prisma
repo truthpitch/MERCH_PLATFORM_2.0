@@ -63,6 +63,8 @@ model ProductStory {
   handle    String   @id
   story     String   @default("")
   imageUrl  String   @default("")
+  // Category chosen in the admin (a slug from src/lib/categories.ts); empty = automatic
+  category  String   @default("")
   updatedAt DateTime @updatedAt
 }
 

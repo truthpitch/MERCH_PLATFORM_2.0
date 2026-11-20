@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ProductGrid } from "@/components/ProductCard";
-import { getProductStories, getProducts } from "@/lib/catalog";
+import { getCategoryOverrides, getProductStories, getProducts } from "@/lib/catalog";
 import { CATEGORIES, findCategory, productsInCategory } from "@/lib/categories";
 
 type Props = { searchParams: Promise<{ category?: string }> };
@@ -13,8 +13,8 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
 
 export default async function ProductsPage({ searchParams }: Props) {
   const category = findCategory((await searchParams).category);
-  const all = await getProducts();
-  const products = category ? productsInCategory(all, category.slug) : all;
+  const [all, overrides] = await Promise.all([getProducts(), getCategoryOverrides()]);
+  const products = category ? productsInCategory(all, category.slug, overrides) : all;
   const stories = await getProductStories(products);
 
   const chip = "shrink-0 border px-3 py-1.5 text-xs font-medium whitespace-nowrap";

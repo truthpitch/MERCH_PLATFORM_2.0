@@ -5,6 +5,7 @@ import path from "node:path";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { checkCredentials, endSession, isAuthConfigured, requireAdmin, startSession } from "@/lib/auth";
+import { findCategory } from "@/lib/categories";
 import { prisma } from "@/lib/db";
 import { getUploadDir, isSafeFilename, removeFaviconFile } from "@/lib/uploads";
 import { isMailConfigured, sendActivationEmail } from "@/lib/activation";
@@ -181,6 +182,18 @@ export async function saveStoryAction(formData: FormData) {
   await prisma.productStory.upsert({ where: { handle }, update: data, create: { handle, ...data } });
   refreshSite();
   redirect(`/admin/products/${encodeURIComponent(handle)}?saved=1`);
+}
+
+/** Picks a category for one product by hand; "" goes back to automatic. */
+export async function saveProductCategoryAction(formData: FormData) {
+  await requireAdmin();
+  const handle = text(formData, "handle", 255);
+  if (!handle) return;
+  const wanted = text(formData, "category", 100);
+  const category = findCategory(wanted)?.slug ?? "";
+  await prisma.productStory.upsert({ where: { handle }, update: { category }, create: { handle, category } });
+  refreshSite();
+  redirect(`/admin/products?saved=${encodeURIComponent(handle)}`);
 }
 
 // ── Media ───────────────────────────────────────────────────

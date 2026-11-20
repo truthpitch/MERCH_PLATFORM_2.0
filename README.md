@@ -66,7 +66,7 @@ The code is commented where credentials go. See:
 - **Menu bar** (mobile first, sticks to the top):
   - Phone / tablet: hamburger + logo on the left, language and light/dark switch in the middle, account, favorites and cart icons on the right, search bar underneath. The hamburger opens a menu that slides in from the left: SHOP (folds open to every category), ABOUT, CONTACT.
   - Desktop (1024px+): one row with the logo, SHOP (opens a panel with every category), ABOUT, CONTACT, the search field and the icons.
-- **Categories** (`/products?category=t-shirts` etc.): T-shirts, Hoodies & sweatshirts, Beanies, Hats & caps, Stickers & decals, Posters & prints, Mugs & drinkware, Tote bags & backpacks, Phone cases, Pins & patches, Socks. A product is placed by its Shopify **Product type**, then its tags, then its title. Edit the list in `src/lib/categories.ts`.
+- **Categories** (`/products?category=t-shirts` etc.): T-shirts, Hoodies & sweatshirts, Beanies, Hats & caps, Stickers & decals, Posters & prints, Mugs & drinkware, Tote bags & backpacks, Phone cases, Pins & patches, Socks. A product is placed by the category chosen for it in the admin (Products tab) if any, otherwise by its Shopify **Product type**, then its title, then its tags. Edit the list in `src/lib/categories.ts`.
 - **Accounts** (`/account`): customers can register (an activation link is emailed once, valid 48 hours; the account can sign in only after clicking it, and signing in to a not-yet-activated account sends a new link), sign in, sign out, reset a forgotten password by email (`/account/forgot`, link valid once for 1 hour; a reset signs the account out on every other device) and delete their account. Passwords are hashed (scrypt); sessions last 30 days. Accounts are optional: the cart offers **Checkout as guest** or **Sign in to check out**. Signed-in customers get their email pre-filled at Shopify's checkout.
 - **Favorites** (`/favorites`): the heart on every product. Guests' favorites are kept on their device and move into their account when they sign in.
 - **Search** (`/search?q=`): every word must appear in a product's title, description or MORE INFO story.
@@ -82,7 +82,7 @@ The code is commented where credentials go. See:
 | **Home** | Announcement bar (headline, button, countdown), hero text/image/button, featured products (add, remove, reorder) |
 | **About** | The `/about` page: intro statement, the story behind TruthPitch, optional image and three principles |
 | **Contact** | The `/contact` page: heading, intro text and the optional email address shown next to the form |
-| **Products** | Edit the **MORE INFO** story (and optional image) for each product |
+| **Products** | Choose each product's shop **category** (Automatic shows which one it gets and why) and edit the **MORE INFO** story (and optional image) |
 | **Media** | Upload images (JPG/PNG/WebP/GIF, 5 MB max) and copy their URLs |
 | **User accounts** | List of customer accounts with activation status, created date and favorites count; search and filter. Per account: **Send activation link** (marks it Not activated and emails a new link) and **Delete** (both ask to confirm) |
 | **Orders** | Latest 25 Shopify orders with payment and fulfillment status |

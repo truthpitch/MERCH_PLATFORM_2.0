@@ -1,9 +1,10 @@
 // Product categories shown under SHOP in the menu.
 //
 // A product lands in a category based on (in this order):
+//   0. a category chosen for it in the admin (Products tab), if any,
 //   1. its Shopify "Product type" (e.g. "T-Shirt", "Hoodie", "Mug"),
-//   2. its Shopify tags,
-//   3. its title.
+//   2. its title,
+//   3. its Shopify tags.
 // Words are matched whole and plurals count too ("cap" also matches "Caps").
 // Tip: set the Product type in Shopify (Printful usually fills it in) for the best result.
 import type { Product } from "./types";
@@ -46,17 +47,38 @@ export function findCategory(slug: string | undefined | null): Category | null {
   return CATEGORIES.find((c) => c.slug === slug) ?? null;
 }
 
-/** The category a product belongs to, or null when nothing matches. */
-export function productCategory(p: Product): Category | null {
-  const sources = [p.productType ?? "", (p.tags ?? []).join(" , "), p.title];
-  for (const source of sources) {
-    if (!source.trim()) continue;
-    const hit = CATEGORIES.find((c) => mentions(source, c.keywords));
-    if (hit) return hit;
+/** Category slugs chosen by hand in the admin (Products tab), keyed by product handle. */
+export type CategoryOverrides = Map<string, string>;
+
+export type CategoryMatch = { category: Category | null; reason: string };
+
+/**
+ * Which category a product lands in, and why.
+ * A category chosen in the admin always wins. Otherwise: Product type, then title, then tags.
+ * (The title counts before tags because tags are often generic or shared between products.)
+ */
+export function explainCategory(p: Product, overrides?: CategoryOverrides): CategoryMatch {
+  const chosen = findCategory(overrides?.get(p.handle));
+  if (chosen) return { category: chosen, reason: "Chosen in the admin" };
+
+  const sources: [string, string][] = [
+    ["Product type", p.productType ?? ""],
+    ["Title", p.title],
+    ["Tags", (p.tags ?? []).join(" , ")],
+  ];
+  for (const [label, text] of sources) {
+    if (!text.trim()) continue;
+    const hit = CATEGORIES.find((c) => mentions(text, c.keywords));
+    if (hit) return { category: hit, reason: `${label}: “${text.length > 60 ? `${text.slice(0, 57)}…` : text}”` };
   }
-  return null;
+  return { category: null, reason: "No match: shows under All products only" };
 }
 
-export function productsInCategory(products: Product[], slug: string): Product[] {
-  return products.filter((p) => productCategory(p)?.slug === slug);
+/** The category a product belongs to, or null when nothing matches. */
+export function productCategory(p: Product, overrides?: CategoryOverrides): Category | null {
+  return explainCategory(p, overrides).category;
+}
+
+export function productsInCategory(products: Product[], slug: string, overrides?: CategoryOverrides): Product[] {
+  return products.filter((p) => productCategory(p, overrides)?.slug === slug);
 }
