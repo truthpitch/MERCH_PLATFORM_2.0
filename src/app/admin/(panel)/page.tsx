@@ -139,7 +139,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
               label="Shopify — order overview"
               ok={isShopifyAdminConfigured()}
               okText="Connected"
-              offText="Optional — add SHOPIFY_ADMIN_ACCESS_TOKEN to .env"
+              offText="Optional — see the Orders tab for setup"
             />
             <Status
               label="Printful — fulfillment"

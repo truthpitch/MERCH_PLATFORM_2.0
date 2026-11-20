@@ -38,7 +38,7 @@ Every variable is documented in [`.env.example`](.env.example). These are the im
 | `AUTH_SECRET` | Admin sessions | `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"` |
 | `SHOPIFY_STORE_DOMAIN` | Real products + checkout | `yourstore.myshopify.com` |
 | `SHOPIFY_STOREFRONT_ACCESS_TOKEN` | Real products + checkout | Shopify admin → Sales channels → **Headless** → Create storefront → public access token |
-| `SHOPIFY_ADMIN_ACCESS_TOKEN` | Orders page (optional) | Shopify admin → Settings → Apps → Develop apps → scope `read_orders` |
+| `SHOPIFY_ADMIN_CLIENT_ID`, `SHOPIFY_ADMIN_CLIENT_SECRET` | Orders page (optional) | Shopify Dev Dashboard app with scope `read_orders`, installed on the store → app Settings → Client ID and Client secret. The site gets and renews the 24-hour access token itself. (An older custom app's `shpat_` token still works in `SHOPIFY_ADMIN_ACCESS_TOKEN`.) |
 | `PRINTFUL_API_KEY` | Optional direct API use | Printful → Settings → API |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` | Contact form, account-activation and password-reset emails (registering needs this) | The mailbox's SMTP login. Titan (truthpitch.com): `smtp.titan.email`, port `465`, user `info@truthpitch.com`. |
 | `CONTACT_TO_EMAIL` | Contact form recipient (optional) | Defaults to `info@truthpitch.com`. |

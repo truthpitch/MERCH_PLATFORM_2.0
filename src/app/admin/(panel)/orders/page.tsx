@@ -11,13 +11,25 @@ export default async function OrdersAdmin() {
         <PageTitle title="Orders" description="A read-only overview of recent Shopify orders." />
         <Card title="Not connected yet">
           <ol className="list-decimal space-y-2 pl-5 text-sm text-neutral-700">
-            <li>In Shopify admin go to Settings → Apps and sales channels → Develop apps → Create an app.</li>
-            <li>Under Configuration → Admin API scopes, enable <code>read_orders</code>.</li>
-            <li>Install the app and copy the Admin API access token (starts with <code>shpat_</code>).</li>
             <li>
-              Add it to <code>.env</code> as <code>SHOPIFY_ADMIN_ACCESS_TOKEN</code> and restart the app.
+              In Shopify admin go to Settings → Apps → <strong>Develop apps</strong> and open the <strong>Dev Dashboard</strong> (signed in with the
+              store owner&apos;s account).
+            </li>
+            <li>Apps → Create app → Start from Dev Dashboard. Give it a name, e.g. &quot;TruthPitch website&quot;.</li>
+            <li>
+              Under Versions, set Scopes to <code>read_orders</code> and click Release.
+            </li>
+            <li>Click Install app and pick your store.</li>
+            <li>
+              In the app&apos;s Settings, copy the <strong>Client ID</strong> and <strong>Client secret</strong>.
+            </li>
+            <li>
+              Add them in Hostinger as <code>SHOPIFY_ADMIN_CLIENT_ID</code> and <code>SHOPIFY_ADMIN_CLIENT_SECRET</code>, then redeploy.
             </li>
           </ol>
+          <p className="mt-4 text-sm text-neutral-600">
+            Already have an older custom app with a token starting with <code>shpat_</code>? Put that in <code>SHOPIFY_ADMIN_ACCESS_TOKEN</code> instead.
+          </p>
           <p className="mt-4 text-sm text-neutral-600">Until then, you can see every order in your Shopify admin.</p>
         </Card>
       </>
