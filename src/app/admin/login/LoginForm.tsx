@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { PasswordInput } from "@/components/PasswordInput";
 import { inputClass, labelClass } from "@/components/admin/styles";
 import { loginAction, type LoginState } from "../actions";
 
@@ -27,10 +28,9 @@ export function LoginForm({ rememberedEmail }: { rememberedEmail: string }) {
         <label htmlFor="password" className={labelClass}>
           Password
         </label>
-        <input
+        <PasswordInput
           id="password"
           name="password"
-          type="password"
           autoComplete="current-password"
           autoFocus={Boolean(rememberedEmail)}
           required

@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState, useState } from "react";
+import { useActionState } from "react";
+import { PasswordInput } from "@/components/PasswordInput";
 import { loginAction, registerAction, type AccountField, type AccountState } from "./actions";
 
 const inputClass =
@@ -17,17 +18,6 @@ function FieldError({ name, message }: { name: AccountField; message?: string })
   );
 }
 
-/** Eye icon; `off` draws it struck through (shown while the password is visible, meaning "hide"). */
-function EyeIcon({ off }: { off: boolean }) {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-      <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" />
-      <circle cx="12" cy="12" r="3" />
-      {off && <path d="m3 3 18 18" />}
-    </svg>
-  );
-}
-
 /** Sign-in and registration form. `next` is where to go afterwards (e.g. back to the cart). */
 export function AuthForm({ mode, next }: { mode: "login" | "register"; next: string }) {
   const [state, action, pending] = useActionState<AccountState, FormData>(mode === "login" ? loginAction : registerAction, {});
@@ -36,7 +26,6 @@ export function AuthForm({ mode, next }: { mode: "login" | "register"; next: str
   const invalid = (name: AccountField) =>
     errors[name] ? { "aria-invalid": true as const, "aria-describedby": `${name}-error` } : {};
   const nextQuery = next !== "/account" ? `?next=${encodeURIComponent(next)}` : "";
-  const [showPassword, setShowPassword] = useState(false);
 
   if (state.activationSentTo) {
     return (
@@ -94,32 +83,16 @@ export function AuthForm({ mode, next }: { mode: "login" | "register"; next: str
             </Link>
           )}
         </div>
-        <div className="relative">
-          <input
-            id="password"
-            name="password"
-            type={showPassword ? "text" : "password"}
-            autoComplete={mode === "login" ? "current-password" : "new-password"}
-            autoCapitalize="none"
-            autoCorrect="off"
-            spellCheck={false}
-            minLength={mode === "register" ? 8 : undefined}
-            maxLength={200}
-            required
-            className={`${inputClass} pr-12`}
-            {...invalid("password")}
-          />
-          <button
-            type="button"
-            onClick={() => setShowPassword((v) => !v)}
-            aria-label={showPassword ? "Hide password" : "Show password"}
-            aria-pressed={showPassword}
-            aria-controls="password"
-            className="absolute inset-y-0 right-0 flex w-12 items-center justify-center text-neutral-500 hover:text-black focus-visible:text-black"
-          >
-            <EyeIcon off={showPassword} />
-          </button>
-        </div>
+        <PasswordInput
+          id="password"
+          name="password"
+          autoComplete={mode === "login" ? "current-password" : "new-password"}
+          minLength={mode === "register" ? 8 : undefined}
+          maxLength={200}
+          required
+          className={inputClass}
+          {...invalid("password")}
+        />
         {mode === "register" && !errors.password && <p className="mt-1.5 text-xs text-neutral-500">At least 8 characters.</p>}
         <FieldError name="password" message={errors.password} />
       </div>

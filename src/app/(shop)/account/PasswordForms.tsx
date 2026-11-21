@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useActionState } from "react";
+import { PasswordInput } from "@/components/PasswordInput";
 import { forgotPasswordAction, resetPasswordAction, type ForgotState, type ResetState } from "./password-actions";
 
 const inputClass =
@@ -70,14 +71,14 @@ export function ResetForm({ token }: { token: string }) {
         <label htmlFor="password" className={labelClass}>
           New password
         </label>
-        <input id="password" name="password" type="password" autoComplete="new-password" minLength={8} maxLength={200} required className={inputClass} />
+        <PasswordInput id="password" name="password" autoComplete="new-password" minLength={8} maxLength={200} required className={inputClass} />
         <p className="mt-1.5 text-xs text-neutral-500">At least 8 characters.</p>
       </div>
       <div>
         <label htmlFor="confirm" className={labelClass}>
           Repeat new password
         </label>
-        <input id="confirm" name="confirm" type="password" autoComplete="new-password" maxLength={200} required className={inputClass} />
+        <PasswordInput id="confirm" name="confirm" autoComplete="new-password" maxLength={200} required className={inputClass} />
       </div>
       <ErrorBox message={state.error} />
       <button type="submit" disabled={pending} className={buttonClass}>
