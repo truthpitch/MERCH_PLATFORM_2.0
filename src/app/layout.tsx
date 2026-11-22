@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getSettings } from "@/lib/settings";
+import { SITE_NAME, publicSiteUrl } from "@/lib/site";
 import { MIME_BY_EXT } from "@/lib/uploads";
 import "./globals.css";
 
@@ -10,8 +11,11 @@ export async function generateMetadata(): Promise<Metadata> {
     .catch(() => "");
   const type = MIME_BY_EXT[faviconUrl.split(".").pop() ?? ""];
   return {
+    // The real domain, so relative links in metadata (canonical, link previews) become full addresses.
+    metadataBase: new URL(publicSiteUrl()),
     title: { default: "TruthPitch — Merch", template: "%s — TruthPitch" },
     description: "Official TruthPitch merch. Clean essentials, printed on demand.",
+    openGraph: { siteName: SITE_NAME, type: "website", locale: "en_GB" },
     ...(faviconUrl && {
       icons: { icon: [{ url: faviconUrl, ...(type && { type }) }], shortcut: faviconUrl, apple: faviconUrl },
     }),

@@ -155,3 +155,24 @@ model PasswordReset {
   createdAt  DateTime  @default(now())
   customer   Customer  @relation(fields: [customerId], references: [id], onDelete: Cascade)
 }
+
+// Blog posts, written in admin → Blog. Content uses simple formatting (## heading, **bold**, - list, [link](url), ![image](url)).
+model BlogPost {
+  id              Int       @id @default(autoincrement())
+  slug            String    @unique // the web address: /blog/<slug>
+  title           String
+  excerpt         String    @default("") // short summary for the list, search results and link previews
+  content         String    @default("")
+  coverImageUrl   String    @default("")
+  coverImageAlt   String    @default("")
+  author          String    @default("TruthPitch")
+  tags            String    @default("") // comma-separated
+  metaTitle       String    @default("") // optional: overrides the title in Google
+  metaDescription String    @default("") // optional: overrides the excerpt in Google
+  published       Boolean   @default(false)
+  publishedAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([published, publishedAt])
+}

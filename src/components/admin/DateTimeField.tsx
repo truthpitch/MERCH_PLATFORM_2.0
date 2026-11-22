@@ -10,7 +10,17 @@ const toLocalInput = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-$
  * Date + time picker in the admin's own time zone. It sends the moment as an exact
  * UTC time (hidden field), so the countdown ends at the same instant for every visitor.
  */
-export function DateTimeField({ id, name, defaultIso }: { id: string; name: string; defaultIso: string | null }) {
+export function DateTimeField({
+  id,
+  name,
+  defaultIso,
+  help = "Leave empty for no countdown. The bar hides itself when the time is up.",
+}: {
+  id: string;
+  name: string;
+  defaultIso: string | null;
+  help?: string;
+}) {
   const [local, setLocal] = useState("");
   // Filled in after mounting, because the time zone is only known in the browser.
   useEffect(() => {
@@ -32,7 +42,7 @@ export function DateTimeField({ id, name, defaultIso }: { id: string; name: stri
       </div>
       <input type="hidden" name={name} value={iso} />
       <p suppressHydrationWarning className="mt-1 text-xs text-neutral-500">
-        Your time zone{zone ? ` (${zone})` : ""}. Leave empty for no countdown. The bar hides itself when the time is up.
+        Your time zone{zone ? ` (${zone})` : ""}. {help}
       </p>
     </div>
   );

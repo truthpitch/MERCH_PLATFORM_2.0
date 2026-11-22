@@ -15,7 +15,7 @@ import { ThemeToggle } from "./header/ThemeToggle";
  *   [ Search products               🔍 ]
  *
  * Desktop (≥ 1024px), one row:
- *   [TRUTHPITCH  SHOP ⌄  ABOUT  CONTACT]  [ Search 🔍 ]  [🌐 EN ⌄ ☾]  [👤 ♡ 🛒]
+ *   [TRUTHPITCH  SHOP ⌄  ABOUT  BLOG  CONTACT]  [ Search 🔍 ]  [🌐 EN ⌄ ☾]  [👤 ♡ 🛒]
  */
 export function SiteHeader({ cartCount, signedIn }: { cartCount: number; signedIn: boolean }) {
   return (
@@ -67,6 +67,10 @@ export function SiteFooter() {
           Printed on demand. Secure checkout by Shopify.{" "}
           <Link href="/about" className="underline underline-offset-2 hover:text-black">
             About
+          </Link>{" "}
+          ·{" "}
+          <Link href="/blog" className="underline underline-offset-2 hover:text-black">
+            Blog
           </Link>{" "}
           ·{" "}
           <Link href="/contact" className="underline underline-offset-2 hover:text-black">

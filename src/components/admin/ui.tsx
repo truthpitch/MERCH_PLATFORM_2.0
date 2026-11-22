@@ -23,6 +23,7 @@ const NAV = [
   { href: "/admin/about", label: "About" },
   { href: "/admin/contact", label: "Contact" },
   { href: "/admin/products", label: "Products" },
+  { href: "/admin/blog", label: "Blog" },
   { href: "/admin/media", label: "Media" },
   { href: "/admin/reviews", label: "Reviews" },
   { href: "/admin/accounts", label: "User accounts" },

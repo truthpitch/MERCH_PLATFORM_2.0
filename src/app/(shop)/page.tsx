@@ -1,11 +1,13 @@
 import Link from "next/link";
+import { PostCard } from "@/components/blog/PostCard";
 import { ProductGrid } from "@/components/ProductCard";
+import { getLatestPosts } from "@/lib/blog";
 import { getFeaturedProducts } from "@/lib/catalog";
 import { getRatingSummaries } from "@/lib/reviews";
 import { getSettings } from "@/lib/settings";
 
 export default async function HomePage() {
-  const [settings, featured] = await Promise.all([getSettings(), getFeaturedProducts()]);
+  const [settings, featured, posts] = await Promise.all([getSettings(), getFeaturedProducts(), getLatestPosts(3)]);
   const ratings = await getRatingSummaries(featured.map((p) => p.handle));
 
   return (
@@ -42,6 +44,25 @@ export default async function HomePage() {
         </div>
         <ProductGrid products={featured} ratings={ratings} />
       </section>
+
+      {/* Latest blog posts (only when there are any) */}
+      {posts.length > 0 && (
+        <section className="border-t border-neutral-200">
+          <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
+            <div className="mb-10 flex items-end justify-between">
+              <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-black">From the blog</h2>
+              <Link href="/blog" className="text-sm text-neutral-600 underline-offset-4 hover:text-black hover:underline">
+                All posts
+              </Link>
+            </div>
+            <div className="grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+              {posts.map((p) => (
+                <PostCard key={p.id} post={p} headingLevel={3} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
     </>
   );

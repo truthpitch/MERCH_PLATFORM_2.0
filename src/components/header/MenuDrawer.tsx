@@ -144,6 +144,11 @@ export function MenuDrawer({ signedIn }: { signedIn: boolean }) {
               </Link>
             </li>
             <li>
+              <Link href="/blog" onClick={close} aria-current={pathname.startsWith("/blog") ? "page" : undefined} className={itemClass}>
+                Blog
+              </Link>
+            </li>
+            <li>
               <Link href="/contact" onClick={close} aria-current={pathname === "/contact" ? "page" : undefined} className={itemClass}>
                 Contact
               </Link>

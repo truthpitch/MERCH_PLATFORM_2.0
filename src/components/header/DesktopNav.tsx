@@ -69,6 +69,9 @@ export function DesktopNav() {
       <Link href="/about" aria-current={pathname === "/about" ? "page" : undefined} className={linkClass}>
         About
       </Link>
+      <Link href="/blog" aria-current={pathname.startsWith("/blog") ? "page" : undefined} className={linkClass}>
+        Blog
+      </Link>
       <Link href="/contact" aria-current={pathname === "/contact" ? "page" : undefined} className={linkClass}>
         Contact
       </Link>

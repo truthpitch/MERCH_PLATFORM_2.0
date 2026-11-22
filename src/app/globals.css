@@ -68,3 +68,79 @@ body {
   background: none !important;
   box-shadow: none !important;
 }
+
+/* ── Blog post text (src/lib/blog-format.tsx) ─────────────────── */
+.blog-content {
+  color: var(--color-neutral-800);
+  font-size: 1.0625rem;
+  line-height: 1.8;
+}
+.blog-content > * + * {
+  margin-top: 1.25em;
+}
+.blog-content h2 {
+  margin-top: 2.2em;
+  font-size: 1.5rem;
+  line-height: 1.3;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--color-black);
+  scroll-margin-top: 6rem;
+}
+.blog-content h3 {
+  margin-top: 1.8em;
+  font-size: 1.2rem;
+  line-height: 1.4;
+  font-weight: 600;
+  color: var(--color-black);
+  scroll-margin-top: 6rem;
+}
+.blog-content a {
+  color: var(--color-black);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.blog-content a:hover {
+  text-decoration-thickness: 2px;
+}
+.blog-content strong {
+  color: var(--color-black);
+  font-weight: 600;
+}
+.blog-content ul,
+.blog-content ol {
+  padding-left: 1.4em;
+}
+.blog-content ul {
+  list-style: disc;
+}
+.blog-content ol {
+  list-style: decimal;
+}
+.blog-content li + li {
+  margin-top: 0.4em;
+}
+.blog-content li::marker {
+  color: var(--color-neutral-500);
+}
+.blog-content blockquote {
+  border-left: 3px solid var(--color-black);
+  padding-left: 1.1em;
+  font-size: 1.2rem;
+  line-height: 1.6;
+  color: var(--color-black);
+}
+.blog-content hr {
+  border: 0;
+  border-top: 1px solid var(--color-neutral-200);
+  margin: 2.5em 0;
+}
+.blog-content figure img {
+  width: 100%;
+  background: var(--color-neutral-100);
+}
+.blog-content figcaption {
+  margin-top: 0.6em;
+  font-size: 0.8rem;
+  color: var(--color-neutral-500);
+}
