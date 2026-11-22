@@ -59,7 +59,8 @@ export default async function ProductPage({ params }: Props) {
         </div>
 
         {/* Details */}
-        <div className="md:sticky md:top-24 md:self-start">
+        {/* min-w-0: lets wide content (the size table) scroll inside instead of widening the page. */}
+        <div className="min-w-0 md:sticky md:top-24 md:self-start">
           <h1 className="text-3xl font-semibold tracking-tight text-black">{product.title}</h1>
           {summary.count > 0 && (
             <a href="#reviews" className="mt-2 inline-flex items-center gap-2 text-sm text-neutral-600 hover:text-black">
