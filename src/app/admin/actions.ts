@@ -268,3 +268,40 @@ export async function deleteCustomerAction(formData: FormData) {
   if (id) await prisma.customer.delete({ where: { id } }).catch(() => null);
   accountsBack(formData, "deleted");
 }
+
+// ── Product page texts ─────────────────────────────────────
+
+/** The "Shipping & returns" fold shown on every product page. */
+export async function saveShippingReturnsAction(formData: FormData) {
+  await requireAdmin();
+  const shippingReturnsText = text(formData, "shippingReturnsText", 10000);
+  await prisma.siteSettings.upsert({ where: { id: 1 }, update: { shippingReturnsText }, create: { id: 1, shippingReturnsText } });
+  refreshSite();
+  redirect("/admin/products?shipping=saved#shipping");
+}
+
+/** Size table for one shop category; empty removes it from product pages. */
+export async function saveSizeGuideAction(formData: FormData) {
+  await requireAdmin();
+  const category = findCategory(text(formData, "category", 100))?.slug;
+  if (!category) return;
+  const content = String(formData.get("content") ?? "").slice(0, 20000);
+  if (content.trim()) {
+    await prisma.sizeGuide.upsert({ where: { category }, update: { content }, create: { category, content } });
+  } else {
+    await prisma.sizeGuide.deleteMany({ where: { category } });
+  }
+  refreshSite();
+  redirect(`/admin/size-guides?saved=${category}#${category}`);
+}
+
+// ── Reviews ─────────────────────────────────────────────────
+
+/** Permanently deletes a customer review. */
+export async function deleteReviewAction(formData: FormData) {
+  await requireAdmin();
+  const id = Number(formData.get("id"));
+  if (Number.isInteger(id) && id > 0) await prisma.review.delete({ where: { id } }).catch(() => null);
+  refreshSite();
+  redirect("/admin/reviews?deleted=1");
+}

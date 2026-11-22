@@ -3,10 +3,19 @@
 import Link from "next/link";
 import { useState, useTransition } from "react";
 import { addToCartAction } from "@/app/(shop)/cart/actions";
-import { formatMoney } from "@/lib/format";
+import { Price } from "./Price";
 import type { ProductVariant } from "@/lib/types";
 
-export function AddToCart({ variants }: { variants: ProductVariant[] }) {
+/** Opens the "Size guide" fold lower on the page and scrolls to it. */
+function openSizeGuide(e: React.MouseEvent) {
+  const guide = document.getElementById("size-guide");
+  if (!(guide instanceof HTMLDetailsElement)) return;
+  e.preventDefault();
+  guide.open = true;
+  guide.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+export function AddToCart({ variants, hasSizeGuide = false }: { variants: ProductVariant[]; hasSizeGuide?: boolean }) {
   const firstAvailable = variants.find((v) => v.availableForSale) ?? variants[0];
   const [variantId, setVariantId] = useState(firstAvailable?.id);
   const [status, setStatus] = useState<"idle" | "added" | "error">("idle");
@@ -14,6 +23,8 @@ export function AddToCart({ variants }: { variants: ProductVariant[] }) {
 
   const variant = variants.find((v) => v.id === variantId) ?? firstAvailable;
   const hasOptions = variants.length > 1 || (variants[0] && variants[0].title !== "Default Title");
+  // "Size", "Color / Size" … from Shopify's option names, or "Option" when unknown.
+  const optionLabel = variants[0]?.selectedOptions?.map((o) => o.name).join(" / ") || "Option";
 
   if (!variant) return null;
 
@@ -28,11 +39,24 @@ export function AddToCart({ variants }: { variants: ProductVariant[] }) {
 
   return (
     <div className="space-y-5">
-      <p className="notranslate text-lg text-neutral-900">{formatMoney(variant.price)}</p>
+      <p>
+        <Price price={variant.price} compareAtPrice={variant.compareAtPrice} size="lg" />
+      </p>
 
       {hasOptions && (
         <div>
-          <p className="mb-2 text-xs uppercase tracking-wider text-neutral-500">Option</p>
+          <div className="mb-2 flex items-baseline justify-between gap-4">
+            <p className="text-xs uppercase tracking-wider text-neutral-500">{optionLabel}</p>
+            {hasSizeGuide && (
+              <a
+                href="#size-guide"
+                onClick={openSizeGuide}
+                className="text-xs text-neutral-700 underline underline-offset-2 hover:text-black"
+              >
+                Size guide
+              </a>
+            )}
+          </div>
           <div className="flex flex-wrap gap-2">
             {variants.map((v) => (
               <button

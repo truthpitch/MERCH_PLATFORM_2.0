@@ -69,6 +69,10 @@ The code is commented where credentials go. See:
 - **Categories** (`/products?category=t-shirts` etc.): T-shirts, Hoodies & sweatshirts, Beanies, Hats & caps, Stickers & decals, Posters & prints, Mugs & drinkware, Tote bags & backpacks, Phone cases, Pins & patches, Socks. A product is placed by the category chosen for it in the admin (Products tab) if any, otherwise by its Shopify **Product type**, then its title, then its tags. Edit the list in `src/lib/categories.ts`.
 - **Accounts** (`/account`): customers can register (an activation link is emailed once, valid 48 hours; the account can sign in only after clicking it, and signing in to a not-yet-activated account sends a new link), sign in, sign out, reset a forgotten password by email (`/account/forgot`, link valid once for 1 hour; a reset signs the account out on every other device) and delete their account. Passwords are hashed (scrypt); sessions last 30 days. Accounts are optional: the cart offers **Checkout as guest** or **Sign in to check out**. Signed-in customers get their email pre-filled at Shopify's checkout.
 - **Favorites** (`/favorites`): the heart on every product. Guests' favorites are kept on their device and move into their account when they sign in.
+- **Sale prices**: set a *Compare-at price* on a variant in Shopify and the shop shows the old price struck through, a **Sale** badge on the product card and "Save 20%" on the product page.
+- **Sort and filter** (Shop page): sort by newest, price or name; filter by size, colour (from Shopify's variant options) and price band. Choices are kept in the address, so filtered pages can be shared.
+- **Product page folds**: Product details, Size guide (when the product's category has one), Shipping & returns, and More info. All start closed.
+- **Reviews**: signed-in customers can give 1–5 stars and write a review (one per product, editable). Shown at the bottom of the product page with the average and a breakdown; stars also show on product cards. Names are shown as "Jane D.".
 - **Search** (`/search?q=`): every word must appear in a product's title, description or MORE INFO story.
 - **Shop page**: each product has a foldable **MORE INFO** under its title; the full story only shows once it's opened.
 - **Dark mode**: follows the device setting until the visitor picks one; the choice is remembered on that device. It only affects the storefront, not the admin panel.
@@ -82,8 +86,9 @@ The code is commented where credentials go. See:
 | **Home** | Announcement bar (headline, button, countdown), hero text/image/button, featured products (add, remove, reorder) |
 | **About** | The `/about` page: intro statement, the story behind TruthPitch, optional image and three principles |
 | **Contact** | The `/contact` page: heading, intro text and the optional email address shown next to the form |
-| **Products** | Choose each product's shop **category** (Automatic shows which one it gets and why) and edit the **MORE INFO** story (and optional image) |
+| **Products** | Choose each product's shop **category** (Automatic shows which one it gets and why), edit the **MORE INFO** story (and optional image), the **Shipping & returns** text for every product page, and the **Size guides** (one table per category) |
 | **Media** | Upload images (JPG/PNG/WebP/GIF, 5 MB max) and copy their URLs |
+| **Reviews** | All customer reviews with stars, product and author; delete spam or inappropriate ones |
 | **User accounts** | List of customer accounts with activation status, created date and favorites count; search and filter. Per account: **Send activation link** (marks it Not activated and emails a new link) and **Delete** (both ask to confirm) |
 | **Orders** | Latest 25 Shopify orders with payment and fulfillment status |
 

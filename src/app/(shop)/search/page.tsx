@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ProductGrid } from "@/components/ProductCard";
 import { searchProducts } from "@/lib/catalog";
+import { getRatingSummaries } from "@/lib/reviews";
 
 type Props = { searchParams: Promise<{ q?: string }> };
 
@@ -13,6 +14,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
 export default async function SearchPage({ searchParams }: Props) {
   const q = ((await searchParams).q ?? "").trim().slice(0, 100);
   const { products, stories } = await searchProducts(q);
+  const ratings = await getRatingSummaries(products.map((p) => p.handle));
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
@@ -28,7 +30,7 @@ export default async function SearchPage({ searchParams }: Props) {
         )}
       </div>
 
-      {q && products.length > 0 && <ProductGrid products={products} stories={stories} />}
+      {q && products.length > 0 && <ProductGrid products={products} stories={stories} ratings={ratings} />}
 
       {(!q || products.length === 0) && (
         <div className="max-w-xl text-neutral-600">

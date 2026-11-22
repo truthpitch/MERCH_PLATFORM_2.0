@@ -22,6 +22,8 @@ model SiteSettings {
   maintenanceMessage     String    @default("We're making a few changes behind the scenes. Please check back shortly.")
   // Browser-tab icon uploaded on the Dashboard (/media/favicon-….png), empty = none
   faviconUrl             String    @default("")
+  // "Shipping & returns" fold on every product page (admin → Products)
+  shippingReturnsText    String    @default("Every item is printed on demand, just for you. Production usually takes 2–5 business days, after which your order ships with a tracking link. Delivery time depends on where you live; you'll see the shipping options and costs at checkout.\n\nBecause each item is made to order, we can't take returns for a wrong size or a change of mind, so please check the size guide before ordering.\n\nDid your order arrive damaged, misprinted or faulty? Contact us within 30 days of delivery with a photo, and we'll send a free replacement or give you a refund.")
   announcementEnabled    Boolean   @default(false)
   announcementText       String    @default("")
   // Optional countdown and button in the announcement bar
@@ -92,6 +94,31 @@ model Customer {
   favorites      Favorite[]
   resets         PasswordReset[]
   activations    EmailActivation[]
+  reviews        Review[]
+}
+
+// A customer's review of a product (one per customer per product; they can edit it).
+model Review {
+  id         Int      @id @default(autoincrement())
+  handle     String   // Shopify product handle
+  customerId Int
+  rating     Int      // 1–5 stars
+  title      String   @default("")
+  body       String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@unique([customerId, handle])
+  @@index([handle])
+}
+
+// Size table per shop category (e.g. "t-shirts"), edited in admin → Products → Size guides.
+// One row per line; cells separated by "|" or a tab; the first line is the header.
+model SizeGuide {
+  category  String   @id
+  content   String   @default("")
+  updatedAt DateTime @updatedAt
 }
 
 // Activation link sent after registering. Only the token's SHA-256 hash is stored.

@@ -1,10 +1,18 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { AddToCart } from "@/components/AddToCart";
-import { MoreInfo, ProductDetails } from "@/components/MoreInfo";
+import { FoldSection, MoreInfo, ProductDetails, TextFold } from "@/components/MoreInfo";
 import { FavoriteButton } from "@/components/favorites/FavoritesProvider";
 import { ProductGrid } from "@/components/ProductCard";
-import { getProduct, getProductStory, getRelatedProducts } from "@/lib/catalog";
+import { ReviewsSection } from "@/components/reviews/ReviewsSection";
+import { Stars } from "@/components/reviews/Stars";
+import { SizeTable } from "@/components/SizeTable";
+import { getCategoryOverrides, getProduct, getProductStory, getRelatedProducts } from "@/lib/catalog";
+import { productCategory } from "@/lib/categories";
+import { getCustomerId } from "@/lib/customers";
+import { getProductReviews, getRatingSummaries } from "@/lib/reviews";
+import { getSettings } from "@/lib/settings";
+import { getSizeGuide } from "@/lib/size-guides";
 
 type Props = { params: Promise<{ handle: string }> };
 
@@ -18,8 +26,20 @@ export default async function ProductPage({ params }: Props) {
   const product = await getProduct(handle);
   if (!product) notFound();
 
-  const [story, related] = await Promise.all([getProductStory(product), getRelatedProducts(handle)]);
+  const [story, related, overrides, settings, customerId] = await Promise.all([
+    getProductStory(product),
+    getRelatedProducts(handle),
+    getCategoryOverrides(),
+    getSettings(),
+    getCustomerId(),
+  ]);
+  const [sizeGuide, reviews, relatedRatings] = await Promise.all([
+    getSizeGuide(productCategory(product, overrides)?.slug),
+    getProductReviews(handle, customerId),
+    getRatingSummaries(related.map((p) => p.handle)),
+  ]);
   const images = product.images.length ? product.images : product.featuredImage ? [product.featuredImage] : [];
+  const { summary } = reviews;
 
   return (
     <>
@@ -41,24 +61,40 @@ export default async function ProductPage({ params }: Props) {
         {/* Details */}
         <div className="md:sticky md:top-24 md:self-start">
           <h1 className="text-3xl font-semibold tracking-tight text-black">{product.title}</h1>
+          {summary.count > 0 && (
+            <a href="#reviews" className="mt-2 inline-flex items-center gap-2 text-sm text-neutral-600 hover:text-black">
+              <Stars value={summary.average} />
+              <span className="underline-offset-4 hover:underline">
+                {summary.average.toFixed(1)} · {summary.count} {summary.count === 1 ? "review" : "reviews"}
+              </span>
+            </a>
+          )}
           <div className="mt-6">
-            <AddToCart variants={product.variants} />
+            <AddToCart variants={product.variants} hasSizeGuide={Boolean(sizeGuide)} />
           </div>
           <div className="mt-3">
             <FavoriteButton handle={product.handle} title={product.title} variant="full" />
           </div>
-          {/* Both fold open on click and start closed; one line between them. */}
+          {/* All fold open on click and start closed; one line between them. */}
           <div className="mt-10 divide-y divide-neutral-200 border-y border-neutral-200 empty:hidden">
             <ProductDetails description={product.description} />
+            {sizeGuide && (
+              <FoldSection title="Size guide" id="size-guide">
+                <SizeTable table={sizeGuide} />
+              </FoldSection>
+            )}
+            <TextFold title="Shipping & returns" text={settings.shippingReturnsText} />
             <MoreInfo story={story.story} imageUrl={story.imageUrl} />
           </div>
         </div>
       </section>
 
+      <ReviewsSection handle={product.handle} productTitle={product.title} signedIn={Boolean(customerId)} {...reviews} />
+
       {related.length > 0 && (
         <section className="mx-auto max-w-6xl border-t border-neutral-200 px-4 py-16 sm:px-6">
           <h2 className="mb-10 text-xs font-semibold uppercase tracking-[0.2em] text-black">You may also like</h2>
-          <ProductGrid products={related} />
+          <ProductGrid products={related} ratings={relatedRatings} />
         </section>
       )}
     </>

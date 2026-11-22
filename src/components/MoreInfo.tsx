@@ -5,9 +5,9 @@ import { toParagraphs } from "@/lib/format";
  * Native <details>, so it works without JavaScript. Stack several inside a
  * `divide-y border-y` wrapper so they share one line between them.
  */
-export function FoldSection({ title, children }: { title: string; children: React.ReactNode }) {
+export function FoldSection({ title, children, id }: { title: string; children: React.ReactNode; id?: string }) {
   return (
-    <details className="group">
+    <details id={id} className="group scroll-mt-24">
       <summary className="flex cursor-pointer list-none items-center justify-between py-4 text-xs font-semibold uppercase tracking-[0.2em] text-black [&::-webkit-details-marker]:hidden">
         {title}
         <span className="text-lg font-light leading-none transition-transform group-open:rotate-45" aria-hidden>
@@ -25,6 +25,21 @@ export function ProductDetails({ description }: { description: string }) {
   if (paragraphs.length === 0) return null;
   return (
     <FoldSection title="Product details">
+      {paragraphs.map((p, i) => (
+        <p key={i} className="whitespace-pre-line">
+          {p}
+        </p>
+      ))}
+    </FoldSection>
+  );
+}
+
+/** Plain text set in the admin (e.g. "Shipping & returns"), split into paragraphs. */
+export function TextFold({ title, text }: { title: string; text: string }) {
+  const paragraphs = toParagraphs(text);
+  if (paragraphs.length === 0) return null;
+  return (
+    <FoldSection title={title}>
       {paragraphs.map((p, i) => (
         <p key={i} className="whitespace-pre-line">
           {p}

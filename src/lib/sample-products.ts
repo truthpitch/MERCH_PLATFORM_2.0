@@ -5,8 +5,10 @@ import type { Product, ProductVariant } from "./types";
 
 const usd = (amount: number) => ({ amount: amount.toFixed(2), currencyCode: "USD" });
 
-function sizes(handle: string, price: number, list = ["S", "M", "L", "XL"]): ProductVariant[] {
+function sizes(handle: string, price: number, compareAt?: number, list = ["S", "M", "L", "XL"]): ProductVariant[] {
   return list.map((size) => ({
+    compareAtPrice: compareAt ? usd(compareAt) : null,
+    selectedOptions: [{ name: "Size", value: size }],
     id: `demo-${handle}-${size.toLowerCase().replace(/\s+/g, "-")}`,
     title: size,
     availableForSale: true,
@@ -19,6 +21,8 @@ function product(p: {
   title: string;
   description: string;
   price: number;
+  /** Optional "was" price, to show a sale in demo mode. */
+  compareAt?: number;
   image: string;
   variants?: ProductVariant[];
   story: string;
@@ -34,6 +38,7 @@ function product(p: {
     featuredImage: image,
     images: [image],
     price: usd(p.price),
+    compareAtPrice: p.compareAt ? usd(p.compareAt) : null,
     variants: p.variants ?? [{ id: `demo-${p.handle}-default`, title: "Default Title", availableForSale: true, price: usd(p.price) }],
     defaultStory: p.story,
     productType: p.productType,
@@ -58,9 +63,10 @@ export const SAMPLE_PRODUCTS: Product[] = [
     productType: "T-Shirt",
     title: "Truth Tee — White",
     description: "The same heavyweight tee in white with a black chest print.",
-    price: 32,
+    price: 26,
+    compareAt: 32,
     image: "tee-white.svg",
-    variants: sizes("truth-tee-white", 32),
+    variants: sizes("truth-tee-white", 26, 32),
     story: "The white version of the original. Same cut, same weight, same quiet message.",
   }),
   product({

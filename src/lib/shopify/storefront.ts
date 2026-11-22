@@ -57,7 +57,12 @@ const PRODUCT_FIELDS = /* GraphQL */ `
     images(first: 10) { nodes { url altText } }
     priceRange { minVariantPrice { amount currencyCode } }
     variants(first: 50) {
-      nodes { id title availableForSale price { amount currencyCode } }
+      nodes {
+        id title availableForSale
+        price { amount currencyCode }
+        compareAtPrice { amount currencyCode }
+        selectedOptions { name value }
+      }
     }
   }
 `;
@@ -77,7 +82,10 @@ type ShopifyProduct = {
 };
 
 function mapProduct(p: ShopifyProduct): Product {
+  // The card shows the lowest price; its "was" price comes from that same variant.
+  const cheapest = [...p.variants.nodes].sort((a, b) => Number(a.price.amount) - Number(b.price.amount))[0];
   return {
+    compareAtPrice: cheapest?.compareAtPrice ?? null,
     id: p.id,
     handle: p.handle,
     title: p.title,

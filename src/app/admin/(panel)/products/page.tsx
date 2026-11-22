@@ -1,14 +1,22 @@
 import Link from "next/link";
-import { PageTitle, SavedNotice } from "@/components/admin/Card";
-import { smallButtonClass } from "@/components/admin/styles";
+import { Card, PageTitle, SavedNotice } from "@/components/admin/Card";
+import { inputClass, smallButtonClass } from "@/components/admin/styles";
+import { SubmitButton } from "@/components/admin/ui";
 import { getProducts, isDemoMode } from "@/lib/catalog";
 import { CATEGORIES, explainCategory } from "@/lib/categories";
 import { prisma } from "@/lib/db";
 import { formatMoney } from "@/lib/format";
-import { saveProductCategoryAction } from "../../actions";
+import { getSettings } from "@/lib/settings";
+import { saveProductCategoryAction, saveShippingReturnsAction } from "../../actions";
 
-export default async function ProductsAdmin({ searchParams }: { searchParams: Promise<{ saved?: string }> }) {
-  const [products, stories, sp] = await Promise.all([getProducts().catch(() => []), prisma.productStory.findMany(), searchParams]);
+export default async function ProductsAdmin({ searchParams }: { searchParams: Promise<{ saved?: string; shipping?: string }> }) {
+  const [products, stories, sp, settings, guideCount] = await Promise.all([
+    getProducts().catch(() => []),
+    prisma.productStory.findMany(),
+    searchParams,
+    getSettings(),
+    prisma.sizeGuide.count(),
+  ]);
   const storyByHandle = new Map(stories.map((s) => [s.handle, s]));
   const overrides = new Map(stories.filter((s) => s.category).map((s) => [s.handle, s.category]));
   const savedTitle = sp.saved ? products.find((p) => p.handle === sp.saved)?.title : undefined;
@@ -24,6 +32,39 @@ export default async function ProductsAdmin({ searchParams }: { searchParams: Pr
         }
       />
       <SavedNotice show={Boolean(savedTitle)}>Category saved for {savedTitle}.</SavedNotice>
+      <SavedNotice show={sp.shipping === "saved"}>Shipping &amp; returns text saved.</SavedNotice>
+
+      <div className="mb-6 grid gap-6 md:grid-cols-[2fr_1fr]">
+        <div id="shipping" className="scroll-mt-6">
+          <Card title="Shipping & returns">
+            <form action={saveShippingReturnsAction} className="space-y-3">
+              <label htmlFor="shippingReturnsText" className="sr-only">
+                Shipping and returns text
+              </label>
+              <textarea
+                id="shippingReturnsText"
+                name="shippingReturnsText"
+                rows={8}
+                defaultValue={settings.shippingReturnsText}
+                className={`${inputClass} leading-relaxed`}
+              />
+              <p className="text-xs text-neutral-500">Shown in a fold-out section on every product page. Leave a blank line between paragraphs. Empty = hidden.</p>
+              <SubmitButton>Save</SubmitButton>
+            </form>
+          </Card>
+        </div>
+        <Card title="Size guides">
+          <p className="text-sm text-neutral-600">
+            One size table per category (T-shirts, Hoodies …). Products in that category get a <strong>Size guide</strong> link next to the sizes.
+          </p>
+          <Link href="/admin/size-guides" className="mt-4 inline-block bg-black px-4 py-2 text-sm font-medium text-white hover:bg-neutral-800">
+            Edit size guides
+          </Link>
+          <p className="mt-3 text-xs text-neutral-500">
+            {guideCount === 0 ? "No size guides yet." : `${guideCount} ${guideCount === 1 ? "category has" : "categories have"} a size guide.`}
+          </p>
+        </Card>
+      </div>
 
       <div className="overflow-x-auto border border-neutral-200 bg-white">
         <table className="w-full min-w-[48rem] text-left text-sm">

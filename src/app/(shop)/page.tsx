@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { ProductGrid } from "@/components/ProductCard";
 import { getFeaturedProducts } from "@/lib/catalog";
+import { getRatingSummaries } from "@/lib/reviews";
 import { getSettings } from "@/lib/settings";
 
 export default async function HomePage() {
   const [settings, featured] = await Promise.all([getSettings(), getFeaturedProducts()]);
+  const ratings = await getRatingSummaries(featured.map((p) => p.handle));
 
   return (
     <>
@@ -38,7 +40,7 @@ export default async function HomePage() {
             View all
           </Link>
         </div>
-        <ProductGrid products={featured} />
+        <ProductGrid products={featured} ratings={ratings} />
       </section>
 
     </>

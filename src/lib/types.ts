@@ -9,6 +9,10 @@ export type ProductVariant = {
   title: string;
   availableForSale: boolean;
   price: Money;
+  /** Shopify "Compare-at price": when it's higher than price, the item is on sale. */
+  compareAtPrice?: Money | null;
+  /** e.g. [{ name: "Color", value: "Black" }, { name: "Size", value: "M" }] */
+  selectedOptions?: { name: string; value: string }[];
 };
 
 export type Product = {
@@ -20,6 +24,8 @@ export type Product = {
   images: ProductImage[];
   featuredImage: ProductImage | null;
   price: Money; // lowest variant price
+  /** The "was" price that goes with `price`, when that variant is on sale. */
+  compareAtPrice?: Money | null;
   variants: ProductVariant[];
   /** Shopify "Product type" and tags, used to sort products into menu categories. */
   productType?: string;

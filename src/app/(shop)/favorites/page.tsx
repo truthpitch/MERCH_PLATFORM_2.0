@@ -4,6 +4,7 @@ import { ProductGrid } from "@/components/ProductCard";
 import { getProducts } from "@/lib/catalog";
 import { getCustomerId } from "@/lib/customers";
 import { getFavoriteHandles } from "@/lib/favorites";
+import { getRatingSummaries } from "@/lib/reviews";
 import type { Product } from "@/lib/types";
 
 export const metadata: Metadata = { title: "Favorites", robots: { index: false } };
@@ -13,6 +14,7 @@ export default async function FavoritesPage() {
   const byHandle = new Map(products.map((p) => [p.handle, p]));
   // Keep the order in which they were saved; skip products that no longer exist.
   const favorites = handles.map((h) => byHandle.get(h)).filter((p): p is Product => Boolean(p));
+  const ratings = await getRatingSummaries(favorites.map((p) => p.handle));
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
@@ -41,7 +43,7 @@ export default async function FavoritesPage() {
           </Link>
         </div>
       ) : (
-        <ProductGrid products={favorites} />
+        <ProductGrid products={favorites} ratings={ratings} />
       )}
     </section>
   );
