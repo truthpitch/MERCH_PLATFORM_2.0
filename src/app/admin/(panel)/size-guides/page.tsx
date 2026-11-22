@@ -58,7 +58,14 @@ export default async function SizeGuidesAdmin({ searchParams }: { searchParams: 
               <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-6 py-4 [&::-webkit-details-marker]:hidden">
                 <span className="text-sm font-semibold uppercase tracking-wider text-black">{c.label}</span>
                 <span className="flex items-center gap-3 text-xs text-neutral-500">
-                  {table ? `${table.rows.length} ${table.rows.length === 1 ? "size" : "sizes"}` : "No size guide"}
+                  {table ? (
+                    <span className="flex items-center gap-1.5 text-black">
+                      <span className="inline-block h-2 w-2 rounded-full bg-black" aria-hidden />
+                      Filled in
+                    </span>
+                  ) : (
+                    "No size guide"
+                  )}
                   <span className="text-lg font-light leading-none text-black transition-transform group-open:rotate-45" aria-hidden>
                     +
                   </span>
