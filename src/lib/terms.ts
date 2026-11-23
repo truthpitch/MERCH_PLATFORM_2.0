@@ -12,7 +12,7 @@ This online shop is run by TruthPitch. Our company details, including our addres
 
 ## 2. Our products
 
-- Every product is **printed on demand**: it's made for you after you order it.
+- Every product is **printed on demand**: it's made for you after you order it, by our production partner Printful, and shipped worldwide.
 - We describe and show our products as accurately as possible. Colours on your screen and in mockup images can differ slightly from the real product, and small differences in print placement are normal for printed items.
 - Measurements are in the size guide on each product page. Small variations (up to about 5 cm) are possible.
 
@@ -35,7 +35,7 @@ Payment is handled securely by **Shopify** at checkout. The available payment me
 
 ## 6. Delivery
 
-How production, shipping, delivery times and tracking work is described in our [shipping policy](/shipping-policy). Delivery times are estimates. If your order is very late, please [contact us](/contact). The risk of loss or damage passes to you once the package has been delivered to you.
+**We ship worldwide.** Production takes 2 to 5 business days for most items, and longer for specialty products such as knitwear, shoes and some all-over prints. Shipping time comes on top of that. All details, including customs for orders outside the EU, are in our [shipping policy](/shipping-policy). Production and delivery times are estimates. If your order is very late, please [contact us](/contact). The risk of loss or damage passes to you once the package has been delivered to you.
 
 ## 7. Your right to cancel (14 days)
 

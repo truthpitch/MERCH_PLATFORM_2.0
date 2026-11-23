@@ -4,19 +4,27 @@
 
 export const DEFAULT_SHIPPING_POLICY = `**Last updated: 23 November 2026**
 
-Every TruthPitch item is **printed on demand**: it's made just for you after you order it, by our production partner Printful. This page explains how production, shipping and delivery work.
+Every TruthPitch item is **printed on demand**: it's made just for you after you order it, by our production partner Printful. **We ship worldwide.** This page explains how production, shipping and delivery work.
 
 ## Production time
 
-Production usually takes **2 to 5 business days** after your order is placed. Some products, and busy periods such as the weeks before the holidays, can take a little longer. We don't produce or ship on weekends and public holidays.
+Production (also called fulfillment) takes **2 to 5 business days for most items**, counted from the next business day after you order. Some products take longer:
+
+- **Shoes and some all-over prints:** usually 3 to 7 business days.
+- **Knitwear** (such as knitted sweaters): usually 7 to 12 business days, and 9 to 16 business days in November and December.
+- **Items made at partner facilities** can also take a little longer.
+
+Busy periods, such as the weeks before the holidays, can add extra time. Production doesn't happen on weekends and public holidays. These are estimates: for the current times per product type, see Printful's [production times](https://help.printful.com/hc/en-us/articles/50265287600913-How-long-does-fulfillment-take).
 
 ## Where we ship to
 
-We ship to the countries you can select at checkout. If your country isn't listed, please [contact us](/contact) and we'll see what's possible.
+**We ship worldwide.** You can choose your country at checkout. Delivery times and costs depend on your destination.
 
 ## Shipping costs and delivery time
 
-Shipping costs and the estimated delivery time are shown at **checkout**, before you pay. They depend on your address, the shipping method you choose and what's in your order. Delivery time is counted from the moment your order ships, so on top of the production time above.
+Shipping costs and the estimated delivery time are shown at **checkout**, before you pay. They depend on your country, the shipping method you choose and what's in your order. Delivery time is counted from the moment your order ships, so it comes **on top of** the production time above.
+
+**Total time until your order arrives = production time + shipping time.**
 
 ## Tracking your order
 
@@ -24,11 +32,11 @@ As soon as your order ships, you get an email with a **tracking link** so you ca
 
 ## Orders in more than one package
 
-Our products are made at different production facilities. If you order several items, they may arrive **in separate packages** and on different days. You don't pay extra for this.
+Our products are made at different production facilities around the world, often one close to you. If you order several items, they may arrive **in separate packages** and on different days. You don't pay extra for this.
 
 ## Customs and import duties
 
-Orders shipped to a country outside the European Union, such as the United Kingdom, Switzerland, Norway or the United States, may be charged **import duties, taxes or customs fees** by that country. These costs are not included in our prices, unless the checkout clearly shows them as included, and are paid by the recipient.
+Because we ship worldwide, some orders cross a customs border. Orders shipped to a country outside the European Union, such as the United Kingdom, Switzerland, Norway, the United States or Australia, may be charged **import duties, taxes or customs fees** by that country. These costs are not included in our prices, unless the checkout clearly shows them as included, and are paid by the recipient.
 
 ## Check your address
 

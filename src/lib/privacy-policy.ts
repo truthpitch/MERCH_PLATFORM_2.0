@@ -55,7 +55,7 @@ We only share personal information when it's needed for the Services or required
 - **Shopify**, which runs our checkout, payments, order administration and order emails.
 - **Payment providers** that Shopify works with (for example card networks and Klarna), to process your payment.
 - **Printful**, our production partner, which receives your name, shipping address and order details to make and ship your products. Printful may also use your email address or phone number to inform you about delivery.
-- **Shipping carriers**, to deliver your package.
+- **Shipping carriers and customs authorities**, to deliver your package. We ship worldwide, so for orders outside the EU your name, address and order contents are also shared with customs in your country.
 - **Hostinger**, which hosts our website, database and email.
 - **Google**, only if you choose a language other than English in our language menu. The page is then translated by Google Translate, which processes the page content and your IP address.
 - **Authorities and others**, when required by law, to enforce our terms and policies, or to protect the Services, our rights or the rights of others.
@@ -117,7 +117,7 @@ If you have a complaint about how we handle your personal information, please co
 
 ## International transfers
 
-Some of our service providers, such as Shopify, Printful and Google, may process your personal information outside the country where you live, including outside the European Economic Area. When information is transferred out of the EEA or the UK, this is done with recognised safeguards, such as the European Commission's Standard Contractual Clauses, or to countries that have been found to provide an adequate level of protection.
+We ship worldwide, and our products are made at Printful's production facilities in several countries. Because of this, and because some of our service providers, such as Shopify, Printful and Google, work internationally, your personal information may be processed outside the country where you live, including outside the European Economic Area. When information is transferred out of the EEA or the UK, this is done with recognised safeguards, such as the European Commission's Standard Contractual Clauses, or to countries that have been found to provide an adequate level of protection.
 
 ## Changes to this Privacy Policy
 

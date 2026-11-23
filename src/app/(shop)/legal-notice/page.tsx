@@ -65,11 +65,27 @@ export default async function LegalNoticePage() {
           .
         </p>
         <p>
+          Every product is printed on demand by our production partner Printful and <strong className="font-medium text-black">shipped worldwide</strong>.
+          Production takes 2–5 business days for most items, longer for specialty products. Payments are processed securely by Shopify.
+        </p>
+        <p>
           Read our{" "}
+          <Link href="/terms-of-service" className="text-black underline underline-offset-4">
+            terms of service
+          </Link>
+          ,{" "}
+          <Link href="/shipping-policy" className="text-black underline underline-offset-4">
+            shipping policy
+          </Link>
+          ,{" "}
           <Link href="/refund-policy" className="text-black underline underline-offset-4">
             refund policy
+          </Link>{" "}
+          and{" "}
+          <Link href="/privacy-policy" className="text-black underline underline-offset-4">
+            privacy policy
           </Link>
-          . Payments are processed securely by Shopify.
+          .
         </p>
       </div>
     </section>
