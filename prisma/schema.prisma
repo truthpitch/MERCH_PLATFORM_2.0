@@ -114,6 +114,9 @@ model Review {
   rating     Int      // 1–5 stars
   title      String   @default("")
   body       String
+  // Only approved reviews are public. New and edited reviews wait for approval in admin → Reviews.
+  approved   Boolean  @default(false)
+  approvedAt DateTime?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
   customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)

@@ -298,13 +298,44 @@ export async function saveSizeGuideAction(formData: FormData) {
 
 // ── Reviews ─────────────────────────────────────────────────
 
+/** Back to the Reviews list with the same filter, plus a "done" message. */
+function reviewsBack(formData: FormData, done: string): never {
+  const status = text(formData, "status", 20);
+  const qs = new URLSearchParams({ done });
+  if (["pending", "approved", "all"].includes(status)) qs.set("status", status);
+  redirect(`/admin/reviews?${qs}`);
+}
+
+const reviewId = (formData: FormData) => {
+  const id = Number(formData.get("id"));
+  return Number.isInteger(id) && id > 0 ? id : null;
+};
+
+/** Makes a review public on the product page. */
+export async function approveReviewAction(formData: FormData) {
+  await requireAdmin();
+  const id = reviewId(formData);
+  if (id) await prisma.review.updateMany({ where: { id }, data: { approved: true, approvedAt: new Date() } });
+  refreshSite();
+  reviewsBack(formData, "approved");
+}
+
+/** Takes an approved review off the website again (it goes back to "Waiting for approval"). */
+export async function unapproveReviewAction(formData: FormData) {
+  await requireAdmin();
+  const id = reviewId(formData);
+  if (id) await prisma.review.updateMany({ where: { id }, data: { approved: false, approvedAt: null } });
+  refreshSite();
+  reviewsBack(formData, "hidden");
+}
+
 /** Permanently deletes a customer review. */
 export async function deleteReviewAction(formData: FormData) {
   await requireAdmin();
-  const id = Number(formData.get("id"));
-  if (Number.isInteger(id) && id > 0) await prisma.review.delete({ where: { id } }).catch(() => null);
+  const id = reviewId(formData);
+  if (id) await prisma.review.delete({ where: { id } }).catch(() => null);
   refreshSite();
-  redirect("/admin/reviews?deleted=1");
+  reviewsBack(formData, "deleted");
 }
 
 // ── Legal ───────────────────────────────────────────────────

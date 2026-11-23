@@ -17,9 +17,11 @@ export function ReviewsSection({
   signedIn: boolean;
   reviews: PublicReview[];
   summary: RatingSummary;
-  own: { rating: number; title: string; body: string } | null;
+  own: { rating: number; title: string; body: string; approved: boolean } | null;
 }) {
-  const counts = [5, 4, 3, 2, 1].map((n) => ({ n, count: reviews.filter((r) => r.rating === n).length }));
+  // The breakdown only counts approved reviews (not the viewer's own pending one).
+  const approved = reviews.filter((r) => r.approved);
+  const counts = [5, 4, 3, 2, 1].map((n) => ({ n, count: approved.filter((r) => r.rating === n).length }));
   const loginHref = `/account/login?next=${encodeURIComponent(`/products/${handle}#reviews`)}`;
 
   return (
@@ -46,7 +48,7 @@ export function ReviewsSection({
                   <li key={n} className="flex items-center gap-3 text-xs text-neutral-600">
                     <span className="w-10 shrink-0">{n} star</span>
                     <span className="h-1.5 flex-1 bg-neutral-200">
-                      <span className="block h-full bg-black" style={{ width: `${reviews.length ? (count / reviews.length) * 100 : 0}%` }} />
+                      <span className="block h-full bg-black" style={{ width: `${approved.length ? (count / approved.length) * 100 : 0}%` }} />
                     </span>
                     <span className="w-6 shrink-0 text-right">{count}</span>
                   </li>
@@ -67,14 +69,20 @@ export function ReviewsSection({
               <Link href={loginHref} className="font-medium text-black underline underline-offset-4">
                 Sign in
               </Link>{" "}
-              to write a review.
+              to write a review. Reviews are checked before they&apos;re published.
             </p>
           )}
 
           {reviews.length > 0 && (
             <ul className="divide-y divide-neutral-200 border-y border-neutral-200">
               {reviews.map((r) => (
-                <li key={r.id} className="py-6">
+                <li key={r.id} className={`py-6 ${r.approved ? "" : "opacity-70"}`}>
+                  {!r.approved && (
+                    <p className="mb-3 inline-flex items-center gap-1.5 border border-neutral-300 px-2 py-1 text-[11px] font-medium uppercase tracking-wider text-neutral-700">
+                      <span className="inline-block h-1.5 w-1.5 rounded-full border border-neutral-500" aria-hidden />
+                      Waiting for approval · only you can see this
+                    </p>
+                  )}
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <Stars value={r.rating} size={14} />
                     <span className="text-xs text-neutral-500">

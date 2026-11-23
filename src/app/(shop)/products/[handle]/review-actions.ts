@@ -28,9 +28,10 @@ export async function saveReviewAction(_prev: ReviewState, formData: FormData): 
   if (await isRateLimited("review", 10, 60 * 60 * 1000)) return { error: "Too many reviews in a short time. Please try again later." };
   if (!(await getProduct(handle))) return { error: "This product no longer exists." };
 
+  // New and edited reviews wait for approval in admin → Reviews before they're public.
   await prisma.review.upsert({
     where: { customerId_handle: { customerId, handle } },
-    update: { rating, title, body },
+    update: { rating, title, body, approved: false, approvedAt: null },
     create: { customerId, handle, rating, title, body },
   });
   revalidatePath("/", "layout");

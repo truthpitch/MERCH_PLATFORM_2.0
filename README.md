@@ -72,7 +72,7 @@ The code is commented where credentials go. See:
 - **Sale prices**: set a *Compare-at price* on a variant in Shopify and the shop shows the old price struck through, a **Sale** badge on the product card and "Save 20%" on the product page.
 - **Sort and filter** (Shop page): sort by newest, price or name; filter by size, colour (from Shopify's variant options) and price band. Choices are kept in the address, so filtered pages can be shared.
 - **Product page folds**: Product details, Size guide (when the product's category has one), Shipping & returns, and More info. All start closed.
-- **Reviews**: signed-in customers can give 1–5 stars and write a review (one per product, editable). Shown at the bottom of the product page with the average and a breakdown; stars also show on product cards. Names are shown as "Jane D.".
+- **Reviews**: signed-in customers can give 1–5 stars and write a review (one per product, editable). Reviews are only published after the admin approves them, and customers are told so; edited reviews are checked again. Shown at the bottom of the product page with the average and a breakdown; stars also show on product cards. Names are shown as "Jane D.".
 - **Blog** (`/blog`): posts written in the admin, with cover image, headings, lists, quotes, links and images; an automatic “In this article” list; tags; reading time; share links and “Keep reading” suggestions. Linked from the menu, the footer and the homepage (“From the blog”). Drafts and scheduled posts are only visible to the admin.
 - **SEO**: `/sitemap.xml` (all products, categories and blog posts), `/robots.txt` (keeps admin, account, cart and search out of Google), `/blog/rss.xml`, canonical links, link previews (Open Graph / X) and structured data (BlogPosting, BreadcrumbList) on blog posts. Set `SITE_URL` if the shop moves to another domain.
 - **Search** (`/search?q=`): every word must appear in a product's title, description or MORE INFO story.
@@ -92,7 +92,7 @@ The code is commented where credentials go. See:
 | **Products** | Choose each product's shop **category** (Automatic shows which one it gets and why), edit the **MORE INFO** story (and optional image), the **Shipping & returns** text for every product page, and the **Size guides** (one table per category) |
 | **Blog** | Write, edit, schedule, publish and delete posts. Per post: title, web address, summary, text (simple formatting), cover image, tags, author, SEO title and description with a live Google preview. Five starter posts come as drafts |
 | **Media** | Upload images (JPG/PNG/WebP/GIF, 5 MB max) and copy their URLs |
-| **Reviews** | All customer reviews with stars, product and author; delete spam or inappropriate ones |
+| **Reviews** | New and edited customer reviews wait here for approval (the Dashboard shows how many). Approve, hide or delete; filter on Waiting / Approved / All |
 | **User accounts** | List of customer accounts with activation status, created date and favorites count; search and filter. Per account: **Send activation link** (marks it Not activated and emails a new link) and **Delete** (both ask to confirm) |
 | **Orders** | Latest 25 Shopify orders with payment and fulfillment status |
 

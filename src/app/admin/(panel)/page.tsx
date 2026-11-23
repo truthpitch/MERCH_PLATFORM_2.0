@@ -4,6 +4,7 @@ import { inputClass } from "@/components/admin/styles";
 import { SubmitButton } from "@/components/admin/ui";
 import { getProducts, isDemoMode } from "@/lib/catalog";
 import { prisma } from "@/lib/db";
+import { countPendingReviews } from "@/lib/reviews";
 import { isPrintfulConfigured } from "@/lib/printful";
 import { getSettings } from "@/lib/settings";
 import { isShopifyAdminConfigured } from "@/lib/shopify/admin";
@@ -18,13 +19,14 @@ const FAVICON_MESSAGES: Record<string, string> = {
 };
 
 export default async function DashboardPage({ searchParams }: { searchParams: Promise<{ saved?: string; favicon?: string }> }) {
-  const [settings, products, featuredCount, storyCount, mediaCount, sp] = await Promise.all([
+  const [settings, products, featuredCount, storyCount, mediaCount, sp, pendingReviews] = await Promise.all([
     getSettings(),
     getProducts().catch(() => []),
     prisma.featuredProduct.count(),
     prisma.productStory.count({ where: { story: { not: "" } } }),
     prisma.media.count(),
     searchParams,
+    countPendingReviews(),
   ]);
   const on = settings.maintenanceMode;
 
@@ -32,6 +34,20 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
     <>
       <PageTitle title="Dashboard" description="Everything you need to run the shop." />
       <SavedNotice show={sp.saved === "1"} />
+      {pendingReviews > 0 && (
+        <Link
+          href="/admin/reviews?status=pending"
+          className="mb-6 flex items-center justify-between gap-4 border border-black bg-white px-5 py-4 text-sm text-black hover:bg-neutral-50"
+        >
+          <span>
+            <strong>
+              {pendingReviews} {pendingReviews === 1 ? "review is" : "reviews are"} waiting for approval.
+            </strong>{" "}
+            They&apos;re not on the website until you approve them.
+          </span>
+          <span className="shrink-0 font-medium underline underline-offset-4">Check reviews →</span>
+        </Link>
+      )}
 
       <div className="grid gap-6">
         {/* Maintenance switch */}
