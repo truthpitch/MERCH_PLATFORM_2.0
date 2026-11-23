@@ -152,7 +152,13 @@ export function ReviewForm({
           <strong className="font-medium text-neutral-700">Reviews are checked before they&apos;re published.</strong> Yours appears once it&apos;s approved
           {own ? "; edited reviews are checked again" : ""}.
         </li>
-        <li>Your review is shown with your first name and the first letter of your last name.</li>
+        <li>
+          Your review is shown with your first name and the first letter of your last name (see our{" "}
+          <a href="/privacy-policy" className="underline underline-offset-2 hover:text-black">
+            privacy policy
+          </a>
+          ).
+        </li>
       </ul>
     </form>
   );

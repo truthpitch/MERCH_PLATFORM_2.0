@@ -63,6 +63,7 @@ const FOOTER_LINKS = [
   { href: "/blog", label: "Blog" },
   { href: "/contact", label: "Contact us" },
   { href: "/refund-policy", label: "Refund policy" },
+  { href: "/privacy-policy", label: "Privacy policy" },
   { href: "/legal-notice", label: "Legal notice" },
 ];
 

@@ -3,6 +3,7 @@ import { Card, PageTitle, SavedNotice } from "@/components/admin/Card";
 import { inputClass, labelClass } from "@/components/admin/styles";
 import { SubmitButton } from "@/components/admin/ui";
 import { missingLegalFields, refundPolicy } from "@/lib/legal";
+import { privacyPolicy } from "@/lib/privacy-policy";
 import { getSettings } from "@/lib/settings";
 import { saveLegalAction } from "../../actions";
 
@@ -14,9 +15,9 @@ export default async function LegalAdmin({ searchParams }: { searchParams: Promi
     <>
       <PageTitle
         title="Legal"
-        description="Your legal notice (Impressum) and refund policy. Shopify requires both to be published before it allows iDEAL | Wero, and Dutch law requires company details on an online shop."
+        description="Your legal notice (Impressum), refund policy and privacy policy. Shopify requires both to be published before it allows iDEAL | Wero, and Dutch law requires company details on an online shop."
       />
-      <SavedNotice show={sp.saved === "1"}>Saved. Both pages are updated on the website.</SavedNotice>
+      <SavedNotice show={sp.saved === "1"}>Saved. The pages are updated on the website.</SavedNotice>
       {missing.length > 0 && (
         <p className="mb-6 border border-black bg-white px-4 py-3 text-sm text-black">
           <strong>Still missing in the legal notice:</strong> {missing.join(", ")}. Fill these in so the page is complete.
@@ -112,6 +113,28 @@ export default async function LegalAdmin({ searchParams }: { searchParams: Promi
           <p className="mt-2 text-xs text-neutral-500">
             Same formatting as blog posts: <code>## Heading</code>, <code>**bold**</code>, <code>- list item</code>, <code>[link](/contact)</code>. Empty the box and save to go back to the
             standard text. Keep the <strong>Shipping &amp; returns</strong> text (Products tab) and your Shopify refund policy in line with this page.
+          </p>
+        </Card>
+
+        <Card
+          title="Privacy policy"
+          actions={
+            <Link href="/privacy-policy" target="_blank" className="text-sm text-black underline underline-offset-4">
+              View page ↗
+            </Link>
+          }
+        >
+          <textarea
+            id="privacyPolicyText"
+            name="privacyPolicyText"
+            rows={22}
+            defaultValue={privacyPolicy(s)}
+            aria-label="Privacy policy text"
+            className={`${inputClass} font-mono text-[13px] leading-relaxed`}
+          />
+          <p className="mt-2 text-xs text-neutral-500">
+            Same formatting as blog posts. Update the <strong>Last updated</strong> date at the top when you change it. Empty the box and save to go back to the standard
+            text. Use the same text for your Shopify privacy policy (Settings → Policies).
           </p>
         </Card>
 

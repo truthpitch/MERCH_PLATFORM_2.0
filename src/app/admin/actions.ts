@@ -7,6 +7,7 @@ import { redirect } from "next/navigation";
 import { checkCredentials, endSession, isAuthConfigured, requireAdmin, startSession } from "@/lib/auth";
 import { findCategory } from "@/lib/categories";
 import { DEFAULT_REFUND_POLICY } from "@/lib/legal";
+import { DEFAULT_PRIVACY_POLICY } from "@/lib/privacy-policy";
 import { prisma } from "@/lib/db";
 import { getUploadDir, isSafeFilename, removeFaviconFile } from "@/lib/uploads";
 import { isMailConfigured, sendActivationEmail } from "@/lib/activation";
@@ -345,6 +346,7 @@ export async function saveLegalAction(formData: FormData) {
   await requireAdmin();
   // Browsers send textarea line breaks as \r\n: normalise before comparing with the default.
   const refund = String(formData.get("refundPolicyText") ?? "").replace(/\r\n/g, "\n").slice(0, 30000).trim();
+  const privacy = String(formData.get("privacyPolicyText") ?? "").replace(/\r\n/g, "\n").slice(0, 60000).trim();
   const email = text(formData, "legalEmail", 200);
   const data = {
     legalCompanyName: text(formData, "legalCompanyName", 200),
@@ -356,6 +358,7 @@ export async function saveLegalAction(formData: FormData) {
     legalExtra: text(formData, "legalExtra", 3000),
     // Saving the unchanged default keeps following future improvements to it.
     refundPolicyText: refund === DEFAULT_REFUND_POLICY.trim() ? "" : refund,
+    privacyPolicyText: privacy === DEFAULT_PRIVACY_POLICY.trim() ? "" : privacy,
   };
   await prisma.siteSettings.upsert({ where: { id: 1 }, update: data, create: { id: 1, ...data } });
   refreshSite();

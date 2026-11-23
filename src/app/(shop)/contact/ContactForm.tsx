@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState } from "react";
 import { submitContactAction, type ContactField, type ContactState } from "./actions";
 
@@ -89,7 +90,13 @@ export function ContactForm() {
       {state.error && <p className="border border-neutral-300 bg-neutral-100 px-4 py-3 text-sm text-black">{state.error}</p>}
 
       <div className="flex flex-col-reverse gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-xs text-neutral-500">* Required. We only use your details to answer your message.</p>
+        <p className="text-xs text-neutral-500">
+          * Required. We only use your details to answer your message. See our{" "}
+          <Link href="/privacy-policy" className="underline underline-offset-2 hover:text-black">
+            privacy policy
+          </Link>
+          .
+        </p>
         <button
           type="submit"
           disabled={pending}

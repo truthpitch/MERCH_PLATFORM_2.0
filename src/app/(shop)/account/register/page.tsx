@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getCustomerId, safeNext } from "@/lib/customers";
 import { AuthForm } from "../AuthForm";
@@ -18,6 +19,13 @@ export default async function RegisterPage({ searchParams }: { searchParams: Pro
       <div className="mt-10">
         <AuthForm mode="register" next={next} />
       </div>
+      <p className="mt-6 text-center text-xs text-neutral-500">
+        Read how we handle your data in our{" "}
+        <Link href="/privacy-policy" className="underline underline-offset-2 hover:text-black">
+          privacy policy
+        </Link>
+        .
+      </p>
     </section>
   );
 }

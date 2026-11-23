@@ -33,6 +33,7 @@ model SiteSettings {
   legalVat               String    @default("") // VAT (btw) number
   legalExtra             String    @default("") // optional extra text, e.g. legal form or representative
   refundPolicyText       String    @default("") // empty = the default policy in src/lib/legal.ts
+  privacyPolicyText      String    @default("") // empty = the default privacy policy in src/lib/privacy-policy.ts
   announcementEnabled    Boolean   @default(false)
   announcementText       String    @default("")
   // Optional countdown and button in the announcement bar
