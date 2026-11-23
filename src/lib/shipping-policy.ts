@@ -46,9 +46,9 @@ If a package is returned to us because of an incorrect or incomplete address, or
 
 ## Late, lost or damaged packages
 
-- **Taking longer than expected?** Check the tracking link first. Still no package well after the estimated delivery date? [Contact us](/contact) and we'll look into it with the carrier.
-- **Lost in transit?** If the carrier confirms your package is lost, we'll send a free replacement or give you a full refund.
-- **Damaged, misprinted or faulty?** Contact us within **30 days** of delivery with a photo, and we'll send a free replacement or give you a refund. See our [refund policy](/refund-policy).
+- **Taking longer than expected?** Check the tracking link first. Still no package well after the estimated delivery date? [Contact us](/contact) and we'll look into it with the carrier. If we can't deliver within 30 days of your order, you may cancel and get a full refund.
+- **Lost in transit?** Until your package is delivered, it's our responsibility. If it's lost on the way, we'll send a free replacement or give you a full refund. We may first check with the carrier.
+- **Damaged, misprinted or faulty?** Let us know as soon as possible, preferably within **30 days** of delivery, with a photo, and we'll send a free replacement or give you a refund. This doesn't limit your legal guarantee. See our [refund policy](/refund-policy).
 
 ## Questions?
 

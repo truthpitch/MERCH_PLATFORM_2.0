@@ -65,6 +65,8 @@ We only share personal information when it's needed for the Services or required
 
 Our checkout is hosted by Shopify, which collects and processes personal information about your purchase to provide and improve the Services. Information you submit at checkout is shared with Shopify, as well as with third parties that may be located in countries other than where you live. Shopify may also use certain information for its own purposes, and in those cases Shopify is responsible for that processing, including responding to your requests to exercise your rights. To learn more, see the [Shopify Consumer Privacy Policy](https://www.shopify.com/legal/privacy/app-users). Depending on where you live, you can exercise certain rights in the [Shopify Privacy Portal](https://privacy.shopify.com/en).
 
+**Payment methods with their own accounts.** If you choose **Shop Pay**, Shopify can save your details for faster checkouts under its own privacy policy. If you pay with **Klarna**, Klarna processes your information, and may check your creditworthiness, under its own privacy notice. Apple Pay and Google Pay work the same way. These providers decide how they use that information.
+
 ## Cookies and similar technologies
 
 truthpitch.com only uses cookies and local storage that are **needed for the website to work** or that remember your own choices. **We don't use advertising or tracking cookies.**
