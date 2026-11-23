@@ -88,6 +88,7 @@ The code is commented where credentials go. See:
 | **Home** | Announcement bar (headline, button, countdown), hero text/image/button, featured products (add, remove, reorder) |
 | **About** | The `/about` page: intro statement, the story behind TruthPitch, optional image and three principles |
 | **Contact** | The `/contact` page: heading, intro text and the optional email address shown next to the form |
+| **Legal** | Legal notice / Impressum (company name, address, email, phone, KvK and VAT number) for `/legal-notice`, and the refund policy for `/refund-policy` (a standard EU-style text is used until you write your own). Shopify requires both for iDEAL | Wero |
 | **Products** | Choose each product's shop **category** (Automatic shows which one it gets and why), edit the **MORE INFO** story (and optional image), the **Shipping & returns** text for every product page, and the **Size guides** (one table per category) |
 | **Blog** | Write, edit, schedule, publish and delete posts. Per post: title, web address, summary, text (simple formatting), cover image, tags, author, SEO title and description with a live Google preview. Five starter posts come as drafts |
 | **Media** | Upload images (JPG/PNG/WebP/GIF, 5 MB max) and copy their URLs |

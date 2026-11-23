@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { checkCredentials, endSession, isAuthConfigured, requireAdmin, startSession } from "@/lib/auth";
 import { findCategory } from "@/lib/categories";
+import { DEFAULT_REFUND_POLICY } from "@/lib/legal";
 import { prisma } from "@/lib/db";
 import { getUploadDir, isSafeFilename, removeFaviconFile } from "@/lib/uploads";
 import { isMailConfigured, sendActivationEmail } from "@/lib/activation";
@@ -304,4 +305,28 @@ export async function deleteReviewAction(formData: FormData) {
   if (Number.isInteger(id) && id > 0) await prisma.review.delete({ where: { id } }).catch(() => null);
   refreshSite();
   redirect("/admin/reviews?deleted=1");
+}
+
+// ── Legal ───────────────────────────────────────────────────
+
+/** Legal notice (Impressum) details and the refund policy. */
+export async function saveLegalAction(formData: FormData) {
+  await requireAdmin();
+  // Browsers send textarea line breaks as \r\n: normalise before comparing with the default.
+  const refund = String(formData.get("refundPolicyText") ?? "").replace(/\r\n/g, "\n").slice(0, 30000).trim();
+  const email = text(formData, "legalEmail", 200);
+  const data = {
+    legalCompanyName: text(formData, "legalCompanyName", 200),
+    legalAddress: text(formData, "legalAddress", 500),
+    legalEmail: /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? email : "",
+    legalPhone: text(formData, "legalPhone", 50),
+    legalKvk: text(formData, "legalKvk", 50),
+    legalVat: text(formData, "legalVat", 50),
+    legalExtra: text(formData, "legalExtra", 3000),
+    // Saving the unchanged default keeps following future improvements to it.
+    refundPolicyText: refund === DEFAULT_REFUND_POLICY.trim() ? "" : refund,
+  };
+  await prisma.siteSettings.upsert({ where: { id: 1 }, update: data, create: { id: 1, ...data } });
+  refreshSite();
+  redirect("/admin/legal?saved=1");
 }

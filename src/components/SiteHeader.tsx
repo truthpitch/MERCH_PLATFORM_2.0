@@ -58,25 +58,33 @@ export function SiteHeader({ cartCount, signedIn }: { cartCount: number; signedI
   );
 }
 
+const FOOTER_LINKS = [
+  { href: "/about", label: "About" },
+  { href: "/blog", label: "Blog" },
+  { href: "/contact", label: "Contact us" },
+  { href: "/refund-policy", label: "Refund policy" },
+  { href: "/legal-notice", label: "Legal notice" },
+];
+
 export function SiteFooter() {
   return (
     <footer className="mt-24 border-t border-neutral-200">
-      <div className="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-10 text-xs text-neutral-500 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-        <p>© {new Date().getFullYear()} TruthPitch. All rights reserved.</p>
-        <p>
-          Printed on demand. Secure checkout by Shopify.{" "}
-          <Link href="/about" className="underline underline-offset-2 hover:text-black">
-            About
-          </Link>{" "}
-          ·{" "}
-          <Link href="/blog" className="underline underline-offset-2 hover:text-black">
-            Blog
-          </Link>{" "}
-          ·{" "}
-          <Link href="/contact" className="underline underline-offset-2 hover:text-black">
-            Contact us
-          </Link>
-        </p>
+      <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-10 text-xs text-neutral-500 sm:px-6 md:flex-row md:items-center md:justify-between">
+        <div className="space-y-1">
+          <p>© {new Date().getFullYear()} TruthPitch. All rights reserved.</p>
+          <p>Printed on demand. Secure checkout by Shopify.</p>
+        </div>
+        <nav aria-label="Footer">
+          <ul className="flex flex-wrap gap-x-4 gap-y-2">
+            {FOOTER_LINKS.map((l) => (
+              <li key={l.href}>
+                <Link href={l.href} className="underline underline-offset-2 hover:text-black">
+                  {l.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
       </div>
     </footer>
   );
