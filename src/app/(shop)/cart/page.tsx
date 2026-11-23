@@ -74,7 +74,13 @@ export default async function CartPage({ searchParams }: { searchParams: Promise
             <span className="text-neutral-700">Subtotal</span>
             <span className="notranslate font-medium text-black">{formatMoney(cart.subtotal)}</span>
           </div>
-          <p className="mt-1 text-sm text-neutral-500">Shipping and taxes are calculated at checkout.</p>
+          <p className="mt-1 text-sm text-neutral-500">
+            Shipping and taxes are calculated at checkout. See our{" "}
+            <Link href="/shipping-policy" className="underline underline-offset-2 hover:text-black">
+              shipping policy
+            </Link>
+            .
+          </p>
 
           {customer ? (
             <form action={checkoutAction} className="mt-8">
@@ -107,6 +113,18 @@ export default async function CartPage({ searchParams }: { searchParams: Promise
               </p>
             </div>
           )}
+
+          <p className="mt-4 text-center text-xs text-neutral-500">
+            By checking out you agree to our{" "}
+            <Link href="/terms-of-service" className="underline underline-offset-2 hover:text-black">
+              terms of service
+            </Link>
+            . You can cancel within 14 days, see our{" "}
+            <Link href="/refund-policy" className="underline underline-offset-2 hover:text-black">
+              refund policy
+            </Link>
+            .
+          </p>
 
           {(demo || sp.demo) && (
             <p className="mt-4 border border-neutral-300 bg-neutral-50 p-4 text-sm text-neutral-700">

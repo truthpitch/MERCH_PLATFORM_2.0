@@ -34,6 +34,8 @@ model SiteSettings {
   legalExtra             String    @default("") // optional extra text, e.g. legal form or representative
   refundPolicyText       String    @default("") // empty = the default policy in src/lib/legal.ts
   privacyPolicyText      String    @default("") // empty = the default privacy policy in src/lib/privacy-policy.ts
+  termsText              String    @default("") // empty = the default terms of service in src/lib/terms.ts
+  shippingPolicyText     String    @default("") // empty = the default shipping policy in src/lib/shipping-policy.ts
   announcementEnabled    Boolean   @default(false)
   announcementText       String    @default("")
   // Optional countdown and button in the announcement bar

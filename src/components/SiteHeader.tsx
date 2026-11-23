@@ -62,8 +62,10 @@ const FOOTER_LINKS = [
   { href: "/about", label: "About" },
   { href: "/blog", label: "Blog" },
   { href: "/contact", label: "Contact us" },
+  { href: "/shipping-policy", label: "Shipping" },
   { href: "/refund-policy", label: "Refund policy" },
   { href: "/privacy-policy", label: "Privacy policy" },
+  { href: "/terms-of-service", label: "Terms of service" },
   { href: "/legal-notice", label: "Legal notice" },
 ];
 

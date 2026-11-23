@@ -8,6 +8,8 @@ import { checkCredentials, endSession, isAuthConfigured, requireAdmin, startSess
 import { findCategory } from "@/lib/categories";
 import { DEFAULT_REFUND_POLICY } from "@/lib/legal";
 import { DEFAULT_PRIVACY_POLICY } from "@/lib/privacy-policy";
+import { DEFAULT_SHIPPING_POLICY } from "@/lib/shipping-policy";
+import { DEFAULT_TERMS } from "@/lib/terms";
 import { prisma } from "@/lib/db";
 import { getUploadDir, isSafeFilename, removeFaviconFile } from "@/lib/uploads";
 import { isMailConfigured, sendActivationEmail } from "@/lib/activation";
@@ -341,12 +343,18 @@ export async function deleteReviewAction(formData: FormData) {
 
 // ── Legal ───────────────────────────────────────────────────
 
-/** Legal notice (Impressum) details and the refund policy. */
+/**
+ * A policy text from the admin. Saving the unchanged standard text stores "" so the page keeps
+ * following future improvements to it. Browsers send textarea line breaks as \r\n: normalise first.
+ */
+function policyText(formData: FormData, key: string, standard: string): string {
+  const value = String(formData.get(key) ?? "").replace(/\r\n/g, "\n").slice(0, 60000).trim();
+  return value === standard.trim() ? "" : value;
+}
+
+/** Legal notice (Impressum) details and the policy pages (refund, privacy, shipping, terms). */
 export async function saveLegalAction(formData: FormData) {
   await requireAdmin();
-  // Browsers send textarea line breaks as \r\n: normalise before comparing with the default.
-  const refund = String(formData.get("refundPolicyText") ?? "").replace(/\r\n/g, "\n").slice(0, 30000).trim();
-  const privacy = String(formData.get("privacyPolicyText") ?? "").replace(/\r\n/g, "\n").slice(0, 60000).trim();
   const email = text(formData, "legalEmail", 200);
   const data = {
     legalCompanyName: text(formData, "legalCompanyName", 200),
@@ -356,9 +364,10 @@ export async function saveLegalAction(formData: FormData) {
     legalKvk: text(formData, "legalKvk", 50),
     legalVat: text(formData, "legalVat", 50),
     legalExtra: text(formData, "legalExtra", 3000),
-    // Saving the unchanged default keeps following future improvements to it.
-    refundPolicyText: refund === DEFAULT_REFUND_POLICY.trim() ? "" : refund,
-    privacyPolicyText: privacy === DEFAULT_PRIVACY_POLICY.trim() ? "" : privacy,
+    refundPolicyText: policyText(formData, "refundPolicyText", DEFAULT_REFUND_POLICY),
+    privacyPolicyText: policyText(formData, "privacyPolicyText", DEFAULT_PRIVACY_POLICY),
+    shippingPolicyText: policyText(formData, "shippingPolicyText", DEFAULT_SHIPPING_POLICY),
+    termsText: policyText(formData, "termsText", DEFAULT_TERMS),
   };
   await prisma.siteSettings.upsert({ where: { id: 1 }, update: data, create: { id: 1, ...data } });
   refreshSite();
