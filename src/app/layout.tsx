@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getSettings } from "@/lib/settings";
-import { SITE_NAME, publicSiteUrl } from "@/lib/site";
+import { GOOGLE_SITE_VERIFICATION, SITE_NAME, publicSiteUrl } from "@/lib/site";
 import { MIME_BY_EXT } from "@/lib/uploads";
 import "./globals.css";
 
@@ -9,9 +9,6 @@ export async function generateMetadata(): Promise<Metadata> {
   const s = await getSettings().catch(() => null);
   const faviconUrl = s?.faviconUrl ?? "";
   const type = MIME_BY_EXT[faviconUrl.split(".").pop() ?? ""];
-  // Ownership codes for Google Search Console and Bing Webmaster Tools (admin → SEO & Traffic).
-  const google = s?.googleVerification.trim() ?? "";
-  const bing = s?.bingVerification.trim() ?? "";
   return {
     // The real domain, so relative links in metadata (canonical, link previews) become full addresses.
     metadataBase: new URL(publicSiteUrl()),
@@ -21,9 +18,6 @@ export async function generateMetadata(): Promise<Metadata> {
     ...(faviconUrl && {
       icons: { icon: [{ url: faviconUrl, ...(type && { type }) }], shortcut: faviconUrl, apple: faviconUrl },
     }),
-    ...((google || bing) && {
-      verification: { ...(google && { google }), ...(bing && { other: { "msvalidate.01": bing } }) },
-    }),
   };
 }
 
@@ -31,11 +25,19 @@ export async function generateMetadata(): Promise<Metadata> {
 // a saved choice wins, otherwise follow the device setting.
 const themeScript = `(function(){try{var t=localStorage.getItem("tp-theme");var d=t?t==="dark":window.matchMedia("(prefers-color-scheme: dark)").matches;document.documentElement.classList.toggle("dark",d)}catch(e){}})();`;
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  // Ownership codes for Google Search Console and Bing Webmaster Tools (admin → SEO & Traffic).
+  // Written straight into <head> (not via metadata, which Next.js may stream into the body),
+  // so every search engine crawler finds them where it expects them.
+  const s = await getSettings().catch(() => null);
+  const google = s?.googleVerification.trim() || GOOGLE_SITE_VERIFICATION;
+  const bing = s?.bingVerification.trim() ?? "";
   return (
     // suppressHydrationWarning: the theme script and Google's translator change attributes on <html>.
     <html lang="en" suppressHydrationWarning>
       <head>
+        <meta name="google-site-verification" content={google} />
+        {bing && <meta name="msvalidate.01" content={bing} />}
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body className="flex min-h-screen flex-col font-sans">{children}</body>

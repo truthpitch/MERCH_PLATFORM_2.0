@@ -6,7 +6,7 @@ import { timeZoneLabel } from "@/lib/analytics";
 import { prisma } from "@/lib/db";
 import { missingLegalFields } from "@/lib/legal";
 import { getSettings } from "@/lib/settings";
-import { absoluteUrl, publicSiteUrl } from "@/lib/site";
+import { GOOGLE_SITE_VERIFICATION, absoluteUrl, publicSiteUrl } from "@/lib/site";
 import { clearTrafficStatsAction, saveSeoVerificationAction } from "../../actions";
 
 // Visitor statistics come from components/AnalyticsTracker → /api/track, and only exist for
@@ -151,7 +151,7 @@ export default async function TrafficAdmin({
       ),
     },
     { ok: !settings.maintenanceMode, text: settings.maintenanceMode ? "Maintenance mode is ON: search engines are asked not to index the shop." : "Maintenance mode is off: search engines can index the shop." },
-    { ok: Boolean(settings.googleVerification), text: settings.googleVerification ? "Google Search Console code is set." : "Google Search Console isn't connected yet (see below)." },
+    { ok: true, text: settings.googleVerification ? "Google Search Console code is set." : "Google Search Console code is built into the website (you can replace it below)." },
     { ok: Boolean(settings.faviconUrl), text: settings.faviconUrl ? "Favicon is set." : <>No favicon yet. Upload one on the <Link href="/admin" className="underline">Dashboard</Link>.</> },
     {
       ok: missingLegalFields(settings).length === 0,
@@ -383,7 +383,7 @@ export default async function TrafficAdmin({
                   <label htmlFor="googleVerification" className={labelClass}>
                     Google verification code
                   </label>
-                  <input id="googleVerification" name="googleVerification" defaultValue={settings.googleVerification} placeholder='<meta name="google-site-verification" content="…" />' className={inputClass} />
+                  <input id="googleVerification" name="googleVerification" defaultValue={settings.googleVerification} placeholder={`Built in: ${GOOGLE_SITE_VERIFICATION}`} className={inputClass} />
                 </div>
                 <div>
                   <label htmlFor="bingVerification" className={labelClass}>

@@ -14,3 +14,10 @@ export function absoluteUrl(path: string): string {
   if (/^https?:\/\//.test(path)) return path;
   return `${publicSiteUrl()}${path.startsWith("/") ? "" : "/"}${path}`;
 }
+
+/**
+ * Google Search Console ownership code for https://www.truthpitch.com (property type: URL prefix).
+ * Always in the page head, so the site stays verified; a code saved in admin → SEO & Traffic wins.
+ * Not secret: Google requires it to be publicly visible in the page source.
+ */
+export const GOOGLE_SITE_VERIFICATION = "ZZDGKRPuyt7L5IuPALD6qae2B-EN_yU84QBpCPDlVKE";
