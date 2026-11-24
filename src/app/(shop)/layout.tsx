@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
+import { Suspense } from "react";
+import { AnalyticsTracker } from "@/components/AnalyticsTracker";
 import { AnnouncementBar } from "@/components/AnnouncementBar";
+import { CookieBanner } from "@/components/CookieBanner";
 import { BAR_CLOSED_COOKIE } from "@/lib/announcement";
 import { FavoritesProvider } from "@/components/favorites/FavoritesProvider";
 import { MaintenancePage } from "@/components/MaintenancePage";
@@ -91,6 +94,11 @@ export default async function ShopLayout({ children }: { children: React.ReactNo
         <SiteHeader cartCount={cart.totalQuantity} signedIn={customerId !== null} />
         <main className="flex-1">{children}</main>
         <SiteFooter />
+        <CookieBanner />
+        {/* Only counts visits after the visitor clicked Accept (see components/AnalyticsTracker). */}
+        <Suspense fallback={null}>
+          <AnalyticsTracker />
+        </Suspense>
       </div>
     </FavoritesProvider>
   );

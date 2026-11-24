@@ -1,9 +1,9 @@
 // The standard privacy policy for truthpitch.com, used until the admin writes their own
 // (admin → Legal). Same formatting as blog posts (## headings, **bold**, - lists, [links](…)).
 // Based on Shopify's template, adapted to what this website really does: its own accounts,
-// favorites, reviews and contact form, no advertising or tracking cookies, no newsletter.
+// favorites, reviews and contact form, analytics only after consent, no advertising cookies, no newsletter.
 
-export const DEFAULT_PRIVACY_POLICY = `**Last updated: 23 November 2026**
+export const DEFAULT_PRIVACY_POLICY = `**Last updated: 24 November 2026**
 
 TruthPitch operates this store and website at truthpitch.com, including all related information, content, features, tools, products and services, in order to provide you, the customer, with a curated shopping experience (the "Services"). Our checkout and payments are powered by **Shopify**, and our products are made and shipped by our production partner **Printful**.
 
@@ -23,7 +23,7 @@ When we use the term "personal information", we mean information that identifies
 - **Transaction information**, including the items you view, put in your cart, save as a favorite, purchase, return, exchange or cancel, and your past orders.
 - **Reviews** you write: your star rating and text, shown publicly with your first name and the first letter of your last name once we have approved them.
 - **Communications with us**, including what you write in our contact form or in emails, for example a customer support question.
-- **Device and usage information**, including your IP address, browser and device type, and how you use the Services. We use this for security, for example to block repeated failed sign-in attempts, and to keep the website running.
+- **Device and usage information**, including your IP address, browser and device type, and how you use the Services. We use this for security, for example to block repeated failed sign-in attempts, and to keep the website running. If you accept analytics cookies, we also keep anonymous visit statistics (see "Cookies and similar technologies").
 
 ## Where we get personal information from
 
@@ -69,14 +69,24 @@ Our checkout is hosted by Shopify, which collects and processes personal informa
 
 ## Cookies and similar technologies
 
-truthpitch.com only uses cookies and local storage that are **needed for the website to work** or that remember your own choices. **We don't use advertising or tracking cookies.**
+truthpitch.com uses cookies and local storage that are **needed for the website to work** or that remember your own choices. Only if you click **Accept** in our cookie banner do we also use **analytics** to see how our website is used. **We don't use advertising cookies, and we don't share analytics data with advertisers or other companies.** Our [cookie policy](/cookie-policy) lists every cookie.
+
+**Necessary (always on):**
 
 - **tp_cart:** remembers your shopping cart.
 - **tp_customer:** keeps you signed in to your account (up to 30 days).
 - **tp_favorites:** remembers your favorites while you're not signed in.
 - **tp_bar_closed:** remembers that you closed the offer bar.
+- **tp_consent:** remembers whether you accepted or rejected analytics (1 year).
 - **Light or dark mode and language:** your choices are saved on your own device (in local storage).
 - **Google Translate:** if you choose another language, Google may set its own cookies.
+
+**Analytics (only after you click Accept):**
+
+- **tp_vid** (local storage): a random visitor number, so we can tell new visitors from returning ones.
+- **tp_sid** (session storage): a random visit number, deleted when you close your browser tab, so we can see how many pages one visit includes.
+
+With these we record which pages are viewed, how long they're looked at, where a visit came from (for example a search engine, social media or a campaign link), your rough location (country, or the time zone of your device), your browser language, and the type of device, browser and operating system. **We don't store your IP address, name or email address with these statistics,** and we use our own system on our own server: no data goes to Google Analytics or similar services. The legal basis is your **consent**. Statistics are deleted automatically after **13 months**. You can change your choice at any time with **Cookie settings** at the bottom of every page; if you reject, the analytics cookies are removed and nothing is recorded anymore.
 
 Shopify's checkout pages may set their own cookies, as described in Shopify's privacy policy. You can delete cookies at any time in your browser settings. Some parts of the shop, like the cart, won't work without them.
 

@@ -7,6 +7,8 @@ import { missingLegalFields, refundPolicy } from "@/lib/legal";
 import { privacyPolicy } from "@/lib/privacy-policy";
 import { shippingPolicy } from "@/lib/shipping-policy";
 import { termsOfService } from "@/lib/terms";
+import { cookiePolicy } from "@/lib/cookie-policy";
+import { howItWorks } from "@/lib/how-it-works";
 import { getSettings } from "@/lib/settings";
 import { saveLegalAction } from "../../actions";
 
@@ -19,13 +21,15 @@ export default async function LegalAdmin({ searchParams }: { searchParams: Promi
     { name: "shippingPolicyText", title: "Shipping policy", href: "/shipping-policy", text: shippingPolicy(s), custom: Boolean(s.shippingPolicyText), help: "Production time, shipping costs, tracking, customs and late or lost packages." },
     { name: "refundPolicyText", title: "Refund policy", href: "/refund-policy", text: refundPolicy(s), custom: Boolean(s.refundPolicyText), help: "Cancelling, returning and refunds. Required by Shopify for iDEAL | Wero." },
     { name: "privacyPolicyText", title: "Privacy policy", href: "/privacy-policy", text: privacyPolicy(s), custom: Boolean(s.privacyPolicyText), help: "Which personal data you collect, why, with whom you share it, cookies and visitors' rights." },
+    { name: "cookiePolicyText", title: "Cookie policy", href: "/cookie-policy", text: cookiePolicy(s), custom: Boolean(s.cookiePolicyText), help: "Every cookie the website uses, and how visitors accept or reject analytics (the cookie banner)." },
+    { name: "howItWorksText", title: "How it works", href: "/how-it-works", text: howItWorks(s), custom: Boolean(s.howItWorksText), help: "A help page that explains ordering, payment, production, shipping, returns, accounts, reviews and cookies step by step." },
   ];
 
   return (
     <>
       <PageTitle
         title="Legal"
-        description="Your legal notice (Impressum) and policy pages: terms of service, shipping, refund and privacy. Shopify requires a legal notice and refund policy for iDEAL | Wero, and Dutch law requires company details on an online shop."
+        description="Your legal notice (Impressum) and policy pages: terms of service, shipping, refund, privacy and cookies, plus the How it works help page. Shopify requires a legal notice and refund policy for iDEAL | Wero, and Dutch law requires company details on an online shop."
       />
       <SavedNotice show={sp.saved === "1"}>Saved. The pages are updated on the website.</SavedNotice>
       {missing.length > 0 && (

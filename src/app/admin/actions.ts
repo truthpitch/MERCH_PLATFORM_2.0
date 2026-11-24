@@ -10,6 +10,8 @@ import { DEFAULT_REFUND_POLICY } from "@/lib/legal";
 import { DEFAULT_PRIVACY_POLICY } from "@/lib/privacy-policy";
 import { DEFAULT_SHIPPING_POLICY } from "@/lib/shipping-policy";
 import { DEFAULT_TERMS } from "@/lib/terms";
+import { DEFAULT_COOKIE_POLICY } from "@/lib/cookie-policy";
+import { DEFAULT_HOW_IT_WORKS } from "@/lib/how-it-works";
 import { prisma } from "@/lib/db";
 import { getUploadDir, isSafeFilename, removeFaviconFile } from "@/lib/uploads";
 import { folderSlug } from "@/lib/media";
@@ -431,10 +433,43 @@ export async function saveLegalAction(formData: FormData) {
     privacyPolicyText: policyText(formData, "privacyPolicyText", DEFAULT_PRIVACY_POLICY),
     shippingPolicyText: policyText(formData, "shippingPolicyText", DEFAULT_SHIPPING_POLICY),
     termsText: policyText(formData, "termsText", DEFAULT_TERMS),
+    cookiePolicyText: policyText(formData, "cookiePolicyText", DEFAULT_COOKIE_POLICY),
+    howItWorksText: policyText(formData, "howItWorksText", DEFAULT_HOW_IT_WORKS),
   };
   await prisma.siteSettings.upsert({ where: { id: 1 }, update: data, create: { id: 1, ...data } });
   refreshSite();
   redirect("/admin/legal?saved=1");
+}
+
+// ── SEO & Traffic ───────────────────────────────────────────
+
+/**
+ * Site ownership codes for Google Search Console and Bing Webmaster Tools. Accepts the bare code
+ * or the whole <meta …> tag the tool shows (the code is taken out of content="…").
+ */
+function verificationCode(formData: FormData, key: string): string {
+  const raw = text(formData, key, 500);
+  const fromTag = raw.match(/content=["']([^"']+)["']/i)?.[1] ?? raw;
+  return fromTag.trim().replace(/[^A-Za-z0-9_\-]/g, "").slice(0, 100);
+}
+
+export async function saveSeoVerificationAction(formData: FormData) {
+  await requireAdmin();
+  const data = {
+    googleVerification: verificationCode(formData, "googleVerification"),
+    bingVerification: verificationCode(formData, "bingVerification"),
+  };
+  await prisma.siteSettings.upsert({ where: { id: 1 }, update: data, create: { id: 1, ...data } });
+  refreshSite();
+  redirect("/admin/traffic?saved=1#seo");
+}
+
+/** Deletes all visitor statistics and cookie-banner counts (e.g. after testing). */
+export async function clearTrafficStatsAction() {
+  await requireAdmin();
+  await prisma.analyticsSession.deleteMany({});
+  await prisma.consentEvent.deleteMany({});
+  redirect("/admin/traffic?cleared=1");
 }
 
 // ── Ordering pause ──────────────────────────────────────────

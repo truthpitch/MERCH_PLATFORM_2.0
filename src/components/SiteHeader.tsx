@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Suspense } from "react";
+import { CookieSettingsLink } from "./CookieBanner";
 import { DesktopNav } from "./header/DesktopNav";
 import { HeaderIcons } from "./header/HeaderIcons";
 import { LanguageSelect } from "./header/LanguageSelect";
@@ -61,10 +62,12 @@ export function SiteHeader({ cartCount, signedIn }: { cartCount: number; signedI
 const FOOTER_LINKS = [
   { href: "/about", label: "About" },
   { href: "/blog", label: "Blog" },
+  { href: "/how-it-works", label: "How it works" },
   { href: "/contact", label: "Contact us" },
   { href: "/shipping-policy", label: "Shipping" },
   { href: "/refund-policy", label: "Refund policy" },
   { href: "/privacy-policy", label: "Privacy policy" },
+  { href: "/cookie-policy", label: "Cookie policy" },
   { href: "/terms-of-service", label: "Terms of service" },
   { href: "/legal-notice", label: "Legal notice" },
 ];
@@ -86,6 +89,9 @@ export function SiteFooter() {
                 </Link>
               </li>
             ))}
+            <li>
+              <CookieSettingsLink className="underline underline-offset-2 hover:text-black" />
+            </li>
           </ul>
         </nav>
       </div>

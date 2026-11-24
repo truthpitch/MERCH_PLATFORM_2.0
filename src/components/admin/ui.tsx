@@ -29,6 +29,7 @@ const NAV = [
   { href: "/admin/reviews", label: "Reviews" },
   { href: "/admin/accounts", label: "User accounts" },
   { href: "/admin/orders", label: "Orders" },
+  { href: "/admin/traffic", label: "SEO & Traffic" },
 ];
 
 export function AdminNav() {

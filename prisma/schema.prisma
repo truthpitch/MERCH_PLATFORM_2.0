@@ -39,6 +39,11 @@ model SiteSettings {
   refundPolicyText       String    @default("") // empty = the default policy in src/lib/legal.ts
   privacyPolicyText      String    @default("") // empty = the default privacy policy in src/lib/privacy-policy.ts
   termsText              String    @default("") // empty = the default terms of service in src/lib/terms.ts
+  cookiePolicyText       String    @default("") // empty = the default cookie policy in src/lib/cookie-policy.ts
+  howItWorksText         String    @default("") // empty = the default "How it works" page in src/lib/how-it-works.ts
+  // Search engine ownership checks (admin → SEO & Traffic), e.g. Google Search Console's code
+  googleVerification     String    @default("")
+  bingVerification       String    @default("")
   shippingPolicyText     String    @default("") // empty = the default shipping policy in src/lib/shipping-policy.ts
   announcementEnabled    Boolean   @default(false)
   announcementText       String    @default("")
@@ -205,4 +210,54 @@ model BlogPost {
   updatedAt       DateTime  @updatedAt
 
   @@index([published, publishedAt])
+}
+
+// ── Visitor statistics (admin → SEO & Traffic) ─────────────
+// Only recorded after a visitor clicks "Accept" in the cookie banner. No IP addresses,
+// names or e-mail addresses are stored: just a random visitor id kept in the visitor's own browser.
+
+model AnalyticsSession {
+  id          String              @id // random id from the visitor's browser (one visit)
+  visitorId   String              // random id that lets us count returning visitors
+  startedAt   DateTime            @default(now())
+  lastSeenAt  DateTime            @default(now())
+  landingPath String              @default("")
+  referrer    String              @default("") // the referring website's domain only, e.g. "google.com"
+  utmSource   String              @default("")
+  utmMedium   String              @default("")
+  utmCampaign String              @default("")
+  device      String              @default("") // mobile, tablet or desktop
+  browser     String              @default("")
+  os          String              @default("")
+  country     String              @default("") // from the hosting provider's headers, when available
+  timeZone    String              @default("") // from the browser, e.g. "Europe/Amsterdam"
+  language    String              @default("")
+  pageViews   AnalyticsPageView[]
+
+  @@index([startedAt])
+  @@index([lastSeenAt])
+  @@index([visitorId])
+}
+
+model AnalyticsPageView {
+  id         Int              @id @default(autoincrement())
+  sessionId  String
+  path       String
+  title      String           @default("")
+  enteredAt  DateTime         @default(now())
+  durationMs Int              @default(0) // time on the page, sent when the visitor leaves it
+  session    AnalyticsSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([enteredAt])
+  @@index([sessionId])
+  @@index([path])
+}
+
+// How many visitors clicked Accept or Reject (no personal data: just the choice and the time).
+model ConsentEvent {
+  id        Int      @id @default(autoincrement())
+  choice    String   // "accepted" or "rejected"
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
 }

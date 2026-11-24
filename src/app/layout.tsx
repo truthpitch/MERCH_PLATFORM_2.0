@@ -6,10 +6,12 @@ import "./globals.css";
 
 export async function generateMetadata(): Promise<Metadata> {
   // The favicon is uploaded on the admin Dashboard. If the database can't be read, carry on without it.
-  const faviconUrl = await getSettings()
-    .then((s) => s.faviconUrl)
-    .catch(() => "");
+  const s = await getSettings().catch(() => null);
+  const faviconUrl = s?.faviconUrl ?? "";
   const type = MIME_BY_EXT[faviconUrl.split(".").pop() ?? ""];
+  // Ownership codes for Google Search Console and Bing Webmaster Tools (admin → SEO & Traffic).
+  const google = s?.googleVerification.trim() ?? "";
+  const bing = s?.bingVerification.trim() ?? "";
   return {
     // The real domain, so relative links in metadata (canonical, link previews) become full addresses.
     metadataBase: new URL(publicSiteUrl()),
@@ -18,6 +20,9 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: { siteName: SITE_NAME, type: "website", locale: "en_GB" },
     ...(faviconUrl && {
       icons: { icon: [{ url: faviconUrl, ...(type && { type }) }], shortcut: faviconUrl, apple: faviconUrl },
+    }),
+    ...((google || bing) && {
+      verification: { ...(google && { google }), ...(bing && { other: { "msvalidate.01": bing } }) },
     }),
   };
 }
