@@ -4,12 +4,13 @@ import { getCart } from "@/lib/cart";
 import { isDemoMode } from "@/lib/catalog";
 import { getCurrentCustomer } from "@/lib/customers";
 import { formatMoney } from "@/lib/format";
+import { getOrderingState, pauseText } from "@/lib/ordering";
 import { checkoutAction, removeLineAction, updateLineAction } from "./actions";
 
 export const metadata: Metadata = { title: "Cart" };
 
 export default async function CartPage({ searchParams }: { searchParams: Promise<{ demo?: string }> }) {
-  const [cart, sp, customer] = await Promise.all([getCart(), searchParams, getCurrentCustomer()]);
+  const [cart, sp, customer, ordering] = await Promise.all([getCart(), searchParams, getCurrentCustomer(), getOrderingState()]);
   const demo = isDemoMode();
 
   return (
@@ -82,7 +83,13 @@ export default async function CartPage({ searchParams }: { searchParams: Promise
             .
           </p>
 
-          {customer ? (
+          {ordering.paused ? (
+            <div role="status" className="mt-8 border border-black px-5 py-4 text-sm text-black">
+              <p className="font-semibold">Ordering is paused</p>
+              <p className="mt-1 text-neutral-700">{pauseText(ordering)}</p>
+              <p className="mt-2 text-neutral-700">Your cart is saved, so you can check out as soon as ordering opens again.</p>
+            </div>
+          ) : customer ? (
             <form action={checkoutAction} className="mt-8">
               <button className="w-full bg-black px-6 py-4 text-sm font-medium uppercase tracking-wider text-white hover:bg-neutral-800">
                 Checkout

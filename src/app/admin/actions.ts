@@ -373,3 +373,27 @@ export async function saveLegalAction(formData: FormData) {
   refreshSite();
   redirect("/admin/legal?saved=1");
 }
+
+// ── Ordering pause ──────────────────────────────────────────
+
+/** Switches the ordering pause on or off. Turning it off also clears the end time. */
+export async function setOrderingPausedAction(formData: FormData) {
+  await requireAdmin();
+  const on = formData.get("on") === "1";
+  const data = on ? { orderingPaused: true } : { orderingPaused: false, orderingPausedUntil: null };
+  await prisma.siteSettings.upsert({ where: { id: 1 }, update: data, create: { id: 1, ...data } });
+  refreshSite();
+  redirect("/admin?ordering=" + (on ? "paused" : "open") + "#ordering");
+}
+
+/** The notice text and the optional moment ordering opens again by itself. */
+export async function saveOrderingPauseAction(formData: FormData) {
+  await requireAdmin();
+  const data = {
+    orderingPauseMessage: text(formData, "orderingPauseMessage", 300),
+    orderingPausedUntil: dateOrNull(formData, "orderingPausedUntil"),
+  };
+  await prisma.siteSettings.upsert({ where: { id: 1 }, update: data, create: { id: 1, ...data } });
+  refreshSite();
+  redirect("/admin?ordering=saved#ordering");
+}

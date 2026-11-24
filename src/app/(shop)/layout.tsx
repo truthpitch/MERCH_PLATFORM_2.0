@@ -10,6 +10,7 @@ import { isAdmin } from "@/lib/auth";
 import { getCart } from "@/lib/cart";
 import { getCustomerId } from "@/lib/customers";
 import { getFavoriteHandles } from "@/lib/favorites";
+import { orderingState, pauseText } from "@/lib/ordering";
 import { getSettings } from "@/lib/settings";
 
 // Content comes from the database and cookies, so always render on request.
@@ -40,6 +41,8 @@ export default async function ShopLayout({ children }: { children: React.ReactNo
 
   const [cart, customerId, favorites, jar] = await Promise.all([getCart(), getCustomerId(), getFavoriteHandles(), cookies()]);
 
+  const ordering = orderingState(settings);
+
   // Announcement bar: on, has content, not expired and not closed by this visitor.
   const endsAt = settings.announcementEndsAt;
   const ctaLabel = settings.announcementCtaUrl.trim() ? settings.announcementCtaLabel.trim() : "";
@@ -60,6 +63,19 @@ export default async function ShopLayout({ children }: { children: React.ReactNo
             <Link href="/admin" className="underline underline-offset-2">
               Control panel
             </Link>
+          </div>
+        )}
+        {ordering.paused && (
+          <div role="status" className="border-b border-neutral-300 bg-neutral-100 px-4 py-2.5 text-center text-sm text-black">
+            <span className="font-semibold">Ordering is paused.</span> {pauseText(ordering).replace(/^Ordering is paused[^.]*\.\s*/, "")}
+            {admin && (
+              <>
+                {" "}
+                <Link href="/admin" className="underline underline-offset-2">
+                  Turn back on in the Dashboard
+                </Link>
+              </>
+            )}
           </div>
         )}
         {showBar && (

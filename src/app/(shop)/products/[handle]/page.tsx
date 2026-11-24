@@ -11,6 +11,7 @@ import { getCategoryOverrides, getProduct, getProductStory, getRelatedProducts }
 import { productCategory } from "@/lib/categories";
 import { getCustomerId } from "@/lib/customers";
 import { getProductReviews, getRatingSummaries } from "@/lib/reviews";
+import { orderingState, pauseText } from "@/lib/ordering";
 import { getSettings } from "@/lib/settings";
 import { getSizeGuide } from "@/lib/size-guides";
 
@@ -38,6 +39,7 @@ export default async function ProductPage({ params }: Props) {
     getProductReviews(handle, customerId),
     getRatingSummaries(related.map((p) => p.handle)),
   ]);
+  const ordering = orderingState(settings);
   const images = product.images.length ? product.images : product.featuredImage ? [product.featuredImage] : [];
   const { summary } = reviews;
 
@@ -71,7 +73,7 @@ export default async function ProductPage({ params }: Props) {
             </a>
           )}
           <div className="mt-6">
-            <AddToCart variants={product.variants} hasSizeGuide={Boolean(sizeGuide)} />
+            <AddToCart variants={product.variants} hasSizeGuide={Boolean(sizeGuide)} pausedMessage={ordering.paused ? pauseText(ordering) : null} />
           </div>
           <div className="mt-3">
             <FavoriteButton handle={product.handle} title={product.title} variant="full" />

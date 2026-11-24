@@ -8,7 +8,15 @@ import { countPendingReviews } from "@/lib/reviews";
 import { isPrintfulConfigured } from "@/lib/printful";
 import { getSettings } from "@/lib/settings";
 import { isShopifyAdminConfigured } from "@/lib/shopify/admin";
-import { removeFaviconAction, saveMaintenanceMessageAction, setMaintenanceAction } from "../actions";
+import { removeFaviconAction, saveMaintenanceMessageAction, saveOrderingPauseAction, setMaintenanceAction, setOrderingPausedAction } from "../actions";
+import { DateTimeField } from "@/components/admin/DateTimeField";
+import { formatResumeTime, orderingState } from "@/lib/ordering";
+
+const ORDERING_MESSAGES: Record<string, string> = {
+  paused: "Ordering is paused. Visitors can still browse, but can't add to cart or check out.",
+  open: "Ordering is open again.",
+  saved: "Message and time saved.",
+};
 
 const FAVICON_MESSAGES: Record<string, string> = {
   saved: "Favicon saved. Browsers can take a moment to show the new icon; reload the tab if you still see the old one.",
@@ -18,7 +26,7 @@ const FAVICON_MESSAGES: Record<string, string> = {
   size: "That file is too large. The maximum is 1 MB.",
 };
 
-export default async function DashboardPage({ searchParams }: { searchParams: Promise<{ saved?: string; favicon?: string }> }) {
+export default async function DashboardPage({ searchParams }: { searchParams: Promise<{ saved?: string; favicon?: string; ordering?: string }> }) {
   const [settings, products, featuredCount, storyCount, mediaCount, sp, pendingReviews] = await Promise.all([
     getSettings(),
     getProducts().catch(() => []),
@@ -29,6 +37,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
     countPendingReviews(),
   ]);
   const on = settings.maintenanceMode;
+  const ordering = orderingState(settings);
 
   return (
     <>
@@ -78,6 +87,65 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
             <SubmitButton variant="secondary">Save message</SubmitButton>
           </form>
         </Card>
+
+        {/* Ordering pause */}
+        <div id="ordering" className="scroll-mt-6">
+          <Card title="Ordering">
+            {sp.ordering && ORDERING_MESSAGES[sp.ordering] && (
+              <p role="status" className="mb-5 border border-neutral-300 bg-neutral-100 px-4 py-3 text-sm text-neutral-800">
+                {ORDERING_MESSAGES[sp.ordering]}
+              </p>
+            )}
+            <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-2xl font-semibold text-black">{ordering.paused ? "PAUSED — no new orders" : "OPEN — customers can order"}</p>
+                <p className="mt-1 text-sm text-neutral-600">
+                  {ordering.paused
+                    ? ordering.until
+                      ? `Opens again by itself on ${formatResumeTime(ordering.until)} (Amsterdam time).`
+                      : "Stays paused until you turn ordering back on."
+                    : "Pause ordering while you change products or prices, or when you're away. The shop stays open for browsing and favorites; adding to cart and checkout are switched off."}
+                </p>
+              </div>
+              <form action={setOrderingPausedAction}>
+                <input type="hidden" name="on" value={ordering.paused ? "0" : "1"} />
+                <button
+                  className={`min-w-48 px-5 py-3 text-sm font-medium ${
+                    ordering.paused ? "bg-black text-white hover:bg-neutral-800" : "border border-black bg-white text-black hover:bg-neutral-100"
+                  }`}
+                >
+                  {ordering.paused ? "Turn ordering back ON" : "Pause ordering"}
+                </button>
+              </form>
+            </div>
+            {settings.orderingPaused && !ordering.paused && (
+              <p className="mt-4 text-sm text-neutral-600">The end time has passed, so ordering is open again. Pause again with the button above.</p>
+            )}
+            <form action={saveOrderingPauseAction} className="mt-6 grid gap-4 border-t border-neutral-200 pt-6 md:grid-cols-[1fr_18rem] md:items-start">
+              <label className="block">
+                <span className="mb-1 block text-xs font-medium uppercase tracking-wider text-neutral-600">Message for visitors</span>
+                <input name="orderingPauseMessage" defaultValue={settings.orderingPauseMessage} maxLength={300} className={inputClass} />
+                <span className="mt-1 block text-xs text-neutral-500">Shown in a bar on every page, on product pages and in the cart while ordering is paused.</span>
+              </label>
+              <div>
+                <span className="mb-1 block text-xs font-medium uppercase tracking-wider text-neutral-600">Open again automatically (optional)</span>
+                <DateTimeField
+                  id="orderingPausedUntil"
+                  name="orderingPausedUntil"
+                  defaultIso={settings.orderingPausedUntil?.toISOString() ?? null}
+                  help="Empty = stays paused until you turn it back on."
+                />
+              </div>
+              <div className="md:col-span-2">
+                <SubmitButton variant="secondary">Save message and time</SubmitButton>
+              </div>
+            </form>
+            <p className="mt-5 text-xs text-neutral-500">
+              Tip: a customer who already opened Shopify&apos;s checkout before you paused can still finish that order. For a complete stop, also set your store in
+              Printful to hold new orders for manual approval instead of fulfilling them automatically.
+            </p>
+          </Card>
+        </div>
 
         {/* Favicon */}
         <div id="favicon" className="scroll-mt-6">

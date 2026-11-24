@@ -15,10 +15,19 @@ function openSizeGuide(e: React.MouseEvent) {
   guide.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
-export function AddToCart({ variants, hasSizeGuide = false }: { variants: ProductVariant[]; hasSizeGuide?: boolean }) {
+export function AddToCart({
+  variants,
+  hasSizeGuide = false,
+  pausedMessage = null,
+}: {
+  variants: ProductVariant[];
+  hasSizeGuide?: boolean;
+  /** Set while ordering is paused (admin → Dashboard): the button is switched off and this explains why. */
+  pausedMessage?: string | null;
+}) {
   const firstAvailable = variants.find((v) => v.availableForSale) ?? variants[0];
   const [variantId, setVariantId] = useState(firstAvailable?.id);
-  const [status, setStatus] = useState<"idle" | "added" | "error">("idle");
+  const [status, setStatus] = useState<"idle" | "added" | "error" | "paused">("idle");
   const [pending, startTransition] = useTransition();
 
   const variant = variants.find((v) => v.id === variantId) ?? firstAvailable;
@@ -33,7 +42,7 @@ export function AddToCart({ variants, hasSizeGuide = false }: { variants: Produc
     setStatus("idle");
     startTransition(async () => {
       const res = await addToCartAction(variant.id, 1);
-      setStatus(res.ok ? "added" : "error");
+      setStatus(res.ok ? "added" : res.paused ? "paused" : "error");
     });
   }
 
@@ -81,11 +90,17 @@ export function AddToCart({ variants, hasSizeGuide = false }: { variants: Produc
       <button
         type="button"
         onClick={add}
-        disabled={pending || !variant.availableForSale}
+        disabled={pending || !variant.availableForSale || Boolean(pausedMessage)}
         className="w-full bg-black px-6 py-4 text-sm font-medium uppercase tracking-wider text-white transition-colors hover:bg-neutral-800 disabled:bg-neutral-400"
       >
-        {!variant.availableForSale ? "Sold out" : pending ? "Adding…" : "Add to cart"}
+        {pausedMessage ? "Ordering paused" : !variant.availableForSale ? "Sold out" : pending ? "Adding…" : "Add to cart"}
       </button>
+
+      {(pausedMessage || status === "paused") && (
+        <p role="status" className="border border-neutral-300 bg-neutral-50 px-4 py-3 text-sm text-neutral-700">
+          {pausedMessage ?? "Ordering is paused for a short while. Please try again later."}
+        </p>
+      )}
 
       {status === "added" && (
         <p className="text-sm text-neutral-700">

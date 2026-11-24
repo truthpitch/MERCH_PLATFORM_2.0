@@ -20,6 +20,10 @@ model SiteSettings {
   id                     Int       @id @default(1)
   maintenanceMode        Boolean   @default(false)
   maintenanceMessage     String    @default("We're making a few changes behind the scenes. Please check back shortly.")
+  // Ordering pause (admin → Dashboard): the shop stays open, but adding to cart and checkout are off.
+  orderingPaused         Boolean   @default(false)
+  orderingPauseMessage   String    @default("Ordering is paused for a short while. You can still browse and save your favorites.")
+  orderingPausedUntil    DateTime? // optional: ordering opens again by itself at this moment
   // Browser-tab icon uploaded on the Dashboard (/media/favicon-….png), empty = none
   faviconUrl             String    @default("")
   // "Shipping & returns" fold on every product page (admin → Products)

@@ -4,10 +4,13 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { addToCart, getCart, removeCartLine, updateCartLine } from "@/lib/cart";
 import { getCurrentCustomer } from "@/lib/customers";
+import { getOrderingState } from "@/lib/ordering";
 import { isShopifyConfigured, shopifySetBuyerEmail } from "@/lib/shopify/storefront";
 
-export async function addToCartAction(variantId: string, quantity = 1): Promise<{ ok: boolean }> {
+export async function addToCartAction(variantId: string, quantity = 1): Promise<{ ok: boolean; paused?: boolean }> {
   if (typeof variantId !== "string" || !variantId) return { ok: false };
+  // Ordering pause (admin → Dashboard): checked here too, not only in the page.
+  if ((await getOrderingState()).paused) return { ok: false, paused: true };
   const qty = Math.min(Math.max(Math.floor(quantity) || 1, 1), 20);
   try {
     await addToCart(variantId, qty);
@@ -38,6 +41,7 @@ export async function removeLineAction(formData: FormData) {
  * passed along, so it's pre-filled and the order is linked to it.
  */
 export async function checkoutAction() {
+  if ((await getOrderingState()).paused) redirect("/cart?paused=1");
   const cart = await getCart();
   if (!cart.checkoutUrl) redirect("/cart?demo=1");
   let checkoutUrl = cart.checkoutUrl;
