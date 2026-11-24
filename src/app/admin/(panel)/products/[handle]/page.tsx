@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { Card, SavedNotice } from "@/components/admin/Card";
 import { inputClass, labelClass } from "@/components/admin/styles";
 import { RichTextEditor } from "@/components/admin/RichTextEditor";
+import { imageSizeHint } from "@/lib/image-sizes";
 import { SubmitButton } from "@/components/admin/ui";
 import { getProduct } from "@/lib/catalog";
 import { prisma } from "@/lib/db";
@@ -55,6 +56,7 @@ export default async function EditStoryPage({ params, searchParams }: Props) {
                 Story image URL (optional)
               </label>
               <input id="imageUrl" name="imageUrl" defaultValue={imageUrl} placeholder="/media/… or https://…" className={inputClass} />
+              <p className="mt-1 text-xs text-neutral-500">Upload one under Media, then paste its URL here. {imageSizeHint("story")}</p>
             </div>
             <div>
               <SubmitButton>Save story</SubmitButton>

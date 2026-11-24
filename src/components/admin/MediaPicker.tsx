@@ -137,7 +137,11 @@ export function MediaPicker({
           </div>
 
           <div className="border-t border-neutral-200 bg-neutral-50 px-5 py-3">
-            <p className="mb-2 text-xs font-medium uppercase tracking-wider text-neutral-600">Upload new images</p>
+            <p className="text-xs font-medium uppercase tracking-wider text-neutral-600">Upload new images</p>
+            <p className="mb-2 mt-1 text-xs text-neutral-500">
+              Best sizes: <strong className="font-medium text-black">cover 1600 × 900 px</strong> (16:9) · <strong className="font-medium text-black">image in the text 1600 px wide</strong>{" "}
+              · JPG or WebP for photos, under about 500 KB.
+            </p>
             <div className="grid gap-2 sm:grid-cols-[1fr_10rem_auto] sm:items-center">
               <input
                 ref={fileInput}

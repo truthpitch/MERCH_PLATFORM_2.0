@@ -5,6 +5,7 @@ import { saveBlogPostAction, type BlogFormState } from "@/app/admin/blog-actions
 import { DateTimeField } from "./DateTimeField";
 import { MediaPicker, type PickerFolder, type PickerImage } from "./MediaPicker";
 import { RichTextEditor } from "./RichTextEditor";
+import { imageSizeHint } from "@/lib/image-sizes";
 import { inputClass, labelClass } from "./styles";
 
 export type BlogFormPost = {
@@ -235,7 +236,7 @@ export function BlogForm({
               </span>
             </div>
             <input id="coverImageUrl" name="coverImageUrl" value={cover} onChange={(e) => setCover(e.target.value)} placeholder="/media/… or https://…" className={inputClass} />
-            <p className="mt-1 text-xs text-neutral-500">Choose from your Media library (or upload there), or paste a URL. Wide images (16:9) look best; also used when the post is shared.</p>
+            <p className="mt-1 text-xs text-neutral-500">Choose from your Media library (or upload there), or paste a URL. {imageSizeHint("blog-cover")}</p>
           </div>
           {cover && (
             // eslint-disable-next-line @next/next/no-img-element

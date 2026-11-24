@@ -4,6 +4,7 @@ import { DateTimeField } from "@/components/admin/DateTimeField";
 import { SubmitButton } from "@/components/admin/ui";
 import { getProducts } from "@/lib/catalog";
 import { prisma } from "@/lib/db";
+import { imageSizeHint } from "@/lib/image-sizes";
 import { getSettings } from "@/lib/settings";
 import { addFeaturedAction, moveFeaturedAction, removeFeaturedAction, saveHomepageAction } from "../../actions";
 
@@ -95,6 +96,7 @@ export default async function HomepageAdmin({ searchParams }: { searchParams: Pr
                     Image URL (optional)
                   </label>
                   <input id="heroImageUrl" name="heroImageUrl" defaultValue={settings.heroImageUrl} placeholder="/media/… or https://…" className={inputClass} />
+                  <p className="mt-1 text-xs text-neutral-500">{imageSizeHint("hero")}</p>
                 </div>
               </div>
               <p className="text-xs text-neutral-500">Tip: upload an image under Media, then paste its URL here.</p>

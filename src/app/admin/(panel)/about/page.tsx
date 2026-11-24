@@ -3,6 +3,7 @@ import { Card, PageTitle, SavedNotice } from "@/components/admin/Card";
 import { inputClass, labelClass } from "@/components/admin/styles";
 import { RichTextEditor } from "@/components/admin/RichTextEditor";
 import { SubmitButton } from "@/components/admin/ui";
+import { imageSizeHint } from "@/lib/image-sizes";
 import { getSettings } from "@/lib/settings";
 import { saveAboutAction } from "../../actions";
 
@@ -50,7 +51,7 @@ export default async function AboutAdmin({ searchParams }: { searchParams: Promi
                 Image URL (optional)
               </label>
               <input id="aboutImageUrl" name="aboutImageUrl" defaultValue={s.aboutImageUrl} placeholder="/media/… or https://…" className={inputClass} />
-              <p className="mt-1 text-xs text-neutral-500">Shown next to the story. Upload one under Media, then paste its URL here.</p>
+              <p className="mt-1 text-xs text-neutral-500">Shown next to the story. Upload one under Media, then paste its URL here. {imageSizeHint("about")}</p>
             </div>
           </div>
         </Card>

@@ -3,6 +3,7 @@ import { Card, PageTitle, SavedNotice } from "@/components/admin/Card";
 import { CopyButton } from "@/components/admin/CopyButton";
 import { inputClass, smallButtonClass } from "@/components/admin/styles";
 import { ConfirmButton, SubmitButton } from "@/components/admin/ui";
+import { IMAGE_FILE_TIPS, IMAGE_SIZES } from "@/lib/image-sizes";
 import { listFolders, listMedia } from "@/lib/media";
 import { createMediaFolderAction, deleteMediaAction, deleteMediaFolderAction, moveMediaAction, renameMediaAction } from "../../actions";
 
@@ -136,10 +137,49 @@ export default async function MediaAdmin({
               <SubmitButton>Upload</SubmitButton>
             </form>
             <p className="mt-2 text-xs text-neutral-500">
-              JPG, PNG, WebP or GIF · max 5 MB each · up to 20 at once. Images keep their own name, so give files a clear name before uploading (good for Google
+              JPG, PNG, WebP or GIF · max 5 MB each · up to 20 at once. See “Recommended image sizes” below for the best size per spot. Images keep their own name, so give files a clear name before uploading (good for Google
               Images too). A name that already exists in the folder gets a number: “Summer tee (1)”.
             </p>
           </Card>
+
+          {/* Recommended sizes */}
+          <details className="group border border-neutral-200 bg-white" open={total === 0}>
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-6 py-4 [&::-webkit-details-marker]:hidden">
+              <span className="text-sm font-semibold uppercase tracking-wider text-black">Recommended image sizes</span>
+              <span className="text-lg font-light leading-none text-black transition-transform group-open:rotate-45" aria-hidden>
+                +
+              </span>
+            </summary>
+            <div className="border-t border-neutral-200 px-6 py-5">
+              <div className="-mx-6 overflow-x-auto px-6">
+                <table className="w-full min-w-[36rem] text-left text-sm">
+                  <thead className="border-b border-neutral-200 text-xs uppercase tracking-wider text-neutral-500">
+                    <tr>
+                      <th className="py-2 pr-4 font-medium">Used for</th>
+                      <th className="py-2 pr-4 font-medium">Best size</th>
+                      <th className="py-2 pr-4 font-medium">Shape</th>
+                      <th className="py-2 font-medium">Good to know</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-neutral-200">
+                    {IMAGE_SIZES.map((s) => (
+                      <tr key={s.key} className="align-top">
+                        <td className="py-2.5 pr-4 font-medium text-black">{s.where}</td>
+                        <td className="whitespace-nowrap py-2.5 pr-4 text-black">{s.size}</td>
+                        <td className="py-2.5 pr-4 text-neutral-700">{s.shape}</td>
+                        <td className="py-2.5 text-xs text-neutral-600">{s.tip}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <ul className="mt-4 list-disc space-y-1 pl-5 text-xs text-neutral-600">
+                {IMAGE_FILE_TIPS.map((t) => (
+                  <li key={t}>{t}</li>
+                ))}
+              </ul>
+            </div>
+          </details>
 
           {/* Search + list */}
           <Card title={`${current ? current.name : "All images"} (${media.length})`}>
