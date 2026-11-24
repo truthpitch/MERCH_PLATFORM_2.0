@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { toParagraphs } from "@/lib/format";
+import { renderPost } from "@/lib/blog-format";
 import { getSettings } from "@/lib/settings";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -34,11 +34,7 @@ export default async function AboutPage() {
         <div className={`grid gap-12 ${s.aboutImageUrl ? "md:grid-cols-2 md:items-start" : ""}`}>
           <div className={s.aboutImageUrl ? "" : "max-w-3xl"}>
             <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-black">The idea</h2>
-            <div className="mt-6 space-y-5 text-lg leading-relaxed text-neutral-700">
-              {toParagraphs(s.aboutText).map((p, i) => (
-                <p key={i}>{p}</p>
-              ))}
-            </div>
+            <div className="rich-text mt-6 text-lg leading-relaxed text-neutral-700">{renderPost(s.aboutText)}</div>
           </div>
           {s.aboutImageUrl && (
             // eslint-disable-next-line @next/next/no-img-element

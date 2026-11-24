@@ -1,3 +1,4 @@
+import { renderPost } from "@/lib/blog-format";
 import { toParagraphs } from "@/lib/format";
 
 /**
@@ -34,25 +35,19 @@ export function ProductDetails({ description }: { description: string }) {
   );
 }
 
-/** Plain text set in the admin (e.g. "Shipping & returns"), split into paragraphs. */
+/** Formatted text set in the admin's text editor (e.g. "Shipping & returns"). */
 export function TextFold({ title, text }: { title: string; text: string }) {
-  const paragraphs = toParagraphs(text);
-  if (paragraphs.length === 0) return null;
+  if (!text.trim()) return null;
   return (
     <FoldSection title={title}>
-      {paragraphs.map((p, i) => (
-        <p key={i} className="whitespace-pre-line">
-          {p}
-        </p>
-      ))}
+      <div className="rich-text">{renderPost(text)}</div>
     </FoldSection>
   );
 }
 
 /** Foldable "MORE INFO" section: the story (and optional image) written in the admin. */
 export function MoreInfo({ story, imageUrl }: { story: string; imageUrl?: string }) {
-  const paragraphs = toParagraphs(story);
-  if (paragraphs.length === 0 && !imageUrl) return null;
+  if (!story.trim() && !imageUrl) return null;
 
   return (
     <FoldSection title="More info">
@@ -60,11 +55,7 @@ export function MoreInfo({ story, imageUrl }: { story: string; imageUrl?: string
         // eslint-disable-next-line @next/next/no-img-element
         <img src={imageUrl} alt="" loading="lazy" className="w-full bg-neutral-100 object-cover" />
       )}
-      {paragraphs.map((p, i) => (
-        <p key={i} className="whitespace-pre-line">
-          {p}
-        </p>
-      ))}
+      {story.trim() && <div className="rich-text">{renderPost(story)}</div>}
     </FoldSection>
   );
 }

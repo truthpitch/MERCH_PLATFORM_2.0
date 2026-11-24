@@ -90,7 +90,7 @@ The code is commented where credentials go. See:
 | **Contact** | The `/contact` page: heading, intro text and the optional email address shown next to the form |
 | **Legal** | Legal notice / Impressum (company name, address, email, phone, KvK and VAT number) for `/legal-notice`, and the policy pages `/terms-of-service`, `/shipping-policy`, `/refund-policy` and `/privacy-policy` (standard texts are used until you write your own; each box shows "Standard text" or "Your own text"). Shopify requires both for iDEAL | Wero |
 | **Products** | Choose each product's shop **category** (Automatic shows which one it gets and why), edit the **MORE INFO** story (and optional image), the **Shipping & returns** text for every product page, and the **Size guides** (one table per category) |
-| **Blog** | Write, edit, schedule, publish and delete posts. Per post: title, web address, summary, text (simple formatting), cover image, tags, author, SEO title and description with a live Google preview. Five starter posts come as drafts |
+| **Blog** | Write, edit, schedule, publish and delete posts. Per post: title, web address, summary, text (text editor with bold, italic, text sizes, lists, quotes, links, dividing lines and images), cover image, tags, author, SEO title and description with a live Google preview. Five starter posts come as drafts |
 | **Media** | Upload images (JPG/PNG/WebP/GIF, 5 MB each, up to 20 at once) into folders (General, Blog, Products, Pages, or your own). Images keep their own name (duplicates get “(1)”, “(2)” …) and live at `/media/<folder>/<name>`. Search by name, filter by folder, rename, move (the URL stays the same), copy the URL, delete. In the blog editor, “Insert image” and “Choose image” open the same library with search, folders and upload |
 | **Reviews** | New and edited customer reviews wait here for approval (the Dashboard shows how many). Approve, hide or delete; filter on Waiting / Approved / All |
 | **User accounts** | List of customer accounts with activation status, created date and favorites count; search and filter. Per account: **Send activation link** (marks it Not activated and emails a new link) and **Delete** (both ask to confirm) |
@@ -152,3 +152,7 @@ See **[DEPLOYMENT.md](DEPLOYMENT.md)** for GitHub → Hostinger.
 - **More admin users**: replace `checkCredentials` in `src/lib/auth.ts` with a `User` table, or use Auth.js.
 - **Production status from Printful**: use `getPrintfulOrderByShopifyId` in `src/lib/printful.ts` on the orders page.
 - **Postgres instead of SQLite**: change `provider` in `schema.prisma` and `DATABASE_URL`, then run `npm run db:migrate`.
+
+### Text editor
+
+Longer texts in the admin (blog posts, the four policies, the About story, product MORE INFO stories and the Shipping & returns text) use a small text editor: **text size** (Normal / Large / Extra large), **bold**, *italic*, bullet and numbered lists, quotes, links, dividing lines, and (in blog posts) images from the Media library. Click an image in the text to remove it. Pasted text arrives without outside fonts or colours. Behind the scenes the text is stored in a simple Markdown-like format (`src/lib/rich-text.ts`) and shown on the website without any raw HTML, so it stays safe. Short texts (titles, summaries, messages) stay plain text fields.

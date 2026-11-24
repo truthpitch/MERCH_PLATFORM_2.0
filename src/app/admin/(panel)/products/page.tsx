@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Card, PageTitle, SavedNotice } from "@/components/admin/Card";
 import { inputClass, smallButtonClass } from "@/components/admin/styles";
+import { RichTextEditor } from "@/components/admin/RichTextEditor";
 import { SubmitButton } from "@/components/admin/ui";
 import { getProducts, isDemoMode } from "@/lib/catalog";
 import { CATEGORIES, explainCategory } from "@/lib/categories";
@@ -38,17 +39,8 @@ export default async function ProductsAdmin({ searchParams }: { searchParams: Pr
         <div id="shipping" className="scroll-mt-6">
           <Card title="Shipping & returns">
             <form action={saveShippingReturnsAction} className="space-y-3">
-              <label htmlFor="shippingReturnsText" className="sr-only">
-                Shipping and returns text
-              </label>
-              <textarea
-                id="shippingReturnsText"
-                name="shippingReturnsText"
-                rows={8}
-                defaultValue={settings.shippingReturnsText}
-                className={`${inputClass} leading-relaxed`}
-              />
-              <p className="text-xs text-neutral-500">Shown in a fold-out section on every product page. Leave a blank line between paragraphs. Empty = hidden.</p>
+              <RichTextEditor name="shippingReturnsText" label="Shipping and returns text" defaultValue={settings.shippingReturnsText} minHeight={200} />
+              <p className="text-xs text-neutral-500">Shown in a fold-out section on every product page. Empty = hidden.</p>
               <SubmitButton>Save</SubmitButton>
             </form>
           </Card>

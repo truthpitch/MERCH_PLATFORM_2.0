@@ -2,6 +2,7 @@ import Link from "next/link";
 import { FavoriteButton } from "./favorites/FavoritesProvider";
 import { Price, SaleBadge } from "./Price";
 import { Stars } from "./reviews/Stars";
+import { renderPost } from "@/lib/blog-format";
 import { saleInfo, toParagraphs } from "@/lib/format";
 import type { RatingSummary } from "@/lib/reviews";
 import type { Product } from "@/lib/types";
@@ -62,12 +63,8 @@ export function ProductCard({ product, story, rating }: { product: Product; stor
               +
             </span>
           </summary>
-          <div className="space-y-3 pb-3 text-sm leading-relaxed text-neutral-600">
-            {paragraphs.map((p, i) => (
-              <p key={i} className="whitespace-pre-line">
-                {p}
-              </p>
-            ))}
+          <div className="rich-text pb-3 text-sm leading-relaxed text-neutral-600">
+            {renderPost(story ?? "")}
           </div>
         </details>
       )}

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Card, PageTitle, SavedNotice } from "@/components/admin/Card";
 import { inputClass, labelClass } from "@/components/admin/styles";
+import { RichTextEditor } from "@/components/admin/RichTextEditor";
 import { SubmitButton } from "@/components/admin/ui";
 import { getSettings } from "@/lib/settings";
 import { saveAboutAction } from "../../actions";
@@ -40,11 +41,9 @@ export default async function AboutAdmin({ searchParams }: { searchParams: Promi
         <Card title="The idea">
           <div className="grid gap-4">
             <div>
-              <label className={labelClass} htmlFor="aboutText">
-                Story
-              </label>
-              <textarea id="aboutText" name="aboutText" defaultValue={s.aboutText} rows={12} className={inputClass} />
-              <p className="mt-1 text-xs text-neutral-500">Why TruthPitch exists and what it stands for. Leave a blank line between paragraphs.</p>
+              <p className={labelClass}>Story</p>
+              <RichTextEditor name="aboutText" label="About story" defaultValue={s.aboutText} minHeight={260} />
+              <p className="mt-1 text-xs text-neutral-500">Why TruthPitch exists and what it stands for.</p>
             </div>
             <div>
               <label className={labelClass} htmlFor="aboutImageUrl">

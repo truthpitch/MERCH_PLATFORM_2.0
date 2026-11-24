@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Card, SavedNotice } from "@/components/admin/Card";
 import { inputClass, labelClass } from "@/components/admin/styles";
+import { RichTextEditor } from "@/components/admin/RichTextEditor";
 import { SubmitButton } from "@/components/admin/ui";
 import { getProduct } from "@/lib/catalog";
 import { prisma } from "@/lib/db";
@@ -45,11 +46,9 @@ export default async function EditStoryPage({ params, searchParams }: Props) {
         <Card title="“More info” story">
           <div className="grid gap-4">
             <div>
-              <label className={labelClass} htmlFor="story">
-                Story
-              </label>
-              <textarea id="story" name="story" defaultValue={story} rows={12} className={inputClass} placeholder="The story behind this product…" />
-              <p className="mt-1 text-xs text-neutral-500">Leave a blank line between paragraphs. Leave empty to hide the section.</p>
+              <p className={labelClass}>Story</p>
+              <RichTextEditor name="story" label="Story" defaultValue={story} minHeight={240} placeholder="The story behind this product…" />
+              <p className="mt-1 text-xs text-neutral-500">Leave empty to hide the section.</p>
             </div>
             <div>
               <label className={labelClass} htmlFor="imageUrl">

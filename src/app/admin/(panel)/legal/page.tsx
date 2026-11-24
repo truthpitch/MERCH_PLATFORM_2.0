@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Card, PageTitle, SavedNotice } from "@/components/admin/Card";
 import { inputClass, labelClass } from "@/components/admin/styles";
+import { RichTextEditor } from "@/components/admin/RichTextEditor";
 import { SubmitButton } from "@/components/admin/ui";
 import { missingLegalFields, refundPolicy } from "@/lib/legal";
 import { privacyPolicy } from "@/lib/privacy-policy";
@@ -121,17 +122,10 @@ export default async function LegalAdmin({ searchParams }: { searchParams: Promi
                   View page ↗
                 </Link>
               </div>
-              <textarea
-                name={p.name}
-                rows={22}
-                defaultValue={p.text}
-                aria-label={`${p.title} text`}
-                className={`${inputClass} font-mono text-[13px] leading-relaxed`}
-              />
+              <RichTextEditor name={p.name} label={`${p.title} text`} defaultValue={p.text} minHeight={360} />
               <p className="mt-2 text-xs text-neutral-500">
-                Same formatting as blog posts: <code>## Heading</code>, <code>**bold**</code>, <code>- list item</code>, <code>[link](/contact)</code>. Update the{" "}
-                <strong>Last updated</strong> date when you change it. Empty the box and save to go back to the standard text. Use the same text in Shopify (Settings →
-                Policies).
+                Update the <strong>Last updated</strong> date at the top when you change it. Empty the text and save to go back to the standard text. Use the same text
+                in Shopify (Settings → Policies).
               </p>
             </div>
           </details>

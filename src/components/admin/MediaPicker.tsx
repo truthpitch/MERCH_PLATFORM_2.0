@@ -64,9 +64,10 @@ export function MediaPicker({
     }
   }
 
+  // Close first: while the window is open, the page behind it can't receive the image.
   const choose = (fn: ((i: PickerImage) => void) | undefined, image: PickerImage) => {
-    fn?.(image);
     dialog.current?.close();
+    fn?.(image);
   };
 
   return (

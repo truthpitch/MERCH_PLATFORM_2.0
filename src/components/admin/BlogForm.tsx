@@ -4,6 +4,7 @@ import { useActionState, useRef, useState } from "react";
 import { saveBlogPostAction, type BlogFormState } from "@/app/admin/blog-actions";
 import { DateTimeField } from "./DateTimeField";
 import { MediaPicker, type PickerFolder, type PickerImage } from "./MediaPicker";
+import { RichTextEditor } from "./RichTextEditor";
 import { inputClass, labelClass } from "./styles";
 
 export type BlogFormPost = {
@@ -42,18 +43,6 @@ function Counter({ value, max }: { value: string; max: number }) {
   );
 }
 
-const HELP: [string, string][] = [
-  ["## Heading", "Section heading (use these: Google likes clear structure)"],
-  ["### Smaller heading", "Sub-heading"],
-  ["**bold**  *italic*", "Emphasis"],
-  ["[link text](/products)", "Link to a page in the shop, or https://…"],
-  ["- item", "Bullet list (one per line)"],
-  ["1. item", "Numbered list"],
-  ["> quote", "Quote"],
-  ["![description](/media/…)", "Image: easiest with the “Insert image” button above the text"],
-  ["---", "Dividing line"],
-];
-
 export function BlogForm({
   post,
   siteUrl,
@@ -66,19 +55,7 @@ export function BlogForm({
   media: PickerImage[];
   folders: PickerFolder[];
 }) {
-  const contentRef = useRef<HTMLTextAreaElement>(null);
   const altRef = useRef<HTMLInputElement>(null);
-
-  /** Puts ![name](url) on its own line where the cursor is in the text. */
-  function insertImage(image: PickerImage) {
-    const ta = contentRef.current;
-    if (!ta) return;
-    const alt = image.name.replace(/[[\]]/g, "");
-    const before = ta.value.slice(0, ta.selectionStart);
-    const pad = before === "" || before.endsWith("\n\n") ? "" : before.endsWith("\n") ? "\n" : "\n\n";
-    ta.focus();
-    ta.setRangeText(`${pad}![${alt}](${image.url})\n\n`, ta.selectionStart, ta.selectionEnd, "end");
-  }
 
   /** Sets the cover image, and its description if that's still empty. */
   function useAsCover(image: PickerImage) {
@@ -158,36 +135,13 @@ export function BlogForm({
         </section>
 
         <section className="border border-neutral-200 bg-white p-6">
-          <div className="mb-1 flex flex-wrap items-end justify-between gap-2">
-            <label htmlFor="content" className={labelClass}>
-              Text
-            </label>
-            <MediaPicker images={media} folders={folders} onInsert={insertImage} onCover={useAsCover} label="Insert image" />
-          </div>
-          <textarea
-            ref={contentRef}
-            id="content"
-            name="content"
-            rows={24}
-            defaultValue={post.content}
-            className={`${inputClass} font-mono text-[13px] leading-relaxed`}
-            spellCheck
-          />
-          <p className="mt-1 text-xs text-neutral-500">Click in the text where the image should go, then use “Insert image”.</p>
-          <details className="mt-3 text-sm">
-            <summary className="cursor-pointer text-neutral-700 underline underline-offset-4">How to format the text</summary>
-            <table className="mt-3 w-full text-left text-xs">
-              <tbody className="divide-y divide-neutral-200">
-                {HELP.map(([code, what]) => (
-                  <tr key={code}>
-                    <td className="py-1.5 pr-4 font-mono text-black">{code}</td>
-                    <td className="py-1.5 text-neutral-600">{what}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <p className="mt-2 text-xs text-neutral-500">Leave an empty line between paragraphs. With 3 or more ## headings, the post gets an “In this article” list automatically.</p>
-          </details>
+          <p className={labelClass}>Text</p>
+          <RichTextEditor name="content" label="Post text" defaultValue={post.content} minHeight={420} media={media} folders={folders} />
+          <p className="mt-2 text-xs text-neutral-500">
+            Use <strong>Large</strong> and <strong>Extra large</strong> for section titles: Google likes clear structure, and with 3 or more Extra large titles the post
+            gets an “In this article” list automatically. Click where an image should go, then use <strong>Image</strong>. To remove or swap an image in the text, click it and use{" "}
+            <strong>Remove image</strong> (or press Delete), then insert another.
+          </p>
         </section>
 
         <section className="space-y-5 border border-neutral-200 bg-white p-6">
@@ -264,7 +218,21 @@ export function BlogForm({
               <label htmlFor="coverImageUrl" className={labelClass}>
                 Cover image
               </label>
-              <MediaPicker images={media} folders={folders} onCover={useAsCover} label="Choose image" />
+              <span className="flex gap-1.5">
+                <MediaPicker images={media} folders={folders} onCover={useAsCover} label={cover ? "Change image" : "Choose image"} />
+                {cover && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCover("");
+                      if (altRef.current) altRef.current.value = "";
+                    }}
+                    className="border border-neutral-300 bg-white px-2.5 py-1 text-xs text-neutral-700 hover:border-black hover:text-black"
+                  >
+                    Remove
+                  </button>
+                )}
+              </span>
             </div>
             <input id="coverImageUrl" name="coverImageUrl" value={cover} onChange={(e) => setCover(e.target.value)} placeholder="/media/… or https://…" className={inputClass} />
             <p className="mt-1 text-xs text-neutral-500">Choose from your Media library (or upload there), or paste a URL. Wide images (16:9) look best; also used when the post is shared.</p>
