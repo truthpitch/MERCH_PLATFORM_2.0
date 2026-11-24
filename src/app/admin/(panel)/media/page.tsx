@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { Card, PageTitle, SavedNotice } from "@/components/admin/Card";
 import { CopyButton } from "@/components/admin/CopyButton";
+import { MediaEditDialog } from "@/components/admin/MediaEditDialog";
 import { inputClass, smallButtonClass } from "@/components/admin/styles";
 import { ConfirmButton, SubmitButton } from "@/components/admin/ui";
 import { IMAGE_FILE_TIPS, IMAGE_SIZES } from "@/lib/image-sizes";
 import { listFolders, listMedia } from "@/lib/media";
-import { createMediaFolderAction, deleteMediaAction, deleteMediaFolderAction, moveMediaAction, renameMediaAction } from "../../actions";
+import { createMediaFolderAction, deleteMediaFolderAction } from "../../actions";
 
 const DONE: Record<string, string> = {
   deleted: "Image deleted.",
@@ -205,7 +206,7 @@ export default async function MediaAdmin({
                       <img src={m.url} alt={m.name} loading="lazy" className="aspect-square w-full object-cover" />
                     </a>
                     <div className="flex flex-1 flex-col gap-2 p-3">
-                      <p className="truncate text-sm font-medium text-black" title={m.name}>
+                      <p className="line-clamp-2 break-words text-sm font-medium leading-snug text-black" title={m.name}>
                         {m.name}
                       </p>
                       <p className="text-xs text-neutral-500">
@@ -213,39 +214,7 @@ export default async function MediaAdmin({
                       </p>
                       <div className="flex flex-wrap gap-1.5">
                         <CopyButton text={m.url} />
-                        <details className="group relative">
-                          <summary className={`${smallButtonClass} cursor-pointer list-none`}>More</summary>
-                          <div className="mt-2 space-y-2 border border-neutral-200 bg-white p-2">
-                            <form action={renameMediaAction} className="flex gap-1">
-                              {back}
-                              <input type="hidden" name="id" value={m.id} />
-                              <input name="name" defaultValue={m.name} maxLength={100} aria-label={`New name for ${m.name}`} className={`${inputClass} py-1 text-xs`} />
-                              <button className={smallButtonClass}>Rename</button>
-                            </form>
-                            <form action={moveMediaAction} className="flex gap-1">
-                              {back}
-                              <input type="hidden" name="id" value={m.id} />
-                              <select name="folder" defaultValue={m.folder} aria-label={`Move ${m.name} to folder`} className={`${inputClass} py-1 text-xs`}>
-                                {folders.map((f) => (
-                                  <option key={f.slug} value={f.slug}>
-                                    {f.name}
-                                  </option>
-                                ))}
-                              </select>
-                              <button className={smallButtonClass}>Move</button>
-                            </form>
-                            <form action={deleteMediaAction}>
-                              {back}
-                              <input type="hidden" name="id" value={m.id} />
-                              <ConfirmButton
-                                className={smallButtonClass}
-                                message={`Delete “${m.name}”? Pages or posts that use this image will show nothing in its place. This can't be undone.`}
-                              >
-                                Delete
-                              </ConfirmButton>
-                            </form>
-                          </div>
-                        </details>
+                        <MediaEditDialog item={{ id: m.id, name: m.name, folder: m.folder, url: m.url, sizeLabel: kb(m.size) }} folders={folders} returnFolder={folder ?? ""} returnQ={q} />
                       </div>
                     </div>
                   </li>
