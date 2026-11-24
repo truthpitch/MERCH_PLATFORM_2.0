@@ -12,6 +12,7 @@ import { DEFAULT_SHIPPING_POLICY } from "@/lib/shipping-policy";
 import { DEFAULT_TERMS } from "@/lib/terms";
 import { prisma } from "@/lib/db";
 import { getUploadDir, isSafeFilename, removeFaviconFile } from "@/lib/uploads";
+import { folderSlug } from "@/lib/media";
 import { isMailConfigured, sendActivationEmail } from "@/lib/activation";
 
 // ── Helpers ─────────────────────────────────────────────────
@@ -202,16 +203,78 @@ export async function saveProductCategoryAction(formData: FormData) {
 
 // ── Media ───────────────────────────────────────────────────
 
+/** Back to the Media tab with the same folder and search, plus a message. */
+function mediaBack(formData: FormData, done: string): never {
+  const qs = new URLSearchParams();
+  const folder = text(formData, "returnFolder", 40);
+  const q = text(formData, "returnQ", 100);
+  if (folder) qs.set("folder", folder);
+  if (q) qs.set("q", q);
+  qs.set("done", done);
+  redirect(`/admin/media?${qs}`);
+}
+
+const mediaId = (formData: FormData) => {
+  const id = Number(formData.get("id"));
+  return Number.isInteger(id) && id > 0 ? id : null;
+};
+
+/** Permanently deletes an image (file and record). Pages that still use its URL will show nothing. */
 export async function deleteMediaAction(formData: FormData) {
   await requireAdmin();
-  const id = Number(formData.get("id"));
-  const media = await prisma.media.findUnique({ where: { id } });
-  if (!media) return;
-  if (isSafeFilename(media.filename)) {
-    await unlink(path.join(getUploadDir(), media.filename)).catch(() => undefined);
+  const id = mediaId(formData);
+  const media = id ? await prisma.media.findUnique({ where: { id } }) : null;
+  if (media) {
+    if (isSafeFilename(media.filename)) {
+      await unlink(path.join(getUploadDir(), ...media.filename.split("/"))).catch(() => undefined);
+    }
+    await prisma.media.delete({ where: { id: media.id } });
   }
-  await prisma.media.delete({ where: { id } });
   revalidatePath("/admin/media");
+  mediaBack(formData, "deleted");
+}
+
+/** Moves an image to another folder. Only the label changes, so its URL keeps working. */
+export async function moveMediaAction(formData: FormData) {
+  await requireAdmin();
+  const id = mediaId(formData);
+  const folder = await prisma.mediaFolder.findUnique({ where: { slug: text(formData, "folder", 40) } });
+  if (id && folder) await prisma.media.updateMany({ where: { id }, data: { folder: folder.slug } });
+  revalidatePath("/admin/media");
+  mediaBack(formData, "moved");
+}
+
+/** Renames an image (the name you search for). Its URL stays the same, so nothing breaks. */
+export async function renameMediaAction(formData: FormData) {
+  await requireAdmin();
+  const id = mediaId(formData);
+  const name = text(formData, "name", 100);
+  if (id && name) await prisma.media.updateMany({ where: { id }, data: { name } });
+  revalidatePath("/admin/media");
+  mediaBack(formData, "renamed");
+}
+
+/** Adds a folder, e.g. "Summer collection". */
+export async function createMediaFolderAction(formData: FormData) {
+  await requireAdmin();
+  const name = text(formData, "name", 40);
+  const slug = folderSlug(name);
+  if (!slug) mediaBack(formData, "folder-invalid");
+  if (await prisma.mediaFolder.findUnique({ where: { slug } })) mediaBack(formData, "folder-exists");
+  await prisma.mediaFolder.create({ data: { slug, name } });
+  revalidatePath("/admin/media");
+  redirect(`/admin/media?folder=${slug}&done=folder-created`);
+}
+
+/** Removes an empty folder. "General" always stays. */
+export async function deleteMediaFolderAction(formData: FormData) {
+  await requireAdmin();
+  const slug = text(formData, "slug", 40);
+  if (slug === "general") mediaBack(formData, "folder-keep");
+  if ((await prisma.media.count({ where: { folder: slug } })) > 0) mediaBack(formData, "folder-not-empty");
+  await prisma.mediaFolder.deleteMany({ where: { slug } });
+  revalidatePath("/admin/media");
+  redirect("/admin/media?done=folder-deleted");
 }
 
 // ── Contact page ────────────────────────────────────────────

@@ -1,33 +1,35 @@
-// Image upload endpoint for the admin Media page (plain multipart form POST).
-import { randomBytes } from "node:crypto";
-import { mkdir, writeFile } from "node:fs/promises";
-import path from "node:path";
+// Image upload for admin → Media and the blog editor's image picker (multipart form POST).
+// Several images at once; each is stored by name in the chosen folder (see src/lib/media.ts).
+// The blog editor asks for JSON (Accept: application/json) so it can stay on the page;
+// the Media tab gets a redirect back with a summary.
+import { revalidatePath } from "next/cache";
 import { isAdmin } from "@/lib/auth";
-import { prisma } from "@/lib/db";
-import { ALLOWED_UPLOAD_TYPES, MAX_UPLOAD_BYTES, getUploadDir } from "@/lib/uploads";
+import { saveUpload, type UploadResult } from "@/lib/media";
 
-// Relative Location header works behind Hostinger's reverse proxy.
-const back = (query: string) => new Response(null, { status: 303, headers: { Location: `/admin/media?${query}` } });
+const MAX_FILES = 20;
 
 export async function POST(request: Request) {
-  if (!(await isAdmin())) return new Response(null, { status: 303, headers: { Location: "/admin/login" } });
+  const wantsJson = (request.headers.get("accept") ?? "").includes("application/json");
+  if (!(await isAdmin())) {
+    return wantsJson ? Response.json({ error: "Please log in again." }, { status: 401 }) : new Response(null, { status: 303, headers: { Location: "/admin/login" } });
+  }
 
   const form = await request.formData();
-  const file = form.get("file");
-  if (!(file instanceof File) || file.size === 0) return back("error=missing");
+  const folder = String(form.get("folder") ?? "general");
+  const files = form.getAll("file").filter((f): f is File => f instanceof File && f.size > 0).slice(0, MAX_FILES);
 
-  const ext = ALLOWED_UPLOAD_TYPES[file.type];
-  if (!ext) return back("error=type");
-  if (file.size > MAX_UPLOAD_BYTES) return back("error=size");
+  const results: UploadResult[] = [];
+  for (const file of files) results.push(await saveUpload(file, folder));
+  revalidatePath("/admin/media");
 
-  const filename = `${Date.now()}-${randomBytes(4).toString("hex")}.${ext}`;
-  const dir = getUploadDir();
-  await mkdir(dir, { recursive: true });
-  await writeFile(path.join(dir, filename), Buffer.from(await file.arrayBuffer()));
+  const uploaded = results.flatMap((r) => (r.ok ? [r.item] : []));
+  const failed = results.flatMap((r) => (r.ok ? [] : [{ name: r.name, error: r.error }]));
 
-  await prisma.media.create({
-    data: { filename, originalName: file.name.slice(0, 200), mimeType: file.type, size: file.size },
-  });
+  if (wantsJson) return Response.json({ uploaded, failed });
 
-  return back("uploaded=1");
+  // Relative Location header works behind Hostinger's reverse proxy.
+  const qs = new URLSearchParams({ folder: uploaded[0]?.folder ?? folder, uploaded: String(uploaded.length) });
+  if (files.length === 0) qs.set("error", "missing");
+  if (failed.length) qs.set("failed", failed.map((f) => `${f.name}: ${f.error}`).join(" | ").slice(0, 600));
+  return new Response(null, { status: 303, headers: { Location: `/admin/media?${qs}` } });
 }

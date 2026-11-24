@@ -89,11 +89,22 @@ model ProductStory {
 // Images uploaded through the admin panel (files live in UPLOAD_DIR).
 model Media {
   id           Int      @id @default(autoincrement())
-  filename     String   @unique
+  filename     String   @unique // path inside UPLOAD_DIR, e.g. "blog/summer-tee.jpg" (older uploads: no folder)
+  name         String   @default("") // display name, e.g. "Summer tee (1)"
+  folder       String   @default("general") // MediaFolder slug, only a label: moving keeps the file (and its URL) where it is
   originalName String
   mimeType     String
   size         Int
   createdAt    DateTime @default(now())
+
+  @@index([folder])
+}
+
+// Folders on the admin Media tab (e.g. Blog, Products). Images are uploaded into a folder.
+model MediaFolder {
+  slug      String   @id // "blog"
+  name      String // "Blog"
+  createdAt DateTime @default(now())
 }
 
 // Shop customers (accounts are optional: guests can always check out).

@@ -3,12 +3,14 @@ import { notFound } from "next/navigation";
 import { BlogForm } from "@/components/admin/BlogForm";
 import { PageTitle, SavedNotice } from "@/components/admin/Card";
 import { prisma } from "@/lib/db";
+import { pickerData } from "@/lib/media";
 import { publicSiteUrl } from "@/lib/site";
 
 export default async function EditBlogPost({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ saved?: string }> }) {
   const [{ id }, sp] = await Promise.all([params, searchParams]);
   const post = await prisma.blogPost.findUnique({ where: { id: Number(id) || 0 } });
   if (!post) notFound();
+  const { media, folders } = await pickerData();
   const live = post.published && post.publishedAt && post.publishedAt <= new Date();
 
   return (
@@ -31,6 +33,8 @@ export default async function EditBlogPost({ params, searchParams }: { params: P
       <BlogForm
         key={post.updatedAt.toISOString()}
         siteUrl={publicSiteUrl()}
+        media={media}
+        folders={folders}
         post={{
           id: post.id,
           title: post.title,

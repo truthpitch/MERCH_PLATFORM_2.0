@@ -1,8 +1,9 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useRef, useState } from "react";
 import { saveBlogPostAction, type BlogFormState } from "@/app/admin/blog-actions";
 import { DateTimeField } from "./DateTimeField";
+import { MediaPicker, type PickerFolder, type PickerImage } from "./MediaPicker";
 import { inputClass, labelClass } from "./styles";
 
 export type BlogFormPost = {
@@ -49,11 +50,42 @@ const HELP: [string, string][] = [
   ["- item", "Bullet list (one per line)"],
   ["1. item", "Numbered list"],
   ["> quote", "Quote"],
-  ["![description](/media/…)", "Image (upload it in Media first, then paste its URL)"],
+  ["![description](/media/…)", "Image: easiest with the “Insert image” button above the text"],
   ["---", "Dividing line"],
 ];
 
-export function BlogForm({ post, siteUrl }: { post: BlogFormPost; siteUrl: string }) {
+export function BlogForm({
+  post,
+  siteUrl,
+  media,
+  folders,
+}: {
+  post: BlogFormPost;
+  siteUrl: string;
+  /** Images from the Media library, for the image picker. */
+  media: PickerImage[];
+  folders: PickerFolder[];
+}) {
+  const contentRef = useRef<HTMLTextAreaElement>(null);
+  const altRef = useRef<HTMLInputElement>(null);
+
+  /** Puts ![name](url) on its own line where the cursor is in the text. */
+  function insertImage(image: PickerImage) {
+    const ta = contentRef.current;
+    if (!ta) return;
+    const alt = image.name.replace(/[[\]]/g, "");
+    const before = ta.value.slice(0, ta.selectionStart);
+    const pad = before === "" || before.endsWith("\n\n") ? "" : before.endsWith("\n") ? "\n" : "\n\n";
+    ta.focus();
+    ta.setRangeText(`${pad}![${alt}](${image.url})\n\n`, ta.selectionStart, ta.selectionEnd, "end");
+  }
+
+  /** Sets the cover image, and its description if that's still empty. */
+  function useAsCover(image: PickerImage) {
+    setCover(image.url);
+    if (altRef.current && !altRef.current.value.trim()) altRef.current.value = image.name;
+  }
+
   const [state, action, pending] = useActionState<BlogFormState, FormData>(saveBlogPostAction, {});
   const [title, setTitle] = useState(post.title);
   const [slug, setSlug] = useState(post.slug);
@@ -126,10 +158,22 @@ export function BlogForm({ post, siteUrl }: { post: BlogFormPost; siteUrl: strin
         </section>
 
         <section className="border border-neutral-200 bg-white p-6">
-          <label htmlFor="content" className={labelClass}>
-            Text
-          </label>
-          <textarea id="content" name="content" rows={24} defaultValue={post.content} className={`${inputClass} font-mono text-[13px] leading-relaxed`} spellCheck />
+          <div className="mb-1 flex flex-wrap items-end justify-between gap-2">
+            <label htmlFor="content" className={labelClass}>
+              Text
+            </label>
+            <MediaPicker images={media} folders={folders} onInsert={insertImage} onCover={useAsCover} label="Insert image" />
+          </div>
+          <textarea
+            ref={contentRef}
+            id="content"
+            name="content"
+            rows={24}
+            defaultValue={post.content}
+            className={`${inputClass} font-mono text-[13px] leading-relaxed`}
+            spellCheck
+          />
+          <p className="mt-1 text-xs text-neutral-500">Click in the text where the image should go, then use “Insert image”.</p>
           <details className="mt-3 text-sm">
             <summary className="cursor-pointer text-neutral-700 underline underline-offset-4">How to format the text</summary>
             <table className="mt-3 w-full text-left text-xs">
@@ -216,11 +260,14 @@ export function BlogForm({ post, siteUrl }: { post: BlogFormPost; siteUrl: strin
 
         <section className="space-y-4 border border-neutral-200 bg-white p-6">
           <div>
-            <label htmlFor="coverImageUrl" className={labelClass}>
-              Cover image URL
-            </label>
+            <div className="mb-1 flex flex-wrap items-end justify-between gap-2">
+              <label htmlFor="coverImageUrl" className={labelClass}>
+                Cover image
+              </label>
+              <MediaPicker images={media} folders={folders} onCover={useAsCover} label="Choose image" />
+            </div>
             <input id="coverImageUrl" name="coverImageUrl" value={cover} onChange={(e) => setCover(e.target.value)} placeholder="/media/… or https://…" className={inputClass} />
-            <p className="mt-1 text-xs text-neutral-500">Upload in Media, then paste the URL. Wide images (16:9) look best; also used when the post is shared.</p>
+            <p className="mt-1 text-xs text-neutral-500">Choose from your Media library (or upload there), or paste a URL. Wide images (16:9) look best; also used when the post is shared.</p>
           </div>
           {cover && (
             // eslint-disable-next-line @next/next/no-img-element
@@ -230,7 +277,15 @@ export function BlogForm({ post, siteUrl }: { post: BlogFormPost; siteUrl: strin
             <label htmlFor="coverImageAlt" className={labelClass}>
               Image description
             </label>
-            <input id="coverImageAlt" name="coverImageAlt" defaultValue={post.coverImageAlt} maxLength={200} placeholder="What's in the picture?" className={inputClass} />
+            <input
+              ref={altRef}
+              id="coverImageAlt"
+              name="coverImageAlt"
+              defaultValue={post.coverImageAlt}
+              maxLength={200}
+              placeholder="What's in the picture?"
+              className={inputClass}
+            />
             <p className="mt-1 text-xs text-neutral-500">For blind visitors and Google Images.</p>
           </div>
         </section>

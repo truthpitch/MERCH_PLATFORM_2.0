@@ -23,9 +23,12 @@ export const MIME_BY_EXT: Record<string, string> = {
   ico: "image/x-icon",
 };
 
-/** Only allow names we generated ourselves: no slashes, no dot-dot. */
+/**
+ * Only allow names we generated ourselves: an optional folder ("blog/"), then a simple
+ * file name. No other slashes, no dot-dot, so nothing outside UPLOAD_DIR can be reached.
+ */
 export function isSafeFilename(name: string): boolean {
-  return /^[a-zA-Z0-9_-]+\.(jpg|png|webp|gif|ico)$/.test(name);
+  return /^(?:[a-z0-9-]{1,40}\/)?[a-zA-Z0-9_-]+\.(jpg|png|webp|gif|ico)$/.test(name);
 }
 
 // ── Favicon ────────────────────────────────────────────────
