@@ -17,7 +17,7 @@ export default async function AboutAdmin({ searchParams }: { searchParams: Promi
 
   return (
     <>
-      <PageTitle title="About page" description="The story and idea behind TruthPitch, shown on /about." />
+      <PageTitle title="About page" description="The story, mission and vision behind TruthPitch, shown on /about. Sections appear in this order on the page." />
       <SavedNotice show={sp.saved === "1"}>About page saved.</SavedNotice>
 
       <form action={saveAboutAction} className="grid gap-6">
@@ -35,6 +35,54 @@ export default async function AboutAdmin({ searchParams }: { searchParams: Promi
               </label>
               <textarea id="aboutIntro" name="aboutIntro" defaultValue={s.aboutIntro} rows={2} className={inputClass} />
               <p className="mt-1 text-xs text-neutral-500">One or two sentences that sum up TruthPitch.</p>
+            </div>
+          </div>
+        </Card>
+
+        <Card title="Mission & vision">
+          <p className="mb-4 text-sm text-neutral-600">Shown side by side under the intro. Empty the text of one to hide it.</p>
+          <div className="grid gap-6 md:grid-cols-2">
+            {[
+              { key: "Mission", title: s.aboutMissionTitle, text: s.aboutMissionText },
+              { key: "Vision", title: s.aboutVisionTitle, text: s.aboutVisionText },
+            ].map((b) => (
+              <div key={b.key} className="grid content-start gap-3">
+                <div>
+                  <label className={labelClass} htmlFor={`about${b.key}Title`}>
+                    {`${b.key}: heading`}
+                  </label>
+                  <input id={`about${b.key}Title`} name={`about${b.key}Title`} defaultValue={b.title} className={inputClass} />
+                </div>
+                <div>
+                  <label className={labelClass} htmlFor={`about${b.key}Text`}>
+                    {`${b.key}: text`}
+                  </label>
+                  <textarea id={`about${b.key}Text`} name={`about${b.key}Text`} defaultValue={b.text} rows={6} className={inputClass} />
+                  <p className="mt-1 text-xs text-neutral-500">An empty line starts a new paragraph. The first paragraph is shown larger.</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+
+        <Card title="Why I started TruthPitch">
+          <div className="grid gap-4">
+            <div>
+              <label className={labelClass} htmlFor="aboutStoryTitle">
+                Heading
+              </label>
+              <input id="aboutStoryTitle" name="aboutStoryTitle" defaultValue={s.aboutStoryTitle} className={inputClass} />
+            </div>
+            <div>
+              <p className={labelClass}>Personal story</p>
+              <RichTextEditor name="aboutStoryText" label="Personal story" defaultValue={s.aboutStoryText} minHeight={320} />
+              <p className="mt-1 text-xs text-neutral-500">Leave empty to hide this section.</p>
+            </div>
+            <div>
+              <label className={labelClass} htmlFor="aboutStorySignoff">
+                Closing line (large, bold)
+              </label>
+              <input id="aboutStorySignoff" name="aboutStorySignoff" defaultValue={s.aboutStorySignoff} className={inputClass} />
             </div>
           </div>
         </Card>

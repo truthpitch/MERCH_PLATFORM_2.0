@@ -89,7 +89,7 @@ The code is commented where credentials go. See:
 | --- | --- |
 | **Dashboard** | Maintenance ON/OFF switch and message, **Ordering pause** (shop stays open, add to cart and checkout off; message and optional automatic end time), favicon upload (PNG, ICO, JPG, WebP or GIF, max 1 MB), quick stats, connection status |
 | **Home** | Announcement bar (headline, button, countdown), hero text/image/button, featured products (add, remove, reorder) |
-| **About** | The `/about` page: intro statement, the story behind TruthPitch, optional image and three principles |
+| **About** | The `/about` page: intro statement, **Our Mission** and **Our Vision** (side by side), **Why I Started TruthPitch** (personal story with a large closing line), the story behind TruthPitch with optional image, and three principles. Empty a text to hide its section |
 | **Contact** | The `/contact` page: heading, intro text and the optional email address shown next to the form |
 | **Legal** | Legal notice / Impressum (company name, address, email, phone, KvK and VAT number) for `/legal-notice`, and the policy pages `/terms-of-service`, `/shipping-policy`, `/refund-policy` `/privacy-policy`, `/cookie-policy` and the help page `/how-it-works` (standard texts are used until you write your own; each box shows "Standard text" or "Your own text"). Shopify requires both for iDEAL | Wero |
 | **Products** | Choose each product's shop **category** (Automatic shows which one it gets and why), edit the **MORE INFO** story (and optional image), the **Shipping & returns** text for every product page, and the **Size guides** (one table per category) |

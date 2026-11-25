@@ -70,6 +70,14 @@ model SiteSettings {
   aboutValue2Text        String    @default("Black, white and grey. Clean typography. Pieces that let the message do the talking.")
   aboutValue3Title       String    @default("Made to order")
   aboutValue3Text        String    @default("Everything is printed on demand when you order it, so nothing is wasted on stock nobody wants.")
+  // About page: mission, vision and the founder's story (empty = section hidden)
+  aboutMissionTitle      String    @default("Our Mission")
+  aboutMissionText       String    @default("TruthPitch puts honest words on things you wear and use every day, so truth travels wherever you go.\n\nWe turn meaningful words into everyday merch: carefully curated, honestly made, and designed to start real conversations.")
+  aboutVisionTitle       String    @default("Our Vision")
+  aboutVisionText        String    @default("A world where truth is spoken, worn and shared, and where we see beyond separateness.\n\nWe keep pitching truth, because the world needs it now more than ever.")
+  aboutStoryTitle        String    @default("Why I Started TruthPitch")
+  aboutStoryText         String    @default("I started TruthPitch because I kept noticing how much noise there is in the world, and how little truth gets through. Headlines, ads and feeds compete for our attention every second, and the real, simple things often get lost along the way.\n\nSome words have the power to wake us up. You are beyond words. Things aren't always black or white. The truth always comes to light. When I read lines like that, something shifts, even if just for a moment. I wanted those moments to last longer than a scroll.\n\nSo I asked myself: what if truth could travel? On a shirt in a crowded street, on a mug at the start of the day, on a sticker on someone's laptop. Small reminders that spark a thought, a question or a real conversation.\n\nTruthPitch is my way of putting truth back into everyday life. Every design is carefully chosen, because I believe the words we carry with us matter.\n\nThank you for being part of it. Wear it, share it, and keep the truth alive.")
+  aboutStorySignoff      String    @default("Truth Exists.")
   updatedAt              DateTime  @updatedAt
 }
 

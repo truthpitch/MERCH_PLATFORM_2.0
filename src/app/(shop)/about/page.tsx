@@ -8,6 +8,13 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: "About", description: settings.aboutIntro.slice(0, 160) || "The idea behind TruthPitch." };
 }
 
+/** Plain text with empty lines between paragraphs → paragraphs. */
+const paragraphs = (t: string) =>
+  t
+    .split(/\r?\n\s*\r?\n/)
+    .map((p) => p.trim())
+    .filter(Boolean);
+
 /** The story behind TruthPitch. All text is edited in Admin → About. */
 export default async function AboutPage() {
   const s = await getSettings();
@@ -16,6 +23,10 @@ export default async function AboutPage() {
     { title: s.aboutValue2Title, text: s.aboutValue2Text },
     { title: s.aboutValue3Title, text: s.aboutValue3Text },
   ].filter((v) => v.title.trim() || v.text.trim());
+  const pillars = [
+    { title: s.aboutMissionTitle, text: s.aboutMissionText },
+    { title: s.aboutVisionTitle, text: s.aboutVisionText },
+  ].filter((p) => p.text.trim());
 
   return (
     <>
@@ -28,6 +39,42 @@ export default async function AboutPage() {
           )}
         </div>
       </section>
+
+      {/* Mission & vision */}
+      {pillars.length > 0 && (
+        <section className="border-b border-neutral-200">
+          <div className={`mx-auto grid max-w-6xl gap-12 px-4 py-20 sm:px-6 ${pillars.length === 2 ? "md:grid-cols-2 md:gap-16" : ""}`}>
+            {pillars.map((p) => (
+              <div key={p.title} className="border-t border-black pt-6">
+                {p.title && <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-black">{p.title}</h2>}
+                {paragraphs(p.text).map((para, i) => (
+                  <p
+                    key={i}
+                    className={
+                      i === 0
+                        ? "mt-6 text-2xl font-semibold leading-snug tracking-tight text-black sm:text-3xl"
+                        : "mt-4 text-lg leading-relaxed text-neutral-700"
+                    }
+                  >
+                    {para}
+                  </p>
+                ))}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Why I started TruthPitch */}
+      {s.aboutStoryText.trim() && (
+        <section className="border-b border-neutral-200">
+          <div className="mx-auto max-w-3xl px-4 py-20 sm:px-6">
+            {s.aboutStoryTitle && <h2 className="text-3xl font-semibold tracking-tight text-black sm:text-4xl">{s.aboutStoryTitle}</h2>}
+            <div className="rich-text mt-8 text-lg leading-relaxed text-neutral-700">{renderPost(s.aboutStoryText)}</div>
+            {s.aboutStorySignoff && <p className="mt-10 text-2xl font-semibold tracking-tight text-black sm:text-3xl">{s.aboutStorySignoff}</p>}
+          </div>
+        </section>
+      )}
 
       {/* The idea */}
       <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6">

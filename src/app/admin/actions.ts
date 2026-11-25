@@ -20,7 +20,8 @@ import { isMailConfigured, sendActivationEmail } from "@/lib/activation";
 // ── Helpers ─────────────────────────────────────────────────
 
 function text(formData: FormData, key: string, max = 5000): string {
-  return String(formData.get(key) ?? "").slice(0, max).trim();
+  // Browsers send line breaks from text fields as \r\n; store them as \n.
+  return String(formData.get(key) ?? "").replace(/\r\n?/g, "\n").slice(0, max).trim();
 }
 
 /** Accept empty, site-relative (/media/…) or http(s) URLs only. */
@@ -138,6 +139,13 @@ export async function saveAboutAction(formData: FormData) {
     aboutValue2Text: text(formData, "aboutValue2Text", 500),
     aboutValue3Title: text(formData, "aboutValue3Title", 80),
     aboutValue3Text: text(formData, "aboutValue3Text", 500),
+    aboutMissionTitle: text(formData, "aboutMissionTitle", 120),
+    aboutMissionText: text(formData, "aboutMissionText", 3000),
+    aboutVisionTitle: text(formData, "aboutVisionTitle", 120),
+    aboutVisionText: text(formData, "aboutVisionText", 3000),
+    aboutStoryTitle: text(formData, "aboutStoryTitle", 120),
+    aboutStoryText: text(formData, "aboutStoryText", 15000),
+    aboutStorySignoff: text(formData, "aboutStorySignoff", 200),
   };
   await prisma.siteSettings.upsert({ where: { id: 1 }, update: data, create: { id: 1, ...data } });
   refreshSite();
