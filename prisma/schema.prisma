@@ -138,6 +138,7 @@ model Customer {
   resets         PasswordReset[]
   activations    EmailActivation[]
   reviews        Review[]
+  blogComments   BlogComment[]
 }
 
 // A customer's review of a product (one per customer per product; they can edit it).
@@ -219,8 +220,27 @@ model BlogPost {
   publishedAt     DateTime?
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
+  comments        BlogComment[]
 
   @@index([published, publishedAt])
+}
+
+// A reader's reply under a blog post. Anyone can write one (signed in or not), but replies are
+// only public after the admin approves them in admin → Replies.
+model BlogComment {
+  id         Int       @id @default(autoincrement())
+  postId     Int
+  customerId Int? // set when the writer was signed in
+  name       String // name shown with the reply
+  body       String
+  approved   Boolean   @default(false)
+  approvedAt DateTime?
+  createdAt  DateTime  @default(now())
+  post       BlogPost  @relation(fields: [postId], references: [id], onDelete: Cascade)
+  customer   Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
+
+  @@index([postId, approved])
+  @@index([approved, createdAt])
 }
 
 // ── Visitor statistics (admin → SEO & Traffic) ─────────────

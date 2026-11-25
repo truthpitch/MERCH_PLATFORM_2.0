@@ -22,18 +22,19 @@ When we use the term "personal information", we mean information that identifies
 - **Account information**, if you create an account: your name, email address and password. Your password is stored only in encrypted (hashed) form, so nobody can read it, including us. We also keep the products you save as favorites.
 - **Transaction information**, including the items you view, put in your cart, save as a favorite, purchase, return, exchange or cancel, and your past orders.
 - **Reviews** you write: your star rating and text, shown publicly with your first name and the first letter of your last name once we have approved them.
+- **Blog replies** you write: the name you give (or, when signed in, your first name and the first letter of your last name) and your reply, shown publicly under the blog post once we have approved them.
 - **Communications with us**, including what you write in our contact form or in emails, for example a customer support question.
 - **Device and usage information**, including your IP address, browser and device type, and how you use the Services. We use this for security, for example to block repeated failed sign-in attempts, and to keep the website running. If you accept analytics cookies, we also keep anonymous visit statistics (see "Cookies and similar technologies").
 
 ## Where we get personal information from
 
-- **Directly from you**, when you place an order, create an account, write a review, contact us or otherwise give us your information.
+- **Directly from you**, when you place an order, create an account, write a review or blog reply, contact us or otherwise give us your information.
 - **Automatically**, from your device when you use the Services, including through cookies and similar technologies (see below).
 - **From our service providers**, such as Shopify (for orders and payments) and Printful (for production and shipping status).
 
 ## How we use your personal information
 
-- **Provide, tailor and improve the Services.** To perform our contract with you: process your payments, fulfill and ship your orders, manage your account and favorites, send messages about your account and orders, handle returns and exchanges, publish your approved reviews, and improve our shop.
+- **Provide, tailor and improve the Services.** To perform our contract with you: process your payments, fulfill and ship your orders, manage your account and favorites, send messages about your account and orders, handle returns and exchanges, publish your approved reviews and blog replies, and improve our shop.
 - **Security and fraud prevention.** To verify your account (for example with an activation email), keep your account and payments secure, and detect and prevent fraud and misuse. If you create an account, you are responsible for keeping your password safe. Please don't share it with anyone.
 - **Communicating with you.** To answer your questions, provide customer support and maintain our relationship with you.
 - **Marketing.** We currently don't send newsletters and don't show personalised advertising. If you tick a box to receive news and offers at checkout, we only use your email address for that, and you can unsubscribe at any time. If we start other marketing, we will ask for your consent first where the law requires it.
@@ -105,6 +106,7 @@ We protect your information with measures such as secure (HTTPS) connections, en
 We keep personal information only as long as we need it:
 
 - **Your account, favorites and reviews:** until you delete your account. You can do that yourself at any time under **My account**.
+- **Blog replies:** as long as they are on the website. Ask us and we will remove yours.
 - **Order information:** as long as required by tax and accounting law (in the Netherlands, generally 7 years).
 - **Messages to customer support:** as long as needed to help you, and to handle any follow-up.
 - **Activation and password-reset links:** they expire after 48 hours and 1 hour respectively.

@@ -48,6 +48,10 @@ You can delete your account yourself at any time under **My account**.
 
 Bought something? Tell others what you think. Sign in, go to the product page and give it **1 to 5 stars** and a short review. Every review is **checked by us before it appears** on the website, to keep out spam and abuse. If you edit your review later, it's checked again. Your review is shown with your first name and the first letter of your last name.
 
+## Blog replies
+
+Want to react to a blog post? Scroll to **Replies** at the bottom of the post, enter your name and write your reply. You don't need an account. Every reply is **checked by us before it appears**, just like reviews.
+
 ## Cookies and privacy
 
 When you first visit, we ask whether you accept **analytics cookies**. Reject or Accept: the shop works the same either way. If you accept, we keep anonymous statistics on our own server, like which pages are popular, to improve the shop. We never store your IP address with them and never share them with advertisers. Change your choice any time with **Cookie settings** at the bottom of every page.

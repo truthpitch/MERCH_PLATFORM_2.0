@@ -415,6 +415,47 @@ export async function deleteReviewAction(formData: FormData) {
   reviewsBack(formData, "deleted");
 }
 
+// ── Blog replies ────────────────────────────────────────────
+
+function commentId(formData: FormData): number | null {
+  const id = Number(formData.get("id"));
+  return Number.isInteger(id) && id > 0 ? id : null;
+}
+
+function repliesBack(formData: FormData, done: string): never {
+  const status = text(formData, "status", 20);
+  const qs = new URLSearchParams({ done });
+  if (["pending", "approved", "all"].includes(status)) qs.set("status", status);
+  redirect(`/admin/replies?${qs}`);
+}
+
+/** Publishes a reader's reply under its blog post. */
+export async function approveCommentAction(formData: FormData) {
+  await requireAdmin();
+  const id = commentId(formData);
+  if (id) await prisma.blogComment.updateMany({ where: { id }, data: { approved: true, approvedAt: new Date() } });
+  refreshSite();
+  repliesBack(formData, "approved");
+}
+
+/** Takes an approved reply off the website again (back to "Waiting for approval"). */
+export async function unapproveCommentAction(formData: FormData) {
+  await requireAdmin();
+  const id = commentId(formData);
+  if (id) await prisma.blogComment.updateMany({ where: { id }, data: { approved: false, approvedAt: null } });
+  refreshSite();
+  repliesBack(formData, "hidden");
+}
+
+/** Permanently deletes a reply. */
+export async function deleteCommentAction(formData: FormData) {
+  await requireAdmin();
+  const id = commentId(formData);
+  if (id) await prisma.blogComment.delete({ where: { id } }).catch(() => null);
+  refreshSite();
+  repliesBack(formData, "deleted");
+}
+
 // ── Legal ───────────────────────────────────────────────────
 
 /**

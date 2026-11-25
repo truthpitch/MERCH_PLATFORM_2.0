@@ -61,6 +61,7 @@ As a consumer, you have the right to cancel your purchase **within 14 days** aft
 - Signed-in customers can write reviews. Reviews must be honest and about the product, and may not contain offensive, discriminating or unlawful content, advertising or personal details of others.
 - We check every review before it's published. We may refuse or remove reviews that don't follow these rules, but we don't remove reviews just because they're negative.
 - By posting a review, you allow us to show it on our website.
+- The same rules apply to replies under blog posts: we check every reply before it's published and may refuse or remove replies that break them.
 
 ## 11. Intellectual property
 

@@ -1,9 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Comments } from "@/components/blog/Comments";
 import { PostCard } from "@/components/blog/PostCard";
 import { isAdmin } from "@/lib/auth";
 import { formatPostDate, getPostBySlug, getRelatedPosts, postTags } from "@/lib/blog";
+import { getApprovedComments } from "@/lib/blog-comments";
+import { getCurrentCustomer } from "@/lib/customers";
+import { publicName } from "@/lib/reviews";
 import { plainText, postHeadings, readingMinutes, renderPost } from "@/lib/blog-format";
 import { SITE_NAME, absoluteUrl } from "@/lib/site";
 
@@ -48,7 +52,7 @@ export default async function BlogPostPage({ params }: Props) {
   if (!post) notFound();
 
   const isDraft = !post.published || !post.publishedAt || post.publishedAt > new Date();
-  const [related] = await Promise.all([getRelatedPosts(post)]);
+  const [related, comments, customer] = await Promise.all([getRelatedPosts(post), getApprovedComments(post.id), getCurrentCustomer()]);
   const headings = postHeadings(post.content).filter((h) => h.level === 2);
   const tags = postTags(post.tags);
   const url = absoluteUrl(`/blog/${post.slug}`);
@@ -179,6 +183,8 @@ export default async function BlogPostPage({ params }: Props) {
             </Link>
           </div>
         </footer>
+
+        <Comments slug={post.slug} comments={comments} signedInAs={customer ? publicName(customer.name) : null} canReply={!isDraft} />
       </article>
 
       {related.length > 0 && (

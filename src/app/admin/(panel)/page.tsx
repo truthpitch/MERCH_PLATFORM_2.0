@@ -5,6 +5,7 @@ import { SubmitButton } from "@/components/admin/ui";
 import { getProducts, isDemoMode } from "@/lib/catalog";
 import { prisma } from "@/lib/db";
 import { countPendingReviews } from "@/lib/reviews";
+import { countPendingComments } from "@/lib/blog-comments";
 import { isPrintfulConfigured } from "@/lib/printful";
 import { getSettings } from "@/lib/settings";
 import { isShopifyAdminConfigured } from "@/lib/shopify/admin";
@@ -27,7 +28,7 @@ const FAVICON_MESSAGES: Record<string, string> = {
 };
 
 export default async function DashboardPage({ searchParams }: { searchParams: Promise<{ saved?: string; favicon?: string; ordering?: string }> }) {
-  const [settings, products, featuredCount, storyCount, mediaCount, sp, pendingReviews] = await Promise.all([
+  const [settings, products, featuredCount, storyCount, mediaCount, sp, pendingReviews, pendingReplies] = await Promise.all([
     getSettings(),
     getProducts().catch(() => []),
     prisma.featuredProduct.count(),
@@ -35,6 +36,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
     prisma.media.count(),
     searchParams,
     countPendingReviews(),
+    countPendingComments(),
   ]);
   const on = settings.maintenanceMode;
   const ordering = orderingState(settings);
@@ -55,6 +57,20 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
             They&apos;re not on the website until you approve them.
           </span>
           <span className="shrink-0 font-medium underline underline-offset-4">Check reviews →</span>
+        </Link>
+      )}
+      {pendingReplies > 0 && (
+        <Link
+          href="/admin/replies?status=pending"
+          className="mb-6 flex items-center justify-between gap-4 border border-black bg-white px-5 py-4 text-sm text-black hover:bg-neutral-50"
+        >
+          <span>
+            <strong>
+              {pendingReplies} blog {pendingReplies === 1 ? "reply is" : "replies are"} waiting for approval.
+            </strong>{" "}
+            They&apos;re not on the website until you approve them.
+          </span>
+          <span className="shrink-0 font-medium underline underline-offset-4">Check replies →</span>
         </Link>
       )}
 
