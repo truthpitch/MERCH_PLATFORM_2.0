@@ -68,10 +68,13 @@ export default async function AboutPage() {
       {/* Why I started TruthPitch */}
       {s.aboutStoryText.trim() && (
         <section className="border-b border-neutral-200">
-          <div className="mx-auto max-w-3xl px-4 py-20 sm:px-6">
+          {/* Same left edge as the other sections; the text itself keeps a readable width. */}
+          <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
+            <div className="max-w-3xl">
             {s.aboutStoryTitle && <h2 className="text-3xl font-semibold tracking-tight text-black sm:text-4xl">{s.aboutStoryTitle}</h2>}
             <div className="rich-text mt-8 text-lg leading-relaxed text-neutral-700">{renderPost(s.aboutStoryText)}</div>
             {s.aboutStorySignoff && <p className="mt-10 text-2xl font-semibold tracking-tight text-black sm:text-3xl">{s.aboutStorySignoff}</p>}
+            </div>
           </div>
         </section>
       )}
