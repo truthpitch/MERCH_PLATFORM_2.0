@@ -6,19 +6,29 @@ import { HeaderIcons } from "./header/HeaderIcons";
 import { LanguageSelect } from "./header/LanguageSelect";
 import { MenuDrawer } from "./header/MenuDrawer";
 import { SearchForm } from "./header/SearchForm";
-import { ThemeToggle } from "./header/ThemeToggle";
+import { ThemePicker } from "./header/ThemePicker";
 
 /**
  * Menu bar, built mobile first.
  *
  * Phone / tablet (< 1024px):
- *   [☰ TRUTHPITCH]   [🌐 EN ⌄ ☾]   [👤 ♡ 🛒]      ← sticks to the top
+ *   [☰ TRUTHPITCH]   [🌐 EN ⌄ 🎨]   [👤 ♡ 🛒]      ← sticks to the top
  *   [ Search products               🔍 ]
  *
  * Desktop (≥ 1024px), one row:
- *   [TRUTHPITCH  SHOP ⌄  ABOUT  BLOG  CONTACT]  [ Search 🔍 ]  [🌐 EN ⌄ ☾]  [👤 ♡ 🛒]
+ *   [TRUTHPITCH  SHOP ⌄  ABOUT  BLOG  CONTACT]  [ Search 🔍 ]  [🌐 EN ⌄ 🎨]  [👤 ♡ 🛒]
  */
-export function SiteHeader({ cartCount, signedIn }: { cartCount: number; signedIn: boolean }) {
+export function SiteHeader({
+  cartCount,
+  signedIn,
+  themeDefault,
+  themeLocked,
+}: {
+  cartCount: number;
+  signedIn: boolean;
+  themeDefault: string;
+  themeLocked: boolean;
+}) {
   return (
     <>
       {/* No backdrop blur here: it would trap the slide-out menu inside the bar. */}
@@ -43,7 +53,8 @@ export function SiteHeader({ cartCount, signedIn }: { cartCount: number; signedI
 
           <div className="flex items-center self-stretch px-0.5 sm:px-1">
             <LanguageSelect />
-            <ThemeToggle />
+            {/* Hidden when the admin fixed the theme (admin → Theme). */}
+            {!themeLocked && <ThemePicker defaultTheme={themeDefault} />}
           </div>
 
           <HeaderIcons cartCount={cartCount} signedIn={signedIn} />

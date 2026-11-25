@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* Palette is deliberately limited to black, white and greys (Tailwind "neutral"). */
+/* The shop only uses white, black and greys (Tailwind "neutral"); themes recolour those. */
 @theme {
   --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
 }
@@ -22,30 +22,9 @@ summary {
   list-style: none;
 }
 
-/* ── Dark mode (storefront only) ───────────────────────────────
-   The store only uses black, white and the neutral greys, so dark mode simply
-   flips those colours inside .shop-root. The admin panel is not affected.
-   The "dark" class on <html> is set before paint by the script in app/layout.tsx. */
-html.dark .shop-root {
-  color-scheme: dark;
-  --color-white: #0a0a0a;
-  --color-black: #fafafa;
-  --color-neutral-50: #121212;
-  --color-neutral-100: #1a1a1a;
-  --color-neutral-200: #2a2a2a;
-  --color-neutral-300: #3d3d3d;
-  --color-neutral-400: #6b6b6b;
-  --color-neutral-500: #8f8f8f;
-  --color-neutral-600: #a8a8a8;
-  --color-neutral-700: #c4c4c4;
-  --color-neutral-800: #e0e0e0;
-  --color-neutral-900: #f0f0f0;
-  --color-neutral-950: #fafafa;
-}
-html.dark body:has(.shop-root) {
-  background: #0a0a0a;
-  color: #fafafa;
-}
+/* ── Themes (storefront only) ─────────────────────────────────
+   Colours, fonts and details per theme are generated from src/lib/themes.ts and put in
+   <head> by app/layout.tsx. The admin panel is not affected. */
 
 /* ── Google website translator ─────────────────────────────────
    Only loaded when a visitor chooses (or their browser asks for) a language other

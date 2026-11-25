@@ -91,7 +91,7 @@ export default async function ShopLayout({ children }: { children: React.ReactNo
             dismissKey={dismissKey}
           />
         )}
-        <SiteHeader cartCount={cart.totalQuantity} signedIn={customerId !== null} />
+        <SiteHeader cartCount={cart.totalQuantity} signedIn={customerId !== null} themeDefault={settings.themeDefault} themeLocked={settings.themeLocked} />
         <main className="flex-1">{children}</main>
         <SiteFooter />
         <CookieBanner />

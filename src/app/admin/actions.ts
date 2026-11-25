@@ -12,6 +12,7 @@ import { DEFAULT_SHIPPING_POLICY } from "@/lib/shipping-policy";
 import { DEFAULT_TERMS } from "@/lib/terms";
 import { DEFAULT_COOKIE_POLICY } from "@/lib/cookie-policy";
 import { DEFAULT_HOW_IT_WORKS } from "@/lib/how-it-works";
+import { isThemeSetting } from "@/lib/themes";
 import { prisma } from "@/lib/db";
 import { getUploadDir, isSafeFilename, removeFaviconFile } from "@/lib/uploads";
 import { folderSlug } from "@/lib/media";
@@ -447,6 +448,21 @@ export async function saveLegalAction(formData: FormData) {
   await prisma.siteSettings.upsert({ where: { id: 1 }, update: data, create: { id: 1, ...data } });
   refreshSite();
   redirect("/admin/legal?saved=1");
+}
+
+// ── Theme ───────────────────────────────────────────────────
+
+/** The storefront's default theme, and whether visitors may pick their own. */
+export async function saveThemeAction(formData: FormData) {
+  await requireAdmin();
+  const chosen = text(formData, "themeDefault", 40);
+  const data = {
+    themeDefault: isThemeSetting(chosen) ? chosen : "auto",
+    themeLocked: formData.get("themeMode") === "locked",
+  };
+  await prisma.siteSettings.upsert({ where: { id: 1 }, update: data, create: { id: 1, ...data } });
+  refreshSite();
+  redirect("/admin/theme?saved=1");
 }
 
 // ── SEO & Traffic ───────────────────────────────────────────
