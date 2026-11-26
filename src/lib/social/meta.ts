@@ -5,12 +5,24 @@ import { SocialError } from "./types";
 
 type Params = Record<string, string | number | undefined>;
 
+/** The configured app secrets, so they can be removed from any text (Meta sometimes echoes them). */
+const SECRET_ENV = ["INSTAGRAM_APP_SECRET", "THREADS_APP_SECRET", "SOCIAL_TOKEN_KEY", "CRON_SECRET"];
+
 /** Removes anything that looks like a token or secret from a message. */
 export function scrub(text: string): string {
-  return text
-    .replace(/(access_token|client_secret|code)=[^&\s"]+/gi, "$1=[hidden]")
-    .replace(/\b(IG|TH)[A-Za-z0-9_-]{30,}\b/g, "[hidden]")
-    .replace(/\bEAA[A-Za-z0-9]{20,}\b/g, "[hidden]");
+  let out = text;
+  for (const name of SECRET_ENV) {
+    const value = process.env[name]?.trim();
+    if (value && value.length >= 8) out = out.split(value).join("[hidden]");
+  }
+  return (
+    out
+      .replace(/(access_token|client_secret|code)(\s*[=:]\s*)[^&\s",]+/gi, "$1$2[hidden]")
+      .replace(/\b(IG|TH)[A-Za-z0-9_-]{30,}\b/g, "[hidden]")
+      .replace(/\bEAA[A-Za-z0-9]{20,}\b/g, "[hidden]")
+      // Meta app secrets are 32 hex characters; ids are decimal, so this never hides an id.
+      .replace(/\b[a-f0-9]{32,}\b/gi, "[hidden]")
+  );
 }
 
 type MetaErrorBody = {

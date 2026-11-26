@@ -65,7 +65,7 @@ export async function finishConnect(platform: Platform, request: Request): Promi
     }
   } catch (err) {
     if (!(err instanceof SocialError)) console.error(`${name} connect failed:`, scrub(err instanceof Error ? err.message : String(err)));
-    message = err instanceof SocialError ? err.message : `Connecting ${name} failed. Please try again.`;
+    message = scrub(err instanceof SocialError ? err.message : `Connecting ${name} failed. Please try again.`);
   }
   // redirect() works by throwing, so it stays outside the try/catch above.
   redirect(message ? accountsUrl({ error: message.slice(0, 300) }) : accountsUrl({ done: "connected" }));

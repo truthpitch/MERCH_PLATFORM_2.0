@@ -6,6 +6,7 @@
 import { prisma } from "@/lib/db";
 import { adapterFor } from "./adapters";
 import { decryptToken, encryptToken } from "./crypto";
+import { scrub } from "./meta";
 import { isSocialMock } from "./mock";
 import { CAPTION_LIMIT, NEEDS_IMAGE, PLATFORM_LABEL, SocialError, isPlatform, type Platform } from "./types";
 
@@ -43,9 +44,9 @@ export function validateForPlatform(platform: Platform, caption: string, imageUr
 
 function readableError(err: unknown, platform: string): string {
   const name = isPlatform(platform) ? PLATFORM_LABEL[platform] : platform;
-  if (err instanceof SocialError) return err.needsReconnect ? `Token expired or revoked, reconnect ${name}. (${err.message})` : err.message;
+  if (err instanceof SocialError) return scrub(err.needsReconnect ? `Token expired or revoked, reconnect ${name}. (${err.message})` : err.message);
   // Unknown errors: log the message only (adapters never put tokens in messages).
-  console.error(`Social publish (${name}) failed:`, err instanceof Error ? err.message : String(err));
+  console.error(`Social publish (${name}) failed:`, scrub(err instanceof Error ? err.message : String(err)));
   return `${name}: something went wrong while publishing. Please try again.`;
 }
 
