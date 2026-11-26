@@ -42,6 +42,8 @@ export function instagramAuthorizeUrl(redirectUri: string, state: string): strin
     // System-user configurations return a code even though they're set up for a token.
     override_default_response_type: "true",
     state,
+    // Shows both "Log in with Facebook" and "Log in with Instagram" (same as Meta's own login URL).
+    prompt: "login",
   });
   return `${DIALOG}?${q}`;
 }
