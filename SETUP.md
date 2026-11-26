@@ -13,7 +13,7 @@ Add these on Hostinger (hPanel → your Node.js app → Environment variables) a
 | `SOCIAL_MOCK` | `true` = test mode with pretend accounts; nothing is posted. Use `false` (or leave it out) on the live site. |
 | `SOCIAL_TOKEN_KEY` | 64 hex characters. Encrypts the stored access tokens. Don't change it later (you'd have to reconnect the accounts). |
 | `CRON_SECRET` | A long random string. The cron job sends it, so nobody else can trigger publishing. |
-| `INSTAGRAM_APP_ID`, `INSTAGRAM_APP_SECRET` | From the Meta app, see 3.2. Optional: `INSTAGRAM_API_VERSION` (default `v27.0`). |
+| `INSTAGRAM_APP_ID`, `INSTAGRAM_APP_SECRET`, `INSTAGRAM_CONFIG_ID` | From the Meta app, see 3.2. Optional: `INSTAGRAM_API_VERSION` (default `v27.0`). |
 | `THREADS_APP_ID`, `THREADS_APP_SECRET` | From the Meta app, see 3.3. Optional: `THREADS_API_VERSION` (default `v1.0`). |
 
 Generate `SOCIAL_TOKEN_KEY` and `CRON_SECRET` (run it twice, one value each):
@@ -39,53 +39,60 @@ role on the app (you), which is all a shop posting to its own accounts needs.
 
 Meta's dashboard changes its wording now and then; the steps below match it at the time of writing.
 
-### 3.1 Create the app
+### 3.1 Create the Instagram app
 
-1. Go to <https://developers.facebook.com/apps> and log in with your Facebook account
-   (register as a developer if asked).
+1. Go to <https://developers.facebook.com/> → log in → **My Apps** (first time: **Get started** to
+   register as a developer).
 2. **Create app** → name it e.g. *TruthPitch Social* → contact email → **Next**.
-3. Use case: **Manage messaging & content on Instagram**. (Threads is added in 3.3.)
-4. Skip connecting a business portfolio if you don't have one → **Create app**.
+3. Use cases: filter on **Content management** and tick **Manage messaging & content on Instagram**
+   (only that one; Threads gets its own app in 3.3) → **Next**.
+4. Business: skip for now → **Create app**.
 
-### 3.2 Instagram (API with Instagram Login)
+### 3.2 Instagram (API with Unified login)
 
-Your Instagram account must be a **Business** or **Creator** account
-(Instagram app → Settings → Account type and tools → Switch to professional account).
-No Facebook Page is needed.
+New Meta apps use **Unified login**: you log in through Meta's login window (choose *Log in with
+Instagram*) and pick the Instagram account to share. The connection **doesn't expire**.
+Needed: an Instagram **Business** or **Creator** account and a free Meta **business portfolio**.
+No Facebook Page.
 
-1. In the app: **Use cases** → *Manage messaging & content on Instagram* → **Customize**
-   → **API setup with Instagram login**.
-2. Under *Add required permissions* make sure these two are added:
-   - `instagram_business_basic`
-   - `instagram_business_content_publish`
-3. Copy the **Instagram app ID** and **Instagram app secret** shown at the top of that page.
-   Careful: these are *not* the Facebook "App ID" from Basic settings.
-4. Under **Set up Instagram business login** → **Business login settings** → *OAuth redirect URIs*, add
-   (exactly, one per line):
+1. **Use cases** → Instagram → **Customize** → **API setup with Unified login**.
+2. **Business portfolio**: click **+ Business portfolio** and create/select one (e.g. *TruthPitch*).
+3. **Permissions and features** (left list): make sure `instagram_basic` and
+   `instagram_content_publish` are added.
+4. Back on **API setup with Unified login** → *1. Configure your app* → **Create new configuration**:
+   - Name: *TruthPitch website*
+   - Login variation: **General**
+   - Access token: **System-user access token**, expiration **Never**
+   - Assets: **Instagram account** (ad account not needed)
+   - Permissions: `instagram_basic` and `instagram_content_publish` are enough (untick the rest if
+     the screen allows it)
+   - Save, then copy the **Configuration ID** it shows.
+5. **Redirect URL** → *Register a new redirect URL*: paste and **Save** (then the second one):
 
    ```
    https://www.truthpitch.com/admin/social/connect/instagram/callback
    https://truthpitch.com/admin/social/connect/instagram/callback
    ```
 
-   The site sends the `www` version (Admin → Social → Accounts shows the exact address it uses).
-   Meta only accepts https addresses here, so a real Instagram connection can't be tested on
-   localhost: use test mode (`SOCIAL_MOCK=true`) locally. Real posts only work from the live site
-   anyway, because Instagram downloads the image from your website.
-5. **Add yourself as a tester**: **App roles** → **Roles** → **Add people** → *Instagram Tester*
-   → your Instagram username. Then accept the invite in Instagram: on the web at
+   Admin → Social → Accounts shows the exact address the site uses. Meta only accepts https, so
+   a real connection can't be tested on localhost: use test mode (`SOCIAL_MOCK=true`) there.
+6. **App ID and secret**: gear icon at the bottom left → **App settings → Basic** → copy the
+   **App ID** and the **App secret** (click *Show*).
+7. **Tester** (needed while the app is in Development mode): **App roles → Roles** → **Add people**
+   → *Instagram Tester* → your Instagram username. Accept at
    <https://www.instagram.com/accounts/manage_access/> → **Tester invites** → **Accept**.
-6. On Hostinger, set the environment variables and restart/redeploy:
+8. On Hostinger, set and redeploy:
 
    ```
-   INSTAGRAM_APP_ID="…"
-   INSTAGRAM_APP_SECRET="…"
+   INSTAGRAM_APP_ID="…"        # App ID from step 6
+   INSTAGRAM_APP_SECRET="…"    # App secret from step 6
+   INSTAGRAM_CONFIG_ID="…"     # Configuration ID from step 4
    SOCIAL_MOCK="false"
    ```
 
-7. Admin → Social → **Accounts** → **Connect Instagram** → log in to Instagram → **Allow**.
-   You come back to the accounts page with the account listed as *Connected* (valid ~60 days,
-   renewed automatically by the cron job).
+9. Admin → Social → **Accounts** → **Connect Instagram** → in Meta's window choose
+   **Log in with Instagram**, select your business portfolio and Instagram account → **Allow**.
+   You come back with the account listed as *Connected* ("Access doesn't expire").
 
 **Good to know about Instagram posts**
 
@@ -96,15 +103,16 @@ No Facebook Page is needed.
   The site checks the current limit before every post and shows a clear error when it's reached.
 - If a post fails halfway, **Retry** continues with the same upload where possible, and refuses
   when Instagram says it's already published, so nothing is posted twice.
+- If you ever remove the app from your business portfolio or move the Instagram account to another
+  portfolio, posting stops: click **Reconnect**.
 
 ### 3.3 Threads
 
-Threads uses its own **Threads app ID and secret**. You can add the Threads use case to the same
-app; if the dashboard doesn't let you combine it with the Instagram use case, simply create a
-second app for Threads (the site keeps the two apart anyway).
+Threads gets its **own app** (Meta doesn't combine it with the Instagram use case) with its own
+**Threads app ID and secret**.
 
-1. In the app: **Use cases** → **Add use cases** → **Access the Threads API**
-   (or create a new app and pick that use case).
+1. **My Apps** → **Create app** → name it e.g. *TruthPitch Threads* → use case
+   **Access the Threads API** → create it.
 2. **Use cases** → *Access the Threads API* → **Customize** → **Permissions**: make sure
    `threads_basic` and `threads_content_publish` are added.
 3. In the use case's **Settings**:

@@ -12,8 +12,18 @@ import { threadsAppConfig, threadsAuthorizeUrl, threadsConnect } from "./threads
 import { PLATFORM_LABEL, SocialError, type Platform } from "./types";
 
 const PROVIDERS = {
-  INSTAGRAM: { configured: instagramAppConfig, authorizeUrl: instagramAuthorizeUrl, connect: instagramConnect, env: "INSTAGRAM_APP_ID and INSTAGRAM_APP_SECRET" },
-  THREADS: { configured: threadsAppConfig, authorizeUrl: threadsAuthorizeUrl, connect: threadsConnect, env: "THREADS_APP_ID and THREADS_APP_SECRET" },
+  INSTAGRAM: {
+    configured: instagramAppConfig,
+    authorizeUrl: instagramAuthorizeUrl,
+    connect: instagramConnect,
+    env: "INSTAGRAM_APP_ID, INSTAGRAM_APP_SECRET and INSTAGRAM_CONFIG_ID",
+  },
+  THREADS: {
+    configured: threadsAppConfig,
+    authorizeUrl: threadsAuthorizeUrl,
+    connect: async (code: string, uri: string) => [await threadsConnect(code, uri)],
+    env: "THREADS_APP_ID and THREADS_APP_SECRET",
+  },
 } satisfies Record<Platform, unknown>;
 
 export async function startConnect(platform: Platform): Promise<never> {
@@ -44,13 +54,15 @@ export async function finishConnect(platform: Platform, request: Request): Promi
 
   let message = "";
   try {
-    const acc = await PROVIDERS[platform].connect(q.get("code") ?? "", redirectUri(platform));
-    const data = { username: acc.username, accessToken: encryptToken(acc.accessToken), expiresAt: acc.expiresAt, lastRefreshError: "" };
-    await prisma.socialAccount.upsert({
-      where: { platform_externalUserId: { platform, externalUserId: acc.externalUserId } },
-      update: data,
-      create: { platform, externalUserId: acc.externalUserId, ...data },
-    });
+    // One login can share several accounts (Instagram); store each.
+    for (const acc of await PROVIDERS[platform].connect(q.get("code") ?? "", redirectUri(platform))) {
+      const data = { username: acc.username, accessToken: encryptToken(acc.accessToken), expiresAt: acc.expiresAt, lastRefreshError: "" };
+      await prisma.socialAccount.upsert({
+        where: { platform_externalUserId: { platform, externalUserId: acc.externalUserId } },
+        update: data,
+        create: { platform, externalUserId: acc.externalUserId, ...data },
+      });
+    }
   } catch (err) {
     if (!(err instanceof SocialError)) console.error(`${name} connect failed:`, scrub(err instanceof Error ? err.message : String(err)));
     message = err instanceof SocialError ? err.message : `Connecting ${name} failed. Please try again.`;

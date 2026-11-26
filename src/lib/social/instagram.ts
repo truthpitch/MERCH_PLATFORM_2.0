@@ -1,90 +1,78 @@
-// Instagram via "Instagram API with Instagram Login" (graph.instagram.com).
-// Works with Instagram Business and Creator accounts; no Facebook Page needed.
-// Scopes: instagram_business_basic, instagram_business_content_publish.
+// Instagram via "Instagram API with Unified Login" (Meta's setup for new apps since 2026).
+// The admin logs in through Facebook Login for Business with a *configuration* (config_id) and
+// can choose "Log in with Instagram". Meta then gives a Business Integration System User token
+// for the chosen Instagram professional account. With the configuration's expiry set to
+// "Never", that token doesn't expire, so no renewal is needed. A business portfolio is required;
+// a Facebook Page is not.
 //
-// Publishing is Meta's two-step flow: create a media container → wait until it's FINISHED →
-// media_publish → fetch the permalink.
+// Publishing is Meta's two-step flow on graph.facebook.com: create a media container → wait
+// until it's FINISHED → media_publish → fetch the permalink.
 import { metaRequest, sleep, unwrap } from "./meta";
 import { SocialError, type SocialAdapter } from "./types";
 
 const NAME = "Instagram";
-export const INSTAGRAM_SCOPES = ["instagram_business_basic", "instagram_business_content_publish"];
 
 // Hosts can be overridden for local testing only (SOCIAL_API_TEST_BASE points at a fake API).
 const TEST_BASE = process.env.SOCIAL_API_TEST_BASE?.replace(/\/+$/, "");
 const VERSION = process.env.INSTAGRAM_API_VERSION?.trim() || "v27.0";
-const GRAPH = TEST_BASE ? `${TEST_BASE}/ig-graph` : "https://graph.instagram.com";
+const GRAPH = TEST_BASE ? `${TEST_BASE}/fb-graph` : "https://graph.facebook.com";
 const API = `${GRAPH}/${VERSION}`;
-const OAUTH = TEST_BASE ? `${TEST_BASE}/ig-api` : "https://api.instagram.com";
-const AUTHORIZE = TEST_BASE ? `${TEST_BASE}/ig-www/oauth/authorize` : "https://www.instagram.com/oauth/authorize";
+const DIALOG = TEST_BASE ? `${TEST_BASE}/fb-www/dialog/oauth` : `https://www.facebook.com/${VERSION}/dialog/oauth`;
 
+/** Meta App ID + App secret (App settings → Basic) and the Unified login configuration ID. */
 export function instagramAppConfig() {
   const appId = process.env.INSTAGRAM_APP_ID?.trim() ?? "";
   const appSecret = process.env.INSTAGRAM_APP_SECRET?.trim() ?? "";
-  return appId && appSecret ? { appId, appSecret } : null;
+  const configId = process.env.INSTAGRAM_CONFIG_ID?.trim() ?? "";
+  return appId && appSecret && configId ? { appId, appSecret, configId } : null;
 }
+
+const notConfigured = () => new SocialError("Instagram isn't configured: set INSTAGRAM_APP_ID, INSTAGRAM_APP_SECRET and INSTAGRAM_CONFIG_ID.");
 
 // ── Connecting (OAuth) ──────────────────────────────────────
 
 export function instagramAuthorizeUrl(redirectUri: string, state: string): string {
   const cfg = instagramAppConfig();
-  if (!cfg) throw new SocialError("Instagram isn't configured: set INSTAGRAM_APP_ID and INSTAGRAM_APP_SECRET.");
+  if (!cfg) throw notConfigured();
   const q = new URLSearchParams({
     client_id: cfg.appId,
+    config_id: cfg.configId,
     redirect_uri: redirectUri,
     response_type: "code",
-    scope: INSTAGRAM_SCOPES.join(","),
+    // System-user configurations return a code even though they're set up for a token.
+    override_default_response_type: "true",
     state,
-    enable_fb_login: "0",
-    force_reauth: "true",
   });
-  return `${AUTHORIZE}?${q}`;
+  return `${DIALOG}?${q}`;
 }
 
-/** Code from the redirect → long-lived token (~60 days) and the account's id and username. */
-export async function instagramConnect(code: string, redirectUri: string) {
+export type ConnectedAccount = { externalUserId: string; username: string; accessToken: string; expiresAt: Date | null };
+
+/** Code from the redirect → system-user token and every Instagram account it was given access to. */
+export async function instagramConnect(code: string, redirectUri: string): Promise<ConnectedAccount[]> {
   const cfg = instagramAppConfig();
-  if (!cfg) throw new SocialError("Instagram isn't configured: set INSTAGRAM_APP_ID and INSTAGRAM_APP_SECRET.");
-  // Instagram appends "#_" to the redirect; it isn't part of the code.
-  const cleanCode = code.replace(/#_$/, "");
+  if (!cfg) throw notConfigured();
 
-  type ShortToken = { access_token: string; user_id: string | number; permissions?: string | string[] };
-  const short = unwrap(
-    await metaRequest<ShortToken | { data: ShortToken[] }>(NAME, "POST", `${OAUTH}/oauth/access_token`, {
-      client_id: cfg.appId,
-      client_secret: cfg.appSecret,
-      grant_type: "authorization_code",
-      redirect_uri: redirectUri,
-      code: cleanCode,
-    }),
-  );
-  if (!short?.access_token) throw new SocialError("Instagram didn't return an access token. Please try connecting again.");
-  const perms = Array.isArray(short.permissions) ? short.permissions : String(short.permissions ?? "").split(",");
-  if (short.permissions && !perms.map((p) => p.trim()).includes("instagram_business_content_publish")) {
-    throw new SocialError("Publishing permission wasn't granted. Connect again and allow Instagram to publish content.");
-  }
-
-  const long = await metaRequest<{ access_token: string; expires_in?: number }>(NAME, "GET", `${GRAPH}/access_token`, {
-    grant_type: "ig_exchange_token",
+  const token = await metaRequest<{ access_token?: string; expires_in?: number }>(NAME, "GET", `${API}/oauth/access_token`, {
+    client_id: cfg.appId,
     client_secret: cfg.appSecret,
-    access_token: short.access_token,
+    redirect_uri: redirectUri,
+    code: code.replace(/#_$/, ""),
   });
+  if (!token.access_token) throw new SocialError("Meta didn't return an access token. Please try connecting again.");
+  // "Expiration: Never" in the configuration → no expires_in (or 0).
+  const expiresAt = token.expires_in ? new Date(Date.now() + token.expires_in * 1000) : null;
 
-  type Me = { user_id?: string | number; id?: string; username?: string; account_type?: string };
-  const me = unwrap(await metaRequest<Me | { data: Me[] }>(NAME, "GET", `${API}/me`, { fields: "user_id,username,account_type", access_token: long.access_token }));
-  // user_id = the Instagram professional account id used for publishing (id is app-scoped).
-  const userId = String(me?.user_id ?? short.user_id ?? "");
-  if (!userId) throw new SocialError("Instagram didn't say which account was connected. Please try again.");
-  if (me?.account_type && !/BUSINESS|MEDIA_CREATOR|CREATOR/i.test(me.account_type)) {
-    throw new SocialError("This is a personal Instagram account. Switch it to a Business or Creator account in the Instagram app, then connect again.");
+  type IgAccount = { id: string; username?: string };
+  const list = await metaRequest<{ data?: IgAccount[] }>(NAME, "GET", `${API}/me/assigned_instagram_accounts`, {
+    fields: "id,username",
+    access_token: token.access_token,
+  });
+  const accounts = list.data ?? [];
+  if (accounts.length === 0) {
+    throw new SocialError("No Instagram account was shared. Connect again and select your Instagram professional account when Meta asks which assets to share.");
   }
-
-  return {
-    externalUserId: userId,
-    username: me?.username ?? "",
-    accessToken: long.access_token,
-    expiresAt: long.expires_in ? new Date(Date.now() + long.expires_in * 1000) : null,
-  };
+  return accounts.map((a) => ({ externalUserId: String(a.id), username: a.username ?? "", accessToken: token.access_token!, expiresAt }));
 }
 
 // ── Publishing ──────────────────────────────────────────────
@@ -153,11 +141,9 @@ export const instagramAdapter: SocialAdapter = {
     return { id: published.id, permalink: info.permalink ?? null };
   },
 
-  async refreshToken(token) {
-    const r = await metaRequest<{ access_token: string; expires_in?: number }>(NAME, "GET", `${GRAPH}/refresh_access_token`, {
-      grant_type: "ig_refresh_token",
-      access_token: token,
-    });
-    return { accessToken: r.access_token, expiresAt: r.expires_in ? new Date(Date.now() + r.expires_in * 1000) : null };
+  // Unified login tokens set to "Never" don't expire. If a configuration did give an expiring
+  // token, it can only be renewed by connecting again.
+  async refreshToken() {
+    throw new SocialError("This Instagram connection can't be renewed automatically. Click Reconnect on the Accounts page.");
   },
 };

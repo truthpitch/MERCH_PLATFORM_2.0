@@ -24,7 +24,7 @@ const DONE: Record<string, string> = {
 };
 
 const ABOUT: Record<Platform, string> = {
-  INSTAGRAM: "Needs an Instagram Business or Creator account. No Facebook Page required.",
+  INSTAGRAM: "Needs an Instagram Business or Creator account in your Meta business portfolio. No Facebook Page required.",
   THREADS: "Your Threads profile. Text posts and posts with one image.",
 };
 
@@ -35,7 +35,7 @@ export default async function SocialAccounts({ searchParams }: { searchParams: P
   const keyOk = isTokenKeyConfigured();
   // Real (OAuth) connections per platform.
   const live: Record<Platform, { configured: boolean; connectHref: string | null; envNames: string }> = {
-    INSTAGRAM: { configured: Boolean(instagramAppConfig()), connectHref: "/admin/social/connect/instagram", envNames: "INSTAGRAM_APP_ID and INSTAGRAM_APP_SECRET" },
+    INSTAGRAM: { configured: Boolean(instagramAppConfig()), connectHref: "/admin/social/connect/instagram", envNames: "INSTAGRAM_APP_ID, INSTAGRAM_APP_SECRET and INSTAGRAM_CONFIG_ID" },
     THREADS: { configured: Boolean(threadsAppConfig()), connectHref: "/admin/social/connect/threads", envNames: "THREADS_APP_ID and THREADS_APP_SECRET" },
   };
   const errorText = sp.error && sp.error !== "key" ? sp.error.slice(0, 300) : "";
@@ -44,7 +44,7 @@ export default async function SocialAccounts({ searchParams }: { searchParams: P
     <>
       <PageTitle
         title="Social accounts"
-        description="Connect the Instagram and Threads accounts you want to post to. Access is renewed automatically every ~60 days by the cron job."
+        description="Connect the Instagram and Threads accounts you want to post to. Instagram access doesn't expire; Threads access is renewed automatically every ~60 days by the cron job."
       />
       <SavedNotice show={Boolean(sp.done && DONE[sp.done])}>{sp.done ? DONE[sp.done] : ""}</SavedNotice>
       {errorText && (
@@ -75,7 +75,7 @@ export default async function SocialAccounts({ searchParams }: { searchParams: P
                         <span className={`px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider ${s.style}`}>{s.label}</span>
                       </div>
                       <p className="mt-1 text-xs text-neutral-500">
-                        {a.expiresAt ? `Access valid until ${formatAmsterdam(a.expiresAt)}` : "No expiry date known"} · connected {formatAmsterdam(a.createdAt)}
+                        {a.expiresAt ? `Access valid until ${formatAmsterdam(a.expiresAt)}` : "Access doesn't expire"} · connected {formatAmsterdam(a.createdAt)}
                       </p>
                       {a.lastRefreshError && <p className="mt-1 text-xs text-red-700">Last renewal failed: {a.lastRefreshError}</p>}
                       <div className="mt-2 flex flex-wrap gap-2">
