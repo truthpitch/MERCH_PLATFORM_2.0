@@ -130,6 +130,17 @@ export default async function SocialAccounts({ searchParams }: { searchParams: P
                   <p className="mt-3 break-all text-xs text-neutral-500">
                     Redirect address for the Meta app: <code className="text-neutral-700">{redirectUri(platform)}</code>
                   </p>
+                  {/* Lets the admin check which settings the live server really uses, without showing the secret. */}
+                  {(() => {
+                    const cfg = platform === "INSTAGRAM" ? instagramAppConfig() : threadsAppConfig();
+                    if (!cfg) return null;
+                    return (
+                      <p className="mt-1 break-all text-xs text-neutral-500">
+                        Server uses app ID <code className="text-neutral-700">{cfg.appId}</code> · secret ending in{" "}
+                        <code className="text-neutral-700">…{cfg.appSecret.slice(-4)}</code> ({cfg.appSecret.length} characters)
+                      </p>
+                    );
+                  })()}
                 </div>
               )}
             </Card>
