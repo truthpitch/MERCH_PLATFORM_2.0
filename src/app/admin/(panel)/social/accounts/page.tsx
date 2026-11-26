@@ -5,6 +5,7 @@ import { prisma } from "@/lib/db";
 import { isTokenKeyConfigured } from "@/lib/social/crypto";
 import { instagramAppConfig } from "@/lib/social/instagram";
 import { redirectUri } from "@/lib/social/oauth";
+import { threadsAppConfig } from "@/lib/social/threads";
 import { accountState, type AccountState } from "@/lib/social/engine";
 import { isSocialMock } from "@/lib/social/mock";
 import { formatAmsterdam } from "@/lib/social/time";
@@ -32,10 +33,10 @@ export default async function SocialAccounts({ searchParams }: { searchParams: P
   const accounts = await prisma.socialAccount.findMany({ orderBy: { createdAt: "asc" } });
   const mock = isSocialMock();
   const keyOk = isTokenKeyConfigured();
-  // Real connections per platform (Threads follows in step 3).
+  // Real (OAuth) connections per platform.
   const live: Record<Platform, { configured: boolean; connectHref: string | null; envNames: string }> = {
     INSTAGRAM: { configured: Boolean(instagramAppConfig()), connectHref: "/admin/social/connect/instagram", envNames: "INSTAGRAM_APP_ID and INSTAGRAM_APP_SECRET" },
-    THREADS: { configured: false, connectHref: null, envNames: "THREADS_APP_ID and THREADS_APP_SECRET" },
+    THREADS: { configured: Boolean(threadsAppConfig()), connectHref: "/admin/social/connect/threads", envNames: "THREADS_APP_ID and THREADS_APP_SECRET" },
   };
   const errorText = sp.error && sp.error !== "key" ? sp.error.slice(0, 300) : "";
 

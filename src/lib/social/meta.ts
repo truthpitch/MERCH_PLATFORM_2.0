@@ -70,7 +70,9 @@ export async function metaRequest<T>(
   const text = await res.text();
   let json: unknown = null;
   try {
-    json = text ? JSON.parse(text) : null;
+    // Meta ids can be sent as numbers bigger than JavaScript can hold exactly (e.g. Threads'
+    // user_id 17841405793187218), which would silently change them. Read long numbers as text.
+    json = text ? JSON.parse(text.replace(/([:\[,]\s*)(-?\d{16,})(?=\s*[,}\]])/g, '$1"$2"')) : null;
   } catch {
     // not JSON (e.g. an HTML error page)
   }

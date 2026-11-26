@@ -31,6 +31,8 @@ export function validateForPlatform(platform: Platform, caption: string, imageUr
   const problems: string[] = [];
   if (NEEDS_IMAGE[platform] && !imageUrl) problems.push(`${name} needs an image.`);
   if (!caption.trim() && !imageUrl) problems.push(`${name}: write a caption or add an image.`);
+  // Threads refuses posts with more than 5 different links.
+  if (platform === "THREADS" && new Set(caption.match(/https?:\/\/[^\s]+/gi) ?? []).size > 5) problems.push("Threads allows at most 5 different links in a post.");
   if (caption.length > CAPTION_LIMIT[platform]) problems.push(`${name} allows at most ${CAPTION_LIMIT[platform]} characters (now ${caption.length}).`);
   // Meta downloads the image itself, so it must be on a public https address (not localhost).
   if (imageUrl && !isSocialMock() && !/^https:\/\/(?!localhost|127\.)/i.test(imageUrl)) {

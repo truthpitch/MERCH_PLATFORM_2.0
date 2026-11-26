@@ -3,9 +3,6 @@
 The admin panel can post to **Instagram** and **Threads**, right away or at a set time
 (Admin → Social). This guide covers everything that has to be set up outside the code.
 
-> Status: steps 1 and 2 of 3 are done (scheduler, test mode, cron endpoint, Instagram).
-> Threads follows in step 3.
-
 ## 1. Environment variables
 
 Add these on Hostinger (hPanel → your Node.js app → Environment variables) and in your local `.env`.
@@ -17,7 +14,7 @@ Add these on Hostinger (hPanel → your Node.js app → Environment variables) a
 | `SOCIAL_TOKEN_KEY` | 64 hex characters. Encrypts the stored access tokens. Don't change it later (you'd have to reconnect the accounts). |
 | `CRON_SECRET` | A long random string. The cron job sends it, so nobody else can trigger publishing. |
 | `INSTAGRAM_APP_ID`, `INSTAGRAM_APP_SECRET` | From the Meta app, see 3.2. Optional: `INSTAGRAM_API_VERSION` (default `v27.0`). |
-| `THREADS_APP_ID`, `THREADS_APP_SECRET` | From the Meta app (step 3). |
+| `THREADS_APP_ID`, `THREADS_APP_SECRET` | From the Meta app, see 3.3. Optional: `THREADS_API_VERSION` (default `v1.0`). |
 
 Generate `SOCIAL_TOKEN_KEY` and `CRON_SECRET` (run it twice, one value each):
 
@@ -47,7 +44,7 @@ Meta's dashboard changes its wording now and then; the steps below match it at t
 1. Go to <https://developers.facebook.com/apps> and log in with your Facebook account
    (register as a developer if asked).
 2. **Create app** → name it e.g. *TruthPitch Social* → contact email → **Next**.
-3. Use case: **Manage messaging & content on Instagram**. (Threads is added in step 3 of the build.)
+3. Use case: **Manage messaging & content on Instagram**. (Threads is added in 3.3.)
 4. Skip connecting a business portfolio if you don't have one → **Create app**.
 
 ### 3.2 Instagram (API with Instagram Login)
@@ -102,7 +99,58 @@ No Facebook Page is needed.
 
 ### 3.3 Threads
 
-_Follows in step 3._
+Threads uses its own **Threads app ID and secret**. You can add the Threads use case to the same
+app; if the dashboard doesn't let you combine it with the Instagram use case, simply create a
+second app for Threads (the site keeps the two apart anyway).
+
+1. In the app: **Use cases** → **Add use cases** → **Access the Threads API**
+   (or create a new app and pick that use case).
+2. **Use cases** → *Access the Threads API* → **Customize** → **Permissions**: make sure
+   `threads_basic` and `threads_content_publish` are added.
+3. In the use case's **Settings**:
+   - Copy the **Threads app ID** and **Threads app secret** (not the Facebook App ID).
+   - *Redirect callback URLs* (Client OAuth settings), add:
+
+     ```
+     https://www.truthpitch.com/admin/social/connect/threads/callback
+     https://truthpitch.com/admin/social/connect/threads/callback
+     ```
+
+     Click **Save** and check the list: the dashboard sometimes adds a trailing `/`, which makes
+     the address no longer match. Remove it if so.
+   - *Uninstall callback URL* and *Delete callback URL* are required to save on some dashboards;
+     you can use `https://www.truthpitch.com/privacy-policy` for both (nothing is called there).
+4. **Add yourself as a tester**: **App roles** → **Roles** → **Add people** → *Threads Tester*
+   → your Threads username. Accept the invite on Threads: <https://www.threads.com/settings/account>
+   → **Website permissions** → **Invites** → **Accept**.
+5. On Hostinger, set and redeploy:
+
+   ```
+   THREADS_APP_ID="…"
+   THREADS_APP_SECRET="…"
+   ```
+
+6. Admin → Social → **Accounts** → **Connect Threads** → log in → **Allow**.
+
+Without App Review you can only post as a Threads tester, which is exactly your own profile.
+
+**Good to know about Threads posts**
+
+- Text only is fine; an image is optional (JPEG or PNG, max 8 MB).
+- Max 500 characters and max 5 different links per post. The first link gets a preview card,
+  and links are clickable.
+- 250 posts per 24 hours via the API; the site checks this before posting.
+- Like Instagram, **Retry** continues with the same upload where possible and never posts twice.
+
+## Troubleshooting
+
+| Message | What to do |
+|---|---|
+| "Token expired or revoked, reconnect …" | Admin → Social → Accounts → **Reconnect**. Happens when you change your password, remove the app's access, or the cron job hasn't run for 60 days. |
+| "… couldn't use the image" | Open the image address in a private browser window. It must load without logging in, be https and (for Instagram) a JPEG. |
+| "Publishing was interrupted" | The server stopped mid-post. Check the profile: if the post isn't there, click **Retry**. |
+| Redirect / "URL blocked" error when connecting | The redirect address in the Meta app must match exactly the one shown on the Accounts page (https, www, no trailing `/`). |
+| Scheduled posts don't go out | Check the cron job (section 4) and that `CRON_SECRET` matches. Run the curl command by hand: it should answer `{"ok":true,…}`. |
 
 ## 4. Cron job on Hostinger
 
