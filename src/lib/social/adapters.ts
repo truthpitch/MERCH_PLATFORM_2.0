@@ -1,12 +1,14 @@
 // Picks the adapter for a platform: the mock when SOCIAL_MOCK=true, otherwise the real API.
+import { instagramAdapter } from "./instagram";
 import { isSocialMock, mockAdapter } from "./mock";
 import { SocialError, type Platform, type SocialAdapter } from "./types";
 
 export function adapterFor(platform: Platform): SocialAdapter {
   if (isSocialMock()) return mockAdapter(platform);
-  // Real adapters arrive in step 2 (Instagram) and step 3 (Threads).
+  if (platform === "INSTAGRAM") return instagramAdapter;
+  // The Threads adapter arrives in step 3.
   const notYet = (): never => {
-    throw new SocialError(`${platform === "INSTAGRAM" ? "Instagram" : "Threads"} publishing isn't set up yet. Use SOCIAL_MOCK=true for now.`);
+    throw new SocialError("Threads publishing isn't set up yet. Use SOCIAL_MOCK=true for now.");
   };
   return { platform, publish: async () => notYet(), refreshToken: async () => notYet() };
 }

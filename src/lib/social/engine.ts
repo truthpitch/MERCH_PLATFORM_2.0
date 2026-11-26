@@ -78,7 +78,7 @@ export async function publishTarget(targetId: number): Promise<"published" | "fa
     const accessToken = decryptToken(account.accessToken);
     const result = await adapterFor(platform).publish(
       { externalUserId: account.externalUserId, accessToken },
-      { caption: post.caption, imageUrl: post.imageUrl },
+      { caption: post.caption, imageUrl: post.imageUrl, previousContainerId: target.containerId },
       async (containerId) => {
         await prisma.socialPostTarget.update({ where: { id: targetId }, data: { containerId } });
       },

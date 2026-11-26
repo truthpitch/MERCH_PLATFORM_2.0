@@ -18,7 +18,8 @@ export type ComposerInitial = {
   scheduledLocal: string;
 };
 
-const isJpeg = (url: string) => /\.jpe?g$/i.test(url.split("?")[0]);
+// A .jpg file, or a Shopify image that is converted to JPEG (?format=jpg).
+const isJpeg = (url: string) => /\.jpe?g$/i.test(url.split("?")[0]) || /[?&]format=p?jpg\b/i.test(url);
 
 /** Write a post for Instagram and/or Threads, then post it now or schedule it. */
 export function SocialComposer({

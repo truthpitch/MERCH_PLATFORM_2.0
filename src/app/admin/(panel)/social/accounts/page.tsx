@@ -3,6 +3,8 @@ import { smallButtonClass } from "@/components/admin/styles";
 import { ConfirmButton } from "@/components/admin/ui";
 import { prisma } from "@/lib/db";
 import { isTokenKeyConfigured } from "@/lib/social/crypto";
+import { instagramAppConfig } from "@/lib/social/instagram";
+import { redirectUri } from "@/lib/social/oauth";
 import { accountState, type AccountState } from "@/lib/social/engine";
 import { isSocialMock } from "@/lib/social/mock";
 import { formatAmsterdam } from "@/lib/social/time";
@@ -30,6 +32,12 @@ export default async function SocialAccounts({ searchParams }: { searchParams: P
   const accounts = await prisma.socialAccount.findMany({ orderBy: { createdAt: "asc" } });
   const mock = isSocialMock();
   const keyOk = isTokenKeyConfigured();
+  // Real connections per platform (Threads follows in step 3).
+  const live: Record<Platform, { configured: boolean; connectHref: string | null; envNames: string }> = {
+    INSTAGRAM: { configured: Boolean(instagramAppConfig()), connectHref: "/admin/social/connect/instagram", envNames: "INSTAGRAM_APP_ID and INSTAGRAM_APP_SECRET" },
+    THREADS: { configured: false, connectHref: null, envNames: "THREADS_APP_ID and THREADS_APP_SECRET" },
+  };
+  const errorText = sp.error && sp.error !== "key" ? sp.error.slice(0, 300) : "";
 
   return (
     <>
@@ -38,6 +46,11 @@ export default async function SocialAccounts({ searchParams }: { searchParams: P
         description="Connect the Instagram and Threads accounts you want to post to. Access is renewed automatically every ~60 days by the cron job."
       />
       <SavedNotice show={Boolean(sp.done && DONE[sp.done])}>{sp.done ? DONE[sp.done] : ""}</SavedNotice>
+      {errorText && (
+        <p role="alert" className="mb-6 border border-black bg-neutral-100 px-4 py-3 text-sm text-black">
+          {errorText}
+        </p>
+      )}
       {(!keyOk || sp.error === "key") && (
         <p className="mb-6 border border-black bg-white px-4 py-3 text-sm text-black">
           <strong>SOCIAL_TOKEN_KEY is not set.</strong> Add it to the server&apos;s environment variables before connecting accounts (see SETUP.md).
@@ -65,11 +78,19 @@ export default async function SocialAccounts({ searchParams }: { searchParams: P
                       </p>
                       {a.lastRefreshError && <p className="mt-1 text-xs text-red-700">Last renewal failed: {a.lastRefreshError}</p>}
                       <div className="mt-2 flex flex-wrap gap-2">
-                        {mock && (
+                        {mock ? (
                           <form action={connectMockAccountAction}>
                             <input type="hidden" name="platform" value={platform} />
                             <button className={smallButtonClass}>Reconnect</button>
                           </form>
+                        ) : (
+                          live[platform].configured &&
+                          live[platform].connectHref && (
+                            // A plain link: the browser must really go to Instagram (no client-side navigation).
+                            <a href={live[platform].connectHref!} className={smallButtonClass}>
+                              Reconnect
+                            </a>
+                          )
                         )}
                         <form action={disconnectSocialAccountAction}>
                           <input type="hidden" name="id" value={a.id} />
@@ -92,8 +113,23 @@ export default async function SocialAccounts({ searchParams }: { searchParams: P
                     <button className="bg-black px-4 py-2 text-sm font-medium text-white hover:bg-neutral-800">Connect test account</button>
                   </form>
                 )
-              ) : (
+              ) : live[platform].connectHref === null ? (
                 <p className="text-xs text-neutral-500">Connecting a real {PLATFORM_LABEL[platform]} account comes in the next step.</p>
+              ) : !live[platform].configured ? (
+                <p className="text-xs text-neutral-500">
+                  To connect, first set {live[platform].envNames} on the server (see SETUP.md), then restart the app.
+                </p>
+              ) : (
+                <div>
+                  {list.length === 0 && (
+                    <a href={live[platform].connectHref!} className="inline-block bg-black px-4 py-2 text-sm font-medium text-white hover:bg-neutral-800">
+                      Connect {PLATFORM_LABEL[platform]}
+                    </a>
+                  )}
+                  <p className="mt-3 break-all text-xs text-neutral-500">
+                    Redirect address for the Meta app: <code className="text-neutral-700">{redirectUri(platform)}</code>
+                  </p>
+                </div>
               )}
             </Card>
           );

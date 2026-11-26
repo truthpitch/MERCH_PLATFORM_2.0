@@ -25,7 +25,12 @@ export class SocialError extends Error {
   }
 }
 
-export type PublishInput = { caption: string; imageUrl: string | null };
+export type PublishInput = {
+  caption: string;
+  imageUrl: string | null;
+  /** Container from an earlier attempt (retry): reused when it is still valid, so nothing is posted twice. */
+  previousContainerId?: string | null;
+};
 export type PublishResult = { id: string; permalink: string | null };
 export type AccountAuth = { externalUserId: string; accessToken: string };
 
