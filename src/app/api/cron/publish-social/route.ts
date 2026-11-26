@@ -3,13 +3,14 @@
 // Protected by CRON_SECRET, sent as "Authorization: Bearer <secret>".
 import { timingSafeEqual } from "node:crypto";
 import { publishDue, refreshExpiringTokens } from "@/lib/social/engine";
+import { envValue } from "@/lib/social/env";
 
 export const dynamic = "force-dynamic";
 // Instagram can take a while to process an image; give the run time to finish.
 export const maxDuration = 300;
 
 function authorized(request: Request): boolean {
-  const secret = process.env.CRON_SECRET?.trim() ?? "";
+  const secret = envValue("CRON_SECRET");
   if (secret.length < 16) return false; // not configured (or too weak): refuse everything
   const given = (request.headers.get("authorization") ?? "").replace(/^Bearer\s+/i, "").trim();
   const a = Buffer.from(given);

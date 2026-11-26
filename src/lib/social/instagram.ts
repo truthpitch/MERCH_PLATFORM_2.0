@@ -9,21 +9,22 @@
 // until it's FINISHED → media_publish → fetch the permalink.
 import { metaRequest, sleep, unwrap } from "./meta";
 import { SocialError, type SocialAdapter } from "./types";
+import { envValue } from "./env";
 
 const NAME = "Instagram";
 
 // Hosts can be overridden for local testing only (SOCIAL_API_TEST_BASE points at a fake API).
 const TEST_BASE = process.env.SOCIAL_API_TEST_BASE?.replace(/\/+$/, "");
-const VERSION = process.env.INSTAGRAM_API_VERSION?.trim() || "v27.0";
+const VERSION = envValue("INSTAGRAM_API_VERSION") || "v27.0";
 const GRAPH = TEST_BASE ? `${TEST_BASE}/fb-graph` : "https://graph.facebook.com";
 const API = `${GRAPH}/${VERSION}`;
 const DIALOG = TEST_BASE ? `${TEST_BASE}/fb-www/dialog/oauth` : `https://www.facebook.com/${VERSION}/dialog/oauth`;
 
 /** Meta App ID + App secret (App settings → Basic) and the Unified login configuration ID. */
 export function instagramAppConfig() {
-  const appId = process.env.INSTAGRAM_APP_ID?.trim() ?? "";
-  const appSecret = process.env.INSTAGRAM_APP_SECRET?.trim() ?? "";
-  const configId = process.env.INSTAGRAM_CONFIG_ID?.trim() ?? "";
+  const appId = envValue("INSTAGRAM_APP_ID");
+  const appSecret = envValue("INSTAGRAM_APP_SECRET");
+  const configId = envValue("INSTAGRAM_CONFIG_ID");
   return appId && appSecret && configId ? { appId, appSecret, configId } : null;
 }
 

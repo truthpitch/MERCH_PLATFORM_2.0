@@ -1,8 +1,9 @@
 // Mock adapter (SOCIAL_MOCK=true): runs the whole flow without real accounts or network calls.
 // Put "#fail" in a caption to see what a failed post looks like.
 import { SocialError, type Platform, type SocialAdapter } from "./types";
+import { envValue } from "./env";
 
-export const isSocialMock = () => process.env.SOCIAL_MOCK === "true";
+export const isSocialMock = () => envValue("SOCIAL_MOCK") === "true";
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 

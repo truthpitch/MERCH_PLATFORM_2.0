@@ -4,20 +4,21 @@
 // FINISHED → threads_publish → fetch the permalink.
 import { metaRequest, sleep, unwrap } from "./meta";
 import { SocialError, type SocialAdapter } from "./types";
+import { envValue } from "./env";
 
 const NAME = "Threads";
 export const THREADS_SCOPES = ["threads_basic", "threads_content_publish"];
 
 // Hosts can be overridden for local testing only (SOCIAL_API_TEST_BASE points at a fake API).
 const TEST_BASE = process.env.SOCIAL_API_TEST_BASE?.replace(/\/+$/, "");
-const VERSION = process.env.THREADS_API_VERSION?.trim() || "v1.0";
+const VERSION = envValue("THREADS_API_VERSION") || "v1.0";
 const GRAPH = TEST_BASE ? `${TEST_BASE}/th-graph` : "https://graph.threads.com";
 const API = `${GRAPH}/${VERSION}`;
 const AUTHORIZE = TEST_BASE ? `${TEST_BASE}/th-www/oauth/authorize` : "https://threads.com/oauth/authorize";
 
 export function threadsAppConfig() {
-  const appId = process.env.THREADS_APP_ID?.trim() ?? "";
-  const appSecret = process.env.THREADS_APP_SECRET?.trim() ?? "";
+  const appId = envValue("THREADS_APP_ID");
+  const appSecret = envValue("THREADS_APP_SECRET");
   return appId && appSecret ? { appId, appSecret } : null;
 }
 

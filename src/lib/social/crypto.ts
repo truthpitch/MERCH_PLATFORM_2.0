@@ -3,16 +3,17 @@
 //   node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 // Changing the key makes stored tokens unreadable: then simply reconnect the accounts.
 import { createCipheriv, createDecipheriv, randomBytes } from "node:crypto";
+import { envValue } from "./env";
 
 function key(): Buffer {
-  const hex = process.env.SOCIAL_TOKEN_KEY?.trim() ?? "";
+  const hex = envValue("SOCIAL_TOKEN_KEY");
   if (!/^[0-9a-fA-F]{64}$/.test(hex)) {
     throw new Error("SOCIAL_TOKEN_KEY is missing or not 64 hex characters. See .env.example.");
   }
   return Buffer.from(hex, "hex");
 }
 
-export const isTokenKeyConfigured = () => /^[0-9a-fA-F]{64}$/.test(process.env.SOCIAL_TOKEN_KEY?.trim() ?? "");
+export const isTokenKeyConfigured = () => /^[0-9a-fA-F]{64}$/.test(envValue("SOCIAL_TOKEN_KEY"));
 
 /** "v1.<iv>.<tag>.<ciphertext>" (base64url parts). */
 export function encryptToken(plain: string): string {

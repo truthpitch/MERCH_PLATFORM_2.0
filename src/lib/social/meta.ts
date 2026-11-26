@@ -2,6 +2,7 @@
 // Turns API errors into readable SocialErrors and makes sure access tokens and app secrets
 // never end up in an error message or a log line.
 import { SocialError } from "./types";
+import { envValue } from "./env";
 
 type Params = Record<string, string | number | undefined>;
 
@@ -12,7 +13,7 @@ const SECRET_ENV = ["INSTAGRAM_APP_SECRET", "THREADS_APP_SECRET", "SOCIAL_TOKEN_
 export function scrub(text: string): string {
   let out = text;
   for (const name of SECRET_ENV) {
-    const value = process.env[name]?.trim();
+    const value = envValue(name);
     if (value && value.length >= 8) out = out.split(value).join("[hidden]");
   }
   return (
