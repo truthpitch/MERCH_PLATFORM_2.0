@@ -292,3 +292,61 @@ model ConsentEvent {
 
   @@index([createdAt])
 }
+
+// ── Social media scheduler (admin → Social) ─────────────────
+// Instagram and Threads only. Platforms are plain strings ("INSTAGRAM" | "THREADS") so the
+// schema works the same on SQLite and PostgreSQL.
+
+// A connected Instagram or Threads account. The access token is encrypted at rest
+// (AES-256-GCM with SOCIAL_TOKEN_KEY, see src/lib/social/crypto.ts) and never logged.
+model SocialAccount {
+  id               Int                @id @default(autoincrement())
+  platform         String // "INSTAGRAM" | "THREADS"
+  username         String             @default("")
+  externalUserId   String
+  accessToken      String // encrypted
+  expiresAt        DateTime?
+  lastRefreshError String             @default("")
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  targets          SocialPostTarget[]
+
+  @@unique([platform, externalUserId])
+}
+
+// One thing to post: a caption with an optional image, to one or more accounts.
+model SocialPost {
+  id            Int                @id @default(autoincrement())
+  caption       String             @default("")
+  imageUrl      String? // public https URL (Meta downloads the image from it)
+  productHandle String? // the shop product it was made from, if any
+  scheduledAt   DateTime? // UTC; null = post right away
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+  targets       SocialPostTarget[]
+
+  @@index([scheduledAt])
+}
+
+// The post on one account. Status: scheduled → publishing → published | failed.
+// "publishing" is set before calling the API, so overlapping cron runs never post twice.
+model SocialPostTarget {
+  id             Int            @id @default(autoincrement())
+  postId         Int
+  accountId      Int? // null once the account is disconnected (history stays)
+  platform       String // copied from the account, so history still shows it
+  status         String         @default("scheduled")
+  containerId    String?
+  externalPostId String?
+  permalink      String?
+  error          String?
+  lockedAt       DateTime? // when "publishing" started
+  publishedAt    DateTime?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  post           SocialPost     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  account        SocialAccount? @relation(fields: [accountId], references: [id], onDelete: SetNull)
+
+  @@index([status])
+  @@index([postId])
+}

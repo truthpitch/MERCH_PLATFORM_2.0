@@ -22,6 +22,8 @@ const ICONS = {
   replies: "M4 4h16v12H8l-4 4z M8 9h8 M8 12h5",
   media: "M3 4h18v16H3z M3 16l5-5 5 5 3-3 5 5 M15.5 8.5h.01",
   traffic: "M4 20V10 M10 20V4 M16 20v-7 M2 20h20",
+  social: "M18 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6z M6 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z M18 22a3 3 0 1 0 0-6 3 3 0 0 0 0 6z M8.6 13.5l6.8 4 M15.4 6.5l-6.8 4",
+  link: "M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1 M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1",
   collapse: "M3 4h18v16H3z M9 4v16 M16 9l-3 3 3 3",
   expand: "M3 4h18v16H3z M9 4v16 M13 9l3 3-3 3",
   menu: "M4 6h16 M4 12h16 M4 18h16",
@@ -67,6 +69,13 @@ const GROUPS: { title: string; items: Item[] }[] = [
       { href: "/admin/replies", label: "Replies", icon: "replies", badge: "replies" },
     ],
   },
+  {
+    title: "Social",
+    items: [
+      { href: "/admin/social", label: "Compose & queue", icon: "social" },
+      { href: "/admin/social/accounts", label: "Accounts", icon: "link" },
+    ],
+  },
   { title: "Insights", items: [{ href: "/admin/traffic", label: "SEO & Traffic", icon: "traffic" }] },
 ];
 
@@ -105,7 +114,12 @@ export function AdminShell({
     document.cookie = `${SIDEBAR_COOKIE}=${next ? "collapsed" : "open"}; path=/admin; max-age=31536000; samesite=lax`;
   };
 
-  const isActive = (href: string) => (href === "/admin" ? pathname === "/admin" : pathname.startsWith(href));
+  // The most specific match wins, so /admin/social/accounts doesn't also light up /admin/social.
+  const allHrefs = GROUPS.flatMap((g) => g.items.map((i) => i.href));
+  const activeHref = allHrefs
+    .filter((h) => (h === "/admin" ? pathname === "/admin" : pathname === h || pathname.startsWith(h + "/")))
+    .sort((a, b) => b.length - a.length)[0];
+  const isActive = (href: string) => href === activeHref;
 
   // `narrow` = icons only (collapsed desktop sidebar). The phone drawer always shows labels.
   const nav = (narrow: boolean) => (
